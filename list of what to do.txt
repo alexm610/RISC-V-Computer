@@ -1,0 +1,7 @@
+start with making pcb of ALU
+create ALU quartus file
+print out schematic of ALU, gate level too
+create a schematic of it in Fusion 360, and create a gerber file
+send to company
+
+CONVERT ALU FROM SIMPLE RISC MACHINE SUCH THAT IT IS COMPATIBLE WITH RISC V!!!!!!!!!!!!!!!
