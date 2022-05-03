@@ -1,0 +1,58 @@
+{C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module sw_led_test_tb
+
+Top level modules:
+	sw_led_test_tb
+
+} {} {}} {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/datapath.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/datapath.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module datapath
+-- Compiling module multiplexer_4input
+
+Top level modules:
+	datapath
+
+} {} {}} {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/RAM.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/RAM.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module RAM
+
+Top level modules:
+	RAM
+
+} {} {}} {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/cpu.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/cpu.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module CPU
+-- Compiling module multiplexer_3input_onehot
+
+Top level modules:
+	CPU
+
+} {} {}} {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/shifter.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/shifter.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module shifter
+
+Top level modules:
+	shifter
+
+} {} {}} {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module regfile
+-- Compiling module reg_load_enable
+-- Compiling module multiplexer_2input
+-- Compiling module multiplexer_8input
+-- Compiling module DFF_Alex
+-- Compiling module decoder
+
+Top level modules:
+	regfile
+
+} {} {}} {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/alu.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/alu.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module ALU
+-- Compiling module AddSub1
+
+Top level modules:
+	ALU
+
+} {} {}}

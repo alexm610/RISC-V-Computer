@@ -17,7 +17,7 @@ module lab7bonus_check_tb;
     err = 0;
     KEY[1] = 1'b0; // reset asserted
     // check if program from Figure 2 in Lab 8 handout can be found loaded in memory
-    if (DUT.MEM.mem[0] !== 16'b1101000000001111) begin err = 1; $display("FAILED: mem[0] wrong; please set data.txt using lab7bonusfig2.s"); $stop; end
+    if (DUT.MEM.mem[0] !== 16'b1101000000001111) begin err = 1; $display("FAILED: mem[0] wrong; please set data.txt using lab7bonusfig2.s"); #100;  end
     if (DUT.MEM.mem[1] !== 16'b0110000000000000) begin err = 1; $display("FAILED: mem[1] wrong; please set data.txt using lab7bonusfig2.s"); $stop; end
     if (DUT.MEM.mem[2] !== 16'b1101000100000000) begin err = 1; $display("FAILED: mem[2] wrong; please set data.txt using lab7bonusfig2.s"); $stop; end
     if (DUT.MEM.mem[3] !== 16'b1101001000000000) begin err = 1; $display("FAILED: mem[3] wrong; please set data.txt using lab7bonusfig2.s"); $stop; end

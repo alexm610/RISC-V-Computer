@@ -2,6 +2,23 @@
 `define M_WRITE		 7'b1110000
 `define M_NONE	 	 7'b1010000
 
+//// Seven segment display definitions ////
+
+`define ZERO  7'b1000000
+`define ONE   7'b1111001
+`define TWO   7'b0100100
+`define THREE 7'b0110000
+`define FOUR  7'b0011001
+`define FIVE  7'b0010010
+`define SIX   7'b0000010
+`define SEVEN 7'b1111000
+`define EIGHT 7'b0000000
+`define NINE  7'b0011000
+`define E     7'b0000110
+`define r     7'b0101111
+`define o     7'b0100011
+`define OFF   7'b1111111
+
 module lab7bonus_top (KEY, SW, LEDR, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, CLOCK_50);
 	input CLOCK_50;	
 	input [3:0] KEY;
@@ -16,6 +33,8 @@ module lab7bonus_top (KEY, SW, LEDR, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, CLOCK_5
 	wire write_equality_comparator, read_equality_comparator, bottom_equality_comparator; 
 	wire LED_command_comparator, LED_address_comparator;
 	wire LED_enable;
+	wire HEX_command_comparator, HEX_address_comparator;
+	wire HEX_enable;
 	wire SWITCH_command_comparator, SWITCH_address_comparator;
 	
 	RAM MEM (CLOCK_50, memory_address[7:0], memory_address[7:0], (write_equality_comparator & bottom_equality_comparator), datapath_out, d_out);
@@ -26,7 +45,10 @@ module lab7bonus_top (KEY, SW, LEDR, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, CLOCK_5
 	assign bottom_equality_comparator = (memory_address[8] == 1'b0) ? 1'b1 : 1'b0;
 
 	assign data_out_memory = (read_equality_comparator & bottom_equality_comparator) ? d_out : {16{1'bz}};      
-	//////// SWITCH AND LED INTERFACE ////////
+	//////// SWITCH AND LED AND HEX INTERFACE ////////
+	
+	// HEX interface
+	assign HEX0[0] = LEDR[0];
 
 	// LED interface
 	assign LED_command_comparator = (memory_command == `M_WRITE) ? 1'b1 : 1'b0;

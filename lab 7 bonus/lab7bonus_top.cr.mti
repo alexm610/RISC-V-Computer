@@ -1,4 +1,11 @@
-{C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/shifter.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/shifter.v}
+{C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module sw_led_test_tb
+
+Top level modules:
+	sw_led_test_tb
+
+} {} {}} {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/shifter.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/shifter.v}
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 -- Compiling module shifter
 
@@ -89,7 +96,14 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 Top level modules:
 	lab7bonus_stage2_tb
 
-} {} {}} {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/cpu.v} {1 {vlog -work work -stats=none {C:\Users\Alex Manak\Desktop\CPEN 211\Lab 7 Bonus\CPEN211_Lab7_Bonus\cpu.v}
+} {} {}} {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/RAM.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/RAM.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module RAM
+
+Top level modules:
+	RAM
+
+} {} {}} {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/cpu.v} {1 {vlog -work work -stats=none {C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/cpu.v}
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 -- Compiling module CPU
 -- Compiling module multiplexer_3input_onehot
