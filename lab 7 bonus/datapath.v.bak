@@ -1,0 +1,71 @@
+module datapath (clk, readnum, vsel, loada, loadb, shift, asel, bsel, ALUop, loadc, loads, writenum, write, status_out, datapath_out, sximm5, mdata, sximm8, PC);
+    input clk;
+    input [2:0] readnum;
+    input [1:0] vsel;
+    input loada;
+    input loadb;
+    input [1:0] shift;
+    input asel;
+    input bsel;
+    input [1:0] ALUop;
+    input loadc;
+    input loads;
+    input [2:0] writenum;
+    input write;
+    input [15:0] mdata;
+    input [15:0] sximm8;
+    input [8:0] PC;
+    input [15:0] sximm5;
+    output [2:0] status_out;
+    output [15:0] datapath_out;
+    wire [15:0] data_out_regfile;
+    wire [15:0] data_out_RA;
+    wire [15:0] data_out_RB;
+    wire [15:0] data_out_shifter;
+    wire [15:0] Ain;
+    wire [15:0] Bin;
+    wire [2:0] status_in;
+    wire [15:0] ALU_out;
+    wire [15:0] data_into_regfile;
+
+    // Regfile instantiation
+    regfile REGFILE (.data_in(data_into_regfile), .writenum(writenum), .write(write), .readnum(readnum), .clk(clk), .data_out(data_out_regfile));
+
+    // Enable-registers A, B, C, and Status instantiation
+    reg_load_enable #(16) RA (clk, data_out_regfile, loada, data_out_RA);
+    reg_load_enable #(16) RB (clk, data_out_regfile, loadb, data_out_RB);
+    reg_load_enable #(16) RC (clk, ALU_out, loadc, datapath_out);
+    reg_load_enable #(3) RStatus (clk, status_in, loads, status_out);
+
+    // Shifter instantiation
+    shifter SHIFTER_UNIT (data_out_RB, shift, data_out_shifter);
+
+    // Source operand multiplexor instantiations
+    multiplexer_2input #(16) Mux_A (16'b0, data_out_RA, asel, Ain);
+    multiplexer_2input #(16) Mux_B (sximm5, data_out_shifter, bsel, Bin);
+
+    // ALU instantiation
+    ALU ALU_UNIT (Ain, Bin, ALUop, ALU_out, status_in);
+
+    // Multiplexor used for reg file input 
+    multiplexer_4input #(16) Mux_regfile_input (mdata, sximm8, {8'b0, PC}, datapath_out, vsel, data_into_regfile);
+endmodule
+
+module multiplexer_4input(a3, a2, a1, a0, s, out); 
+    parameter k = 16;
+    input [k-1:0] a3, a2, a1, a0;
+    input [1:0] s; 
+    output reg [k-1:0] out;
+
+    always @(*) begin
+        case(s)
+            2'b00: out = a0;
+            2'b01: out = a1;
+            2'b10: out = a2;
+            2'b11: out = a3;
+            default: out = {k{1'bx}};
+        endcase
+    end
+endmodule
+
+

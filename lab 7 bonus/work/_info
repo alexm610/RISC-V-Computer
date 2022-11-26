@@ -1,0 +1,566 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/intelFPGA_lite/18.1
+vAddSub1
+Z0 !s110 1651555661
+!i10b 1
+!s100 XfhI3`aZDhM6mMR@CEK?B3
+I4_6cM13bF=DU42Fc[M:072
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus
+Z3 w1638609249
+Z4 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/alu.v
+Z5 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/alu.v
+L0 43
+Z6 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z7 !s108 1651555661.000000
+Z8 !s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/alu.v|
+Z9 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/alu.v|
+!i113 1
+Z10 o-work work
+Z11 tCvgOpt 0
+n@add@sub1
+vALU
+R0
+!i10b 1
+!s100 KclbC:HHg9:6h_JdlC2HF1
+IemSCQMY6T^lj]cWA`cJEJ0
+R1
+R2
+R3
+R4
+R5
+L0 1
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+n@a@l@u
+vB_test_tb
+!s110 1651552489
+!i10b 1
+!s100 44ek9JILi1mD]bLH@9OSb0
+IFXZ`XYl1j^UC0L6So<lzJ0
+R1
+R2
+Z12 w1638916192
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/B_test_tb.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/B_test_tb.v
+L0 1
+R6
+r1
+!s85 0
+31
+Z13 !s108 1651552489.000000
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/B_test_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/B_test_tb.v|
+!i113 1
+R10
+R11
+n@b_test_tb
+vBEQ_test_tb
+Z14 !s110 1651552490
+!i10b 1
+!s100 JYc@b3ITc8`U?h>[DmGUV3
+Iz=nC9jWRP@2^bfNW29HLH3
+R1
+R2
+R12
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BEQ_test_tb.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BEQ_test_tb.v
+L0 1
+R6
+r1
+!s85 0
+31
+R13
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BEQ_test_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BEQ_test_tb.v|
+!i113 1
+R10
+R11
+n@b@e@q_test_tb
+vBLE_test_tb
+R14
+!i10b 1
+!s100 4dg5B4?>:DZ0lOclCd@YS2
+IJDEQ=2>JUKD8U^ncIS:Ua1
+R1
+R2
+R12
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLE_test.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLE_test.v
+L0 1
+R6
+r1
+!s85 0
+31
+Z15 !s108 1651552490.000000
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLE_test.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLE_test.v|
+!i113 1
+R10
+R11
+n@b@l@e_test_tb
+vBLT_test_tb
+R14
+!i10b 1
+!s100 =9R`CY;kb7HSbECPTjI3H0
+I0>MNHCO;f2YL1ka0GT;];0
+R1
+R2
+R12
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLT_test.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLT_test.v
+L0 1
+R6
+r1
+!s85 0
+31
+R15
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLT_test.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BLT_test.v|
+!i113 1
+R10
+R11
+n@b@l@t_test_tb
+vBNE_test_tb
+R14
+!i10b 1
+!s100 nf[QV^Nmk2SLz64lNgcJY1
+Ie1Re6^JF2W:KcziVn]HYJ0
+R1
+R2
+R12
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BNE_test.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BNE_test.v
+L0 1
+R6
+r1
+!s85 0
+31
+R15
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BNE_test.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/BNE_test.v|
+!i113 1
+R10
+R11
+n@b@n@e_test_tb
+vCPU
+R0
+!i10b 1
+!s100 5SJB91dLPf4i7fPYm5o=R2
+I^7o<lzao=X]7eL5PZV2JH2
+R1
+R2
+Z16 w1638919311
+Z17 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/cpu.v
+Z18 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/cpu.v
+L0 101
+R6
+r1
+!s85 0
+31
+R7
+Z19 !s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/cpu.v|
+Z20 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/cpu.v|
+!i113 1
+R10
+R11
+n@c@p@u
+vdatapath
+R0
+!i10b 1
+!s100 fCIPIGhed?=_`HnbKm4JX2
+Ic@0gLBLcoIR:N7=Bdg_Q40
+R1
+R2
+Z21 w1638918898
+Z22 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/datapath.v
+Z23 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/datapath.v
+L0 1
+R6
+r1
+!s85 0
+31
+R7
+Z24 !s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/datapath.v|
+Z25 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/datapath.v|
+!i113 1
+R10
+R11
+vdecoder
+Z26 !s110 1651555662
+!i10b 1
+!s100 jdRQc3PS^K=J]nK?LJdCa3
+ImFibzE8TBV4Jm6Yz<GbaL0
+R1
+R2
+R3
+Z27 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v
+Z28 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v
+L0 81
+R6
+r1
+!s85 0
+31
+Z29 !s108 1651555662.000000
+Z30 !s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v|
+Z31 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v|
+!i113 1
+R10
+R11
+vDFF_Alex
+R26
+!i10b 1
+!s100 WCXmAG7h5lCIh78AMg?f92
+IDD`0GEll33Jn<Z53Gdh=<1
+R1
+R2
+R3
+R27
+R28
+L0 71
+R6
+r1
+!s85 0
+31
+R29
+R30
+R31
+!i113 1
+R10
+R11
+n@d@f@f_@alex
+vlab7_check_tb
+R14
+!i10b 1
+!s100 edfie`d60l>?Fh9lcHS7`1
+IR144jjNPGOd8T[Z0zOH_C3
+R1
+R2
+w1638333656
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_autograder_check.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_autograder_check.v
+L0 7
+R6
+r1
+!s85 0
+31
+R15
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_autograder_check.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_autograder_check.v|
+!i113 1
+R10
+R11
+vlab7_top
+!s110 1638762873
+!i10b 1
+!s100 ;GWVQdB=]?Jd7lU7:U?2J0
+IMWWNYnI6KcOZBjVcVcfm<3
+R1
+dC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus
+w1638656890
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_top.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_top.v
+L0 5
+R6
+r1
+!s85 0
+31
+!s108 1638762873.000000
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_top.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7_top.v|
+!i113 1
+R10
+R11
+vlab7bonus_check_tb
+R14
+!i10b 1
+!s100 ]20^n`n;AHLZ^UAYdFbEg0
+I>7:0>[zFU2NcdBBWDEmaB3
+R1
+R2
+w1638783919
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_autograder_check.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_autograder_check.v
+L0 1
+R6
+r1
+!s85 0
+31
+R15
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_autograder_check.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_autograder_check.v|
+!i113 1
+R10
+R11
+vlab7bonus_stage2_tb
+!s110 1651552491
+!i10b 1
+!s100 TX4[c[fKZc7@ZUQS9gSSC2
+I4LDV9V;na6;fC_kd`i^^_3
+R1
+R2
+w1638913099
+8C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_stage2_tb.v
+FC:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_stage2_tb.v
+L0 3
+R6
+r1
+!s85 0
+31
+R15
+!s107 C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_stage2_tb.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/Desktop/CPEN 211/Lab 7 Bonus/CPEN211_Lab7_Bonus/lab7bonus_stage2_tb.v|
+!i113 1
+R10
+R11
+vlab7bonus_top
+R0
+!i10b 1
+!s100 cbh8KoaoRj2:AB:APZWYF2
+IPTEX[NBQ;[DN2]W7iK<7=1
+R1
+R2
+w1651555654
+8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/lab7bonus_top.v
+FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/lab7bonus_top.v
+L0 22
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/lab7bonus_top.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/lab7bonus_top.v|
+!i113 1
+R10
+R11
+vmultiplexer_2input
+R26
+!i10b 1
+!s100 eiNN]hRT7Hkhl^AGl=QF[3
+IK1P@ZJg]OCIdKKEh2=;Bk1
+R1
+R2
+R3
+R27
+R28
+L0 35
+R6
+r1
+!s85 0
+31
+R29
+R30
+R31
+!i113 1
+R10
+R11
+vmultiplexer_3input_onehot
+R0
+!i10b 1
+!s100 QLehmC7Qn^dH48O:m0zCz0
+IO4N?IiSJ0Q7?AYzz3dIRg3
+R1
+R2
+R16
+R17
+R18
+L0 370
+R6
+r1
+!s85 0
+31
+R7
+R19
+R20
+!i113 1
+R10
+R11
+vmultiplexer_4input
+R0
+!i10b 1
+!s100 d2U46SWhGSP0SAMN2[nX02
+I:Xih_f6n;KzXF>Z14aZ_G3
+R1
+R2
+R21
+R22
+R23
+L0 54
+R6
+r1
+!s85 0
+31
+R7
+R24
+R25
+!i113 1
+R10
+R11
+vmultiplexer_8input
+R26
+!i10b 1
+!s100 4PAFnc75FZL2ZnjP6FThL1
+IFNLhX:JcJ0iCD=8IV>E_`0
+R1
+R2
+R3
+R27
+R28
+L0 50
+R6
+r1
+!s85 0
+31
+R29
+R30
+R31
+!i113 1
+R10
+R11
+vRAM
+R0
+!i10b 1
+!s100 `5EC6:^V3D;1YZ5zHzWEA2
+IZ3VT1:K[K;NVR56EDV0?G0
+R1
+R2
+w1651553019
+8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/RAM.v
+FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/RAM.v
+L0 1
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/RAM.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/RAM.v|
+!i113 1
+R10
+R11
+n@r@a@m
+vreg_load_enable
+R26
+!i10b 1
+!s100 5A8K<o0=56QK99:7ABZF`0
+IN:<c@?Ll`jnO4_IS>GWzI2
+R1
+R2
+R3
+R27
+R28
+L0 24
+R6
+r1
+!s85 0
+31
+R29
+R30
+R31
+!i113 1
+R10
+R11
+vregfile
+R26
+!i10b 1
+!s100 CPf@@>eS]FIjaehY:Ojk=1
+I0k:lbnh_QgWX7o:cRM[1E2
+R1
+R2
+R3
+R27
+R28
+L0 1
+R6
+r1
+!s85 0
+31
+R29
+R30
+R31
+!i113 1
+R10
+R11
+vshifter
+R0
+!i10b 1
+!s100 hK?QjJfImQTz7DMIf=zmK2
+I93Og;fPTlehaP2?7=TVNJ3
+R1
+R2
+R3
+8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/shifter.v
+FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/shifter.v
+L0 1
+R6
+r1
+!s85 0
+31
+R7
+!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/shifter.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/shifter.v|
+!i113 1
+R10
+R11
+vsw_led_tb_top
+!s110 1651549618
+!i10b 1
+!s100 ::7eV72QoCD?QClA:7C6Y1
+Ic>:[37O<VRFOQ33=`9`S<0
+R1
+R2
+w1650948037
+Z32 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v
+Z33 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v
+L0 1
+R6
+r1
+!s85 0
+31
+!s108 1651549618.000000
+!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
+Z34 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
+!i113 1
+R10
+R11
+vsw_led_test_tb
+R26
+!i10b 1
+!s100 `Khd>T[db?LAz1nAJa=<A1
+IJSi7FAY8PGGhmWFn>_Yia0
+R1
+R2
+w1651552481
+R32
+R33
+L0 1
+R6
+r1
+!s85 0
+31
+R29
+!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
+R34
+!i113 1
+R10
+R11
