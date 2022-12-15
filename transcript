@@ -85,3 +85,5 @@ restart -f; run -all
 # ** Note: $stop    : tb_rtl_reg_file.sv(31)
 #    Time: 192 ps  Iteration: 0  Instance: /tb_rtl_reg_file
 # Break in Module tb_rtl_reg_file at tb_rtl_reg_file.sv line 31
+# End time: 15:10:43 on Dec 15,2022, Elapsed time: 0:13:00
+# Errors: 0, Warnings: 0

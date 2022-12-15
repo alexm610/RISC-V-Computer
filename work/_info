@@ -65,7 +65,7 @@ IkJ@=J4db3Qe?Zbb@N[PYb0
 R3
 R4
 S1
-dc:/Users/Alex Manak/Desktop/Math/Verilog/RISC-V-Computer
+Z13 dc:/Users/Alex Manak/Desktop/Math/Verilog/RISC-V-Computer
 w1671143502
 8c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv
 Fc:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv
@@ -78,8 +78,30 @@ r1
 !s107 c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv|
 !s90 -nologo|-work|work|c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv|
 !i113 1
-o-nologo -work work
+Z14 o-nologo -work work
 R12
+vRAM
+!s110 1671145768
+!i10b 1
+!s100 Ck00EWShGHE90N5;:MzVP2
+ILVlQb34;JWO[3<DEzNfhd2
+R3
+R13
+w1671145760
+8c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\RAM.v
+Fc:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\RAM.v
+L0 40
+R8
+r1
+!s85 0
+31
+!s108 1671145768.000000
+!s107 c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\RAM.v|
+!s90 -nologo|-work|work|c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\RAM.v|
+!i113 1
+R14
+R12
+n@r@a@m
 vreg_file
 R1
 R2
