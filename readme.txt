@@ -2,9 +2,7 @@ NEW MISSION STATEMENT: Create a RISC-V compatible computer on the FPGA
 
 DECEMBER 15, 2022
 	- Created documents folder, have included lab7 files from CPEN 211 for reference
-
-
-
+	- reg_file.sv complete; simple testbench shows each register can be written to
 
 
 
