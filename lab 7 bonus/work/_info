@@ -206,46 +206,46 @@ Z25 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/r
 R10
 R11
 vdecoder
-Z26 !s110 1651555662
+Z26 !s110 1671142307
 !i10b 1
 !s100 jdRQc3PS^K=J]nK?LJdCa3
-ImFibzE8TBV4Jm6Yz<GbaL0
+IjObV=1Aj1JPP89o?L1Fdj1
 R1
-R2
-R3
-Z27 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v
-Z28 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v
+Z27 dc:/Users/Alex Manak/Desktop/Math/Verilog/RISC-V-Computer/lab 7 bonus
+Z28 w1669460497
+Z29 8c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\lab 7 bonus\regfile.v
+Z30 Fc:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\lab 7 bonus\regfile.v
 L0 81
 R6
 r1
 !s85 0
 31
-Z29 !s108 1651555662.000000
-Z30 !s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v|
-Z31 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/regfile.v|
+Z31 !s108 1671142306.000000
+Z32 !s107 c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\lab 7 bonus\regfile.v|
+Z33 !s90 -nologo|-work|work|c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\lab 7 bonus\regfile.v|
 !i113 1
-R10
+Z34 o-nologo -work work
 R11
 vDFF_Alex
 R26
 !i10b 1
 !s100 WCXmAG7h5lCIh78AMg?f92
-IDD`0GEll33Jn<Z53Gdh=<1
+IddX9Ini>ZN24bSWCSKk6d2
 R1
-R2
-R3
 R27
 R28
+R29
+R30
 L0 71
 R6
 r1
 !s85 0
 31
-R29
-R30
 R31
+R32
+R33
 !i113 1
-R10
+R34
 R11
 n@d@f@f_@alex
 vlab7_check_tb
@@ -357,22 +357,22 @@ vmultiplexer_2input
 R26
 !i10b 1
 !s100 eiNN]hRT7Hkhl^AGl=QF[3
-IK1P@ZJg]OCIdKKEh2=;Bk1
+I9BmDR>YQDQDCNzCaQT=G;2
 R1
-R2
-R3
 R27
 R28
+R29
+R30
 L0 35
 R6
 r1
 !s85 0
 31
-R29
-R30
 R31
+R32
+R33
 !i113 1
-R10
+R34
 R11
 vmultiplexer_3input_onehot
 R0
@@ -420,22 +420,22 @@ vmultiplexer_8input
 R26
 !i10b 1
 !s100 4PAFnc75FZL2ZnjP6FThL1
-IFNLhX:JcJ0iCD=8IV>E_`0
+IeMze[7R>nP2Oa=Z`SBbof1
 R1
-R2
-R3
 R27
 R28
+R29
+R30
 L0 50
 R6
 r1
 !s85 0
 31
-R29
-R30
 R31
+R32
+R33
 !i113 1
-R10
+R34
 R11
 vRAM
 R0
@@ -463,43 +463,43 @@ vreg_load_enable
 R26
 !i10b 1
 !s100 5A8K<o0=56QK99:7ABZF`0
-IN:<c@?Ll`jnO4_IS>GWzI2
+I[VIL1<58Y:N0Vh?`dM1DY0
 R1
-R2
-R3
 R27
 R28
+R29
+R30
 L0 24
 R6
 r1
 !s85 0
 31
-R29
-R30
 R31
+R32
+R33
 !i113 1
-R10
+R34
 R11
 vregfile
 R26
 !i10b 1
 !s100 CPf@@>eS]FIjaehY:Ojk=1
-I0k:lbnh_QgWX7o:cRM[1E2
+IQdFddPD?kUhlcWe=jg=8?2
 R1
-R2
-R3
 R27
 R28
+R29
+R30
 L0 1
 R6
 r1
 !s85 0
 31
-R29
-R30
 R31
+R32
+R33
 !i113 1
-R10
+R34
 R11
 vshifter
 R0
@@ -530,37 +530,37 @@ Ic>:[37O<VRFOQ33=`9`S<0
 R1
 R2
 w1650948037
-Z32 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v
-Z33 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v
+Z35 8C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v
+Z36 FC:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v
 L0 1
 R6
 r1
 !s85 0
 31
 !s108 1651549618.000000
-!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
-Z34 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
+Z37 !s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
+Z38 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
 !i113 1
 R10
 R11
 vsw_led_test_tb
-R26
+!s110 1651555662
 !i10b 1
 !s100 `Khd>T[db?LAz1nAJa=<A1
 IJSi7FAY8PGGhmWFn>_Yia0
 R1
 R2
 w1651552481
-R32
-R33
+R35
+R36
 L0 1
 R6
 r1
 !s85 0
 31
-R29
-!s107 C:/Users/Alex Manak/source/repos/RISC-V-Computer/lab 7 bonus/sw_led_tb.v|
-R34
+!s108 1651555662.000000
+R37
+R38
 !i113 1
 R10
 R11

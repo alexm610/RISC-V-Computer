@@ -1,0 +1,130 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/Alex Manak/Desktop/Math/Verilog/RISC-V-Computer
+vdecoder
+Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z1 !s110 1671144549
+!i10b 1
+!s100 mhBb5n<54dSgK[XIOD6e42
+Ib[e=?W_fkTzS3Rz=g5@@]2
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 !s105 reg_file_sv_unit
+S1
+Z4 dc:/Users/Alex Manak/Desktop/Math/Verilog/RISC-V-Computer
+Z5 w1671144548
+Z6 8c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv
+Z7 Fc:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv
+L0 112
+Z8 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z9 !s108 1671144548.000000
+Z10 !s107 c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv|
+Z11 !s90 -nologo|-work|work|c:\Users\Alex Manak\Desktop\Math\Verilog\RISC-V-Computer\reg_file.sv|
+!i113 1
+Z12 o-nologo -work work
+Z13 tCvgOpt 0
+vmultiplexer_32input
+R0
+R1
+!i10b 1
+!s100 _dba4:9X2bC1eJbHFnh=I1
+IjK6z4G7^S^Yo`E]Ta9Y;i1
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+L0 67
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+vmultiplexer_8input
+R0
+!s110 1671143502
+!i10b 1
+!s100 5AR<8[oODE5;bgBGk^n`91
+IkJ@=J4db3Qe?Zbb@N[PYb0
+R2
+R3
+S1
+R4
+w1671143502
+R6
+R7
+L0 60
+R8
+r1
+!s85 0
+31
+!s108 1671143502.000000
+R10
+R11
+!i113 1
+R12
+R13
+vreg_file
+R0
+R1
+!i10b 1
+!s100 Q=2<BGKULozdFo;h7H^`P2
+IX9UFHc<=9C6UdR=nLh2>Q1
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+L0 8
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+vregister
+R0
+R1
+!i10b 1
+!s100 dAEOV@?^XXWIcb10VBA8M1
+ILDJ6KMgjIcZ;V2<7k>:W^0
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+L0 52
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
