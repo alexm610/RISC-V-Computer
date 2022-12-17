@@ -4,7 +4,7 @@ DECEMBER 15, 2022
 	- Created documents folder, have included lab7 files from CPEN 211 for reference
 	- reg_file.sv complete; simple testbench shows each register can be written to
 	- RAM.v created; built using Quartus wizard
-
+	- need to hardwire x0 output of reg_file module to ZERO
 
 
 ------NOTES------
