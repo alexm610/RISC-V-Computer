@@ -1,3 +1,4 @@
+/*        ALUop        */
 `define ADD 4'b0000
 `define SUB 4'b0001
 `define AND 4'b0010
