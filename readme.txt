@@ -6,7 +6,16 @@ DECEMBER 15, 2022
 	- RAM.v created; built using Quartus wizard
 	- need to hardwire x0 output of reg_file module to ZERO
 
-
+DECEMBER 19, 2022
+	- I created a draft of the ALU, based on the ALU written for Lab 7 of CPEN 211
+	- aluop definitions found based off of the video:
+		https://www.youtube.com/watch?v=4dF4YbOy0oM
+	- Upon further research, the ALUop's, although seemingly defined by a 4-bit wide bus,
+		do not seem to be set in stone; ie. ADD has not been assigned a specific 4-bit 
+		value to be inputted to the ALU
+		- In fact, it seems as though I must use funct3 and funct7 to decode the exact 
+			operation.
+		- This is going to be fun
 ------NOTES------
 Register file: 
 	- 32 registers in total, denoted by xn (ie. x1, x31, etc.)
