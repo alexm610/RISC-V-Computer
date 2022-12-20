@@ -1,3 +1,5 @@
+`include "defines.sv"
+
 module ALU (Ain, Bin, ALUop, out, status);
     input logic [3:0] ALUop;
     input logic [31:0] Ain, Bin;
@@ -7,18 +9,16 @@ module ALU (Ain, Bin, ALUop, out, status);
 
     AddSub #(32) overflow_detection (Ain, Bin, 1, dummy_output, overflow);
 
-    // set ALU output
     always @(*) begin
         case (ALUop) 
-            4'b0000: out = 
-            4'b0001: out = 
-            4'b0010: out = 
-            4'b0011: out = 
-            4'b0100: out = 
-            4'b0101: out = 
-            4'b0110: out = 
-            4'b0111: out = 
-            4'b1000: out = 
+            4'b0000: out = `ADD;
+            4'b0001: out = `SUB;
+            4'b0010: out = `AND;
+            4'b0011: out = `OR;
+            4'b0100: out = `NOT;
+            4'b0101: out = `XOR;
+            4'b0110: out = `SL; 
+            4'b0111: out = `SR;
         endcase
     end
 

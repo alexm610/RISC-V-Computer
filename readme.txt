@@ -16,6 +16,8 @@ DECEMBER 19, 2022
 		- In fact, it seems as though I must use funct3 and funct7 to decode the exact 
 			operation.
 		- This is going to be fun
+	- Added defines.sv, to contain all defines used in the project;
+		- remember to `include "defines.sv" in all files
 ------NOTES------
 Register file: 
 	- 32 registers in total, denoted by xn (ie. x1, x31, etc.)
