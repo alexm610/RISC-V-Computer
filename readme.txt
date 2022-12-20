@@ -20,6 +20,10 @@ DECEMBER 19, 2022
 		- remember to `include "defines.sv" in all files
 	- Try designing the datapath based off of the datapath in CPEN 211, but modify as 
 		necessary to be similar to the textbook datapath
+	- Added folder for assembly files
+		- use this link to see how to use it:
+			https://marketplace.visualstudio.com/items?itemName=hm.riscv-venus
+		
 
 ------NOTES------
 Register file: 
