@@ -18,6 +18,9 @@ DECEMBER 19, 2022
 		- This is going to be fun
 	- Added defines.sv, to contain all defines used in the project;
 		- remember to `include "defines.sv" in all files
+	- Try designing the datapath based off of the datapath in CPEN 211, but modify as 
+		necessary to be similar to the textbook datapath
+
 ------NOTES------
 Register file: 
 	- 32 registers in total, denoted by xn (ie. x1, x31, etc.)
