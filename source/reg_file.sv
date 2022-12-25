@@ -1,4 +1,5 @@
 `timescale 1ps/1ps
+`include "defines.sv"
 
 /*
     Register bank in RV32I ISA has 32 registers, each 32 bits wide;

@@ -4,8 +4,26 @@ DECEMBER 15, 2022
 	- Created documents folder, have included lab7 files from CPEN 211 for reference
 	- reg_file.sv complete; simple testbench shows each register can be written to
 	- RAM.v created; built using Quartus wizard
+	- need to hardwire x0 output of reg_file module to ZERO
 
-
+DECEMBER 19, 2022
+	- I created a draft of the ALU, based on the ALU written for Lab 7 of CPEN 211
+	- aluop definitions found based off of the video:
+		https://www.youtube.com/watch?v=4dF4YbOy0oM
+	- Upon further research, the ALUop's, although seemingly defined by a 4-bit wide bus,
+		do not seem to be set in stone; ie. ADD has not been assigned a specific 4-bit 
+		value to be inputted to the ALU
+		- In fact, it seems as though I must use funct3 and funct7 to decode the exact 
+			operation.
+		- This is going to be fun
+	- Added defines.sv, to contain all defines used in the project;
+		- remember to `include "defines.sv" in all files
+	- Try designing the datapath based off of the datapath in CPEN 211, but modify as 
+		necessary to be similar to the textbook datapath
+	- Added folder for assembly files
+		- use this link to see how to use it:
+			https://marketplace.visualstudio.com/items?itemName=hm.riscv-venus
+		
 
 ------NOTES------
 Register file: 
