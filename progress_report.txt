@@ -24,7 +24,11 @@ DECEMBER 19, 2022
 		- use this link to see how to use it:
 			https://marketplace.visualstudio.com/items?itemName=hm.riscv-venus
 		
-
+FEBRUARY 27, 2023
+	- From the journal paper in /documents, only implement SW, LW, ADD, SUB, AND, OR, and BEQ. (according to the paper, these 
+		are enough for Turing Completeness)
+	- RAM.sv will act as the instruction memory, and ROM.sv will act as the data memory, per the textbook.
+	- ALUop = {instruction[30], funct3} -> instruction[30] = 2nd msb of funct7, used to differentiate add/sub
 ------NOTES------
 Register file: 
 	- 32 registers in total, denoted by xn (ie. x1, x31, etc.)

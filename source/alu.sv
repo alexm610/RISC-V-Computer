@@ -11,14 +11,11 @@ module ALU (Ain, Bin, ALUop, out, status);
 
     always @(*) begin
         case (ALUop) 
-            4'b0000: out = `ADD;
-            4'b0001: out = `SUB;
-            4'b0010: out = `AND;
-            4'b0011: out = `OR;
-            4'b0100: out = `NOT;
-            4'b0101: out = `XOR;
-            4'b0110: out = `SL; 
-            4'b0111: out = `SR;
+            // Instructions needing the ALU: BEQ, ADD, SUB, AND, OR
+            4'b: out = Ain + Bin;
+            4'b: out = Ain - Bin;
+            4'b: out = Ain & Bin;
+            4'b: out = Ain | Bin;
         endcase
     end
 
