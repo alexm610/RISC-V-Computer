@@ -1,6 +1,6 @@
 `include "defines.sv"
 
-module ALU (Ain, Bin, ALUop, out, status);
+module alu (Ain, Bin, ALUop, out, status);
     input logic [3:0] ALUop;
     input logic [31:0] Ain, Bin;
     output logic [2:0] status;
@@ -34,7 +34,7 @@ module ALU (Ain, Bin, ALUop, out, status);
             default: status[2] = 0;
         endcase
     end
-endmodule: ALU
+endmodule: alu
 
 module AddSub (a, b, sub, s, ovf);
     parameter n = 32;

@@ -16,16 +16,16 @@ module reg_file (clk, reset_n, data_in, data_out, write, writenum, readnum);
     decoder #(5, 32) WRITENUM_DECODER (writenum, writenum_onehot);
     decoder #(5, 32) READNUM_DECODER (readnum, readnum_onehot);
     multiplexer_32input #(32) DATA_OUT_MUX (x31, x30, x29, x28, x27, x26, x25, x24, x23, x22, x21, x20, x19, x18, x17, x16, x15, x14, x13, x12, x11, x10, x9, x8, x7, x6, x5, x4, x3, x2, x1, x0, readnum_onehot, data_out);
-    register #(32) X0 (clk, reset_n, data_in, write & writenum_onehot[0], x0); //-> should be hardwired to ZERO
-    register #(32) X1 (clk, reset_n, data_in, write & writenum_onehot[1], x1);
-    register #(32) X2 (clk, reset_n, data_in, write & writenum_onehot[2], x2);
-    register #(32) X3 (clk, reset_n, data_in, write & writenum_onehot[3], x3);
-    register #(32) X4 (clk, reset_n, data_in, write & writenum_onehot[4], x4);
-    register #(32) X5 (clk, reset_n, data_in, write & writenum_onehot[5], x5);
-    register #(32) X6 (clk, reset_n, data_in, write & writenum_onehot[6], x6);
-    register #(32) X7 (clk, reset_n, data_in, write & writenum_onehot[7], x7);
-    register #(32) X8 (clk, reset_n, data_in, write & writenum_onehot[8], x8);
-    register #(32) X9 (clk, reset_n, data_in, write & writenum_onehot[9], x9);
+    register #(32) X0  (clk, reset_n, data_in, write & writenum_onehot[0], x0); //-> should be hardwired to ZERO
+    register #(32) X1  (clk, reset_n, data_in, write & writenum_onehot[1], x1);
+    register #(32) X2  (clk, reset_n, data_in, write & writenum_onehot[2], x2);
+    register #(32) X3  (clk, reset_n, data_in, write & writenum_onehot[3], x3);
+    register #(32) X4  (clk, reset_n, data_in, write & writenum_onehot[4], x4);
+    register #(32) X5  (clk, reset_n, data_in, write & writenum_onehot[5], x5);
+    register #(32) X6  (clk, reset_n, data_in, write & writenum_onehot[6], x6);
+    register #(32) X7  (clk, reset_n, data_in, write & writenum_onehot[7], x7);
+    register #(32) X8  (clk, reset_n, data_in, write & writenum_onehot[8], x8);
+    register #(32) X9  (clk, reset_n, data_in, write & writenum_onehot[9], x9);
     register #(32) X10 (clk, reset_n, data_in, write & writenum_onehot[10], x10);
     register #(32) X11 (clk, reset_n, data_in, write & writenum_onehot[11], x11);
     register #(32) X12 (clk, reset_n, data_in, write & writenum_onehot[12], x12);
@@ -73,7 +73,7 @@ module multiplexer_32input(a31, a30, a29, a28, a27, a26, a25, a24, a23, a22, a21
 
     always @(*) begin // select signal is one-hot
         case(s)
-            32'b00000000000000000000000000000001: out = a0;
+            32'b00000000000000000000000000000001: out = 32'h0; // ISA dictates that register X0 be hardwired to zero
             32'b00000000000000000000000000000010: out = a1;
             32'b00000000000000000000000000000100: out = a2;
             32'b00000000000000000000000000001000: out = a3;
