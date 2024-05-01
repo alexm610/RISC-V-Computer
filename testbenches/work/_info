@@ -1,0 +1,130 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/intelFPGA_lite/19.1
+vdecoder
+Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z1 !s110 1714591815
+!i10b 1
+!s100 Mg@=:bDLTO50k[<;Le;KL0
+Ie4Abdf_Ue8Y^V5N]=h>Un3
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 !s105 reg_file_sv_unit
+S1
+Z4 dC:/Users/alexm/math/RISC-V-Computer/testbenches
+Z5 w1714591803
+Z6 8C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+Z7 FC:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+L0 121
+Z8 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z9 !s108 1714591815.000000
+Z10 !s107 C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv|
+Z11 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv|
+!i113 1
+Z12 o-work work -sv
+Z13 tCvgOpt 0
+vmultiplexer_32input
+R0
+R1
+!i10b 1
+!s100 GiMKRna6[n@hHJDS:J;c;0
+Ie1Z<M;z0;2c2P9a@<??eD1
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+L0 76
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+vreg_file
+R0
+R1
+!i10b 1
+!s100 Y8<aW473?e>9E[2T6dELc0
+I5D1]lkGo^ZF>e9S>YCE]63
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+L0 11
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+vregister
+R0
+R1
+!i10b 1
+!s100 95:k1k0J^EAUADB@_kFlE3
+Inei`5RaW^C8n>?CN]P7W70
+R2
+R3
+S1
+R4
+R5
+R6
+R7
+L0 57
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+vtb_rtl_reg_file
+R0
+R1
+!i10b 1
+!s100 KKNK5UE^A2b<SKn;DNCXO1
+In@n_jO;Y3^jU5lKD=UT7V2
+R2
+!s105 tb_rtl_reg_file_sv_unit
+S1
+R4
+w1714591568
+8C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv
+FC:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv
+L0 3
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv|
+!i113 1
+R12
+R13

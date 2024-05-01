@@ -1,53 +1,57 @@
 `timescale 1ps/1ps
-`include "defines.sv"
+//`include "defines.sv"
 
 /*
     Register bank in RV32I ISA has 32 registers, each 32 bits wide;
     Register to be read/written to is given by input signal writenum/readnum
         these location signals are decoded into a one-hot signal, which is how the module knows which reg to write/read to/from
-*/
-module reg_file (clk, reset_n, data_in, data_out, write, writenum, readnum);
-    input clk, reset_n, write;
-    input [4:0] writenum, readnum;
-    input [31:0] data_in;
-    output [31:0] data_out;
-    logic [31:0] writenum_onehot, readnum_onehot, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31;
 
-    decoder #(5, 32) WRITENUM_DECODER (writenum, writenum_onehot);
-    decoder #(5, 32) READNUM_DECODER (readnum, readnum_onehot);
-    multiplexer_32input #(32) DATA_OUT_MUX (x31, x30, x29, x28, x27, x26, x25, x24, x23, x22, x21, x20, x19, x18, x17, x16, x15, x14, x13, x12, x11, x10, x9, x8, x7, x6, x5, x4, x3, x2, x1, x0, readnum_onehot, data_out);
-    register #(32) X0  (clk, reset_n, data_in, write & writenum_onehot[0], x0); //-> should be hardwired to ZERO
-    register #(32) X1  (clk, reset_n, data_in, write & writenum_onehot[1], x1);
-    register #(32) X2  (clk, reset_n, data_in, write & writenum_onehot[2], x2);
-    register #(32) X3  (clk, reset_n, data_in, write & writenum_onehot[3], x3);
-    register #(32) X4  (clk, reset_n, data_in, write & writenum_onehot[4], x4);
-    register #(32) X5  (clk, reset_n, data_in, write & writenum_onehot[5], x5);
-    register #(32) X6  (clk, reset_n, data_in, write & writenum_onehot[6], x6);
-    register #(32) X7  (clk, reset_n, data_in, write & writenum_onehot[7], x7);
-    register #(32) X8  (clk, reset_n, data_in, write & writenum_onehot[8], x8);
-    register #(32) X9  (clk, reset_n, data_in, write & writenum_onehot[9], x9);
-    register #(32) X10 (clk, reset_n, data_in, write & writenum_onehot[10], x10);
-    register #(32) X11 (clk, reset_n, data_in, write & writenum_onehot[11], x11);
-    register #(32) X12 (clk, reset_n, data_in, write & writenum_onehot[12], x12);
-    register #(32) X13 (clk, reset_n, data_in, write & writenum_onehot[13], x13);
-    register #(32) X14 (clk, reset_n, data_in, write & writenum_onehot[14], x14);
-    register #(32) X15 (clk, reset_n, data_in, write & writenum_onehot[15], x15);
-    register #(32) X16 (clk, reset_n, data_in, write & writenum_onehot[16], x16);
-    register #(32) X17 (clk, reset_n, data_in, write & writenum_onehot[17], x17);
-    register #(32) X18 (clk, reset_n, data_in, write & writenum_onehot[18], x18);
-    register #(32) X19 (clk, reset_n, data_in, write & writenum_onehot[19], x19);
-    register #(32) X20 (clk, reset_n, data_in, write & writenum_onehot[20], x20);
-    register #(32) X21 (clk, reset_n, data_in, write & writenum_onehot[21], x21);
-    register #(32) X22 (clk, reset_n, data_in, write & writenum_onehot[22], x22);
-    register #(32) X23 (clk, reset_n, data_in, write & writenum_onehot[23], x23);
-    register #(32) X24 (clk, reset_n, data_in, write & writenum_onehot[24], x24);
-    register #(32) X25 (clk, reset_n, data_in, write & writenum_onehot[25], x25);
-    register #(32) X26 (clk, reset_n, data_in, write & writenum_onehot[26], x26);
-    register #(32) X27 (clk, reset_n, data_in, write & writenum_onehot[27], x27);
-    register #(32) X28 (clk, reset_n, data_in, write & writenum_onehot[28], x28);
-    register #(32) X29 (clk, reset_n, data_in, write & writenum_onehot[29], x29);
-    register #(32) X30 (clk, reset_n, data_in, write & writenum_onehot[30], x30);
-    register #(32) X31 (clk, reset_n, data_in, write & writenum_onehot[31], x31);
+    Note that the `write' signal applies to whatever register is defined by the `rd' signal
+*/
+module reg_file    (input logic clk, input logic reset_n, input logic write, 
+                    input logic [4:0] rs1, input logic [4:0] rs2, input logic [4:0] rd, 
+                    input logic [31:0] writedata, output logic [31:0] readdata_1, output logic [31:0] readdata_2);
+
+    logic [31:0] addr_1, addr_2, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31;
+
+    decoder #(5, 32) RS_1  (rs1, addr_1);
+    decoder #(5, 32) RS_2  (rs2, addr_2);
+
+    multiplexer_32input #(32) DATA_OUT_1 (x31, x30, x29, x28, x27, x26, x25, x24, x23, x22, x21, x20, x19, x18, x17, x16, x15, x14, x13, x12, x11, x10, x9, x8, x7, x6, x5, x4, x3, x2, x1, x0, addr_1, readdata_1);
+    multiplexer_32input #(32) DATA_OUT_2 (x31, x30, x29, x28, x27, x26, x25, x24, x23, x22, x21, x20, x19, x18, x17, x16, x15, x14, x13, x12, x11, x10, x9, x8, x7, x6, x5, x4, x3, x2, x1, x0, addr_2, readdata_2);
+
+    register #(32) X0  (clk, reset_n, writedata, write & (addr_1[0] | addr_2[0]), x0); //-> should be hardwired to ZERO
+    register #(32) X1  (clk, reset_n, writedata, write & (addr_1[1] | addr_2[1]), x1);
+    register #(32) X2  (clk, reset_n, writedata, write & (addr_1[2] | addr_2[2]), x2);
+    register #(32) X3  (clk, reset_n, writedata, write & (addr_1[3] | addr_2[3]), x3);
+    register #(32) X4  (clk, reset_n, writedata, write & (addr_1[4] | addr_2[4]), x4);
+    register #(32) X5  (clk, reset_n, writedata, write & (addr_1[5] | addr_2[5]), x5);
+    register #(32) X6  (clk, reset_n, writedata, write & (addr_1[6] | addr_2[6]), x6);
+    register #(32) X7  (clk, reset_n, writedata, write & (addr_1[7] | addr_2[7]), x7);
+    register #(32) X8  (clk, reset_n, writedata, write & (addr_1[8] | addr_2[8]), x8);
+    register #(32) X9  (clk, reset_n, writedata, write & (addr_1[9] | addr_2[9]), x9);
+    register #(32) X10 (clk, reset_n, writedata, write & (addr_1[10] | addr_2[10]), x10);
+    register #(32) X11 (clk, reset_n, writedata, write & (addr_1[11] | addr_2[11]), x11);
+    register #(32) X12 (clk, reset_n, writedata, write & (addr_1[12] | addr_2[12]), x12);
+    register #(32) X13 (clk, reset_n, writedata, write & (addr_1[13] | addr_2[13]), x13);
+    register #(32) X14 (clk, reset_n, writedata, write & (addr_1[14] | addr_2[14]), x14);
+    register #(32) X15 (clk, reset_n, writedata, write & (addr_1[15] | addr_2[15]), x15);
+    register #(32) X16 (clk, reset_n, writedata, write & (addr_1[16] | addr_2[16]), x16);
+    register #(32) X17 (clk, reset_n, writedata, write & (addr_1[17] | addr_2[17]), x17);
+    register #(32) X18 (clk, reset_n, writedata, write & (addr_1[18] | addr_2[18]), x18);
+    register #(32) X19 (clk, reset_n, writedata, write & (addr_1[19] | addr_2[19]), x19);
+    register #(32) X20 (clk, reset_n, writedata, write & (addr_1[20] | addr_2[20]), x20);
+    register #(32) X21 (clk, reset_n, writedata, write & (addr_1[21] | addr_2[21]), x21);
+    register #(32) X22 (clk, reset_n, writedata, write & (addr_1[22] | addr_2[22]), x22);
+    register #(32) X23 (clk, reset_n, writedata, write & (addr_1[23] | addr_2[23]), x23);
+    register #(32) X24 (clk, reset_n, writedata, write & (addr_1[24] | addr_2[24]), x24);
+    register #(32) X25 (clk, reset_n, writedata, write & (addr_1[25] | addr_2[25]), x25);
+    register #(32) X26 (clk, reset_n, writedata, write & (addr_1[26] | addr_2[26]), x26);
+    register #(32) X27 (clk, reset_n, writedata, write & (addr_1[27] | addr_2[27]), x27);
+    register #(32) X28 (clk, reset_n, writedata, write & (addr_1[28] | addr_2[28]), x28);
+    register #(32) X29 (clk, reset_n, writedata, write & (addr_1[29] | addr_2[29]), x29);
+    register #(32) X30 (clk, reset_n, writedata, write & (addr_1[30] | addr_2[30]), x30);
+    register #(32) X31 (clk, reset_n, writedata, write & (addr_1[31] | addr_2[31]), x31);
 endmodule: reg_file
 
 module register (clock, reset, in, enable, out);
@@ -59,8 +63,12 @@ module register (clock, reset, in, enable, out);
     always @(posedge clock) begin
         if (!reset) begin
             out = {k{1'b0}};
-        end else if (enable) begin
-            out = in;
+        end else begin
+            case (enable)
+                1'b1: out <= in;
+                1'b0: out <= out;
+                default: out <= out;
+            endcase
         end
     end
 endmodule

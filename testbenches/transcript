@@ -1,0 +1,233 @@
+# Compile of tb_rtl_reg_file.sv failed with 4 errors.
+# Compile of reg_file.sv failed with 1 errors.
+# 2 compiles, 2 failed with 5 errors.
+# Compile of tb_rtl_reg_file.sv failed with 2 errors.
+# Compile of reg_file.sv failed with 1 errors.
+# 2 compiles, 2 failed with 3 errors.
+# Compile of tb_rtl_reg_file.sv failed with 2 errors.
+# Compile of reg_file.sv failed with 1 errors.
+# 2 compiles, 2 failed with 3 errors.
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv failed with 1 errors.
+# 2 compiles, 1 failed with 1 error.
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv was successful.
+# 2 compiles, 0 failed with no errors.
+vsim -gui work.tb_rtl_reg_file
+# vsim -gui work.tb_rtl_reg_file 
+# Start time: 12:20:22 on May 01,2024
+# Loading sv_std.std
+# Loading work.tb_rtl_reg_file
+# Loading work.reg_file
+# Loading work.decoder
+# Loading work.multiplexer_32input
+# Loading work.register
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(23): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X0 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(24): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X1 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(25): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X2 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(26): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X3 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(27): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X4 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(28): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X5 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(29): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X6 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(30): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X7 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(31): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X8 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(32): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X9 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(33): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X10 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(34): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X11 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(35): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X12 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(36): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X13 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(37): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X14 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(38): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X15 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(39): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X16 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(40): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X17 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(41): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X18 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(42): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X19 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(43): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X20 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(44): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X21 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(45): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X22 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(46): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X23 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(47): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X24 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(48): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X25 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(49): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X26 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(50): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X27 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(51): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X28 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(52): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X29 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(53): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X30 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+# ** Warning: (vsim-3015) C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(54): [PCDPC] - Port size (32) does not match connection size (1) for port 'in'. The port definition is at: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv(57).
+#    Time: 0 ps  Iteration: 0  Instance: /tb_rtl_reg_file/dut/X31 File: C:/Users/alexm/math/RISC-V-Computer/source/reg_file.sv
+add wave  \
+sim:/tb_rtl_reg_file/dut/clk \
+sim:/tb_rtl_reg_file/dut/reset_n \
+sim:/tb_rtl_reg_file/dut/write \
+sim:/tb_rtl_reg_file/dut/rs1 \
+sim:/tb_rtl_reg_file/dut/rs2 \
+sim:/tb_rtl_reg_file/dut/rd \
+sim:/tb_rtl_reg_file/dut/writedata \
+sim:/tb_rtl_reg_file/dut/readdata_1 \
+sim:/tb_rtl_reg_file/dut/readdata_2
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv was successful.
+# 2 compiles, 0 failed with no errors.
+add wave  \
+sim:/tb_rtl_reg_file/dut/x0 \
+sim:/tb_rtl_reg_file/dut/x1 \
+sim:/tb_rtl_reg_file/dut/x2 \
+sim:/tb_rtl_reg_file/dut/x3 \
+sim:/tb_rtl_reg_file/dut/x4 \
+sim:/tb_rtl_reg_file/dut/x5 \
+sim:/tb_rtl_reg_file/dut/x6 \
+sim:/tb_rtl_reg_file/dut/x7 \
+sim:/tb_rtl_reg_file/dut/x8 \
+sim:/tb_rtl_reg_file/dut/x9 \
+sim:/tb_rtl_reg_file/dut/x10 \
+sim:/tb_rtl_reg_file/dut/x11 \
+sim:/tb_rtl_reg_file/dut/x12 \
+sim:/tb_rtl_reg_file/dut/x13 \
+sim:/tb_rtl_reg_file/dut/x14 \
+sim:/tb_rtl_reg_file/dut/x15 \
+sim:/tb_rtl_reg_file/dut/x16 \
+sim:/tb_rtl_reg_file/dut/x17 \
+sim:/tb_rtl_reg_file/dut/x18 \
+sim:/tb_rtl_reg_file/dut/x19 \
+sim:/tb_rtl_reg_file/dut/x20 \
+sim:/tb_rtl_reg_file/dut/x21 \
+sim:/tb_rtl_reg_file/dut/x22 \
+sim:/tb_rtl_reg_file/dut/x23 \
+sim:/tb_rtl_reg_file/dut/x24 \
+sim:/tb_rtl_reg_file/dut/x25 \
+sim:/tb_rtl_reg_file/dut/x26 \
+sim:/tb_rtl_reg_file/dut/x27 \
+sim:/tb_rtl_reg_file/dut/x28 \
+sim:/tb_rtl_reg_file/dut/x29 \
+sim:/tb_rtl_reg_file/dut/x30 \
+sim:/tb_rtl_reg_file/dut/x31
+restart -f; run -all
+# Loading work.tb_rtl_reg_file
+# Loading work.reg_file
+# Loading work.decoder
+# Loading work.multiplexer_32input
+# Loading work.register
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(30)
+#    Time: 138 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 30
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv was successful.
+# 2 compiles, 0 failed with no errors.
+restart -f; run -all
+# Loading work.tb_rtl_reg_file
+# Loading work.reg_file
+# Loading work.decoder
+# Loading work.multiplexer_32input
+# Loading work.register
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(30)
+#    Time: 138 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 30
+add wave  \
+sim:/tb_rtl_reg_file/dut/X8/clock \
+sim:/tb_rtl_reg_file/dut/X8/reset \
+sim:/tb_rtl_reg_file/dut/X8/enable \
+sim:/tb_rtl_reg_file/dut/X8/in \
+sim:/tb_rtl_reg_file/dut/X8/out
+restart -f; run -all
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(30)
+#    Time: 138 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 30
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv was successful.
+# 2 compiles, 0 failed with no errors.
+restart -f; run -all
+# Loading work.tb_rtl_reg_file
+# Loading work.reg_file
+# Loading work.decoder
+# Loading work.multiplexer_32input
+# Loading work.register
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(35)
+#    Time: 144 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 35
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv was successful.
+# 2 compiles, 0 failed with no errors.
+restart -f; run -all
+# Loading work.tb_rtl_reg_file
+# Loading work.reg_file
+# Loading work.decoder
+# Loading work.multiplexer_32input
+# Loading work.register
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(36)
+#    Time: 144 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 36
+# WARNING: No extended dataflow license exists
+# Error: invalid command name "::.main_pane.dataflow.interior.cs.body.pw.df.c"
+# Error: invalid command name "::.main_pane.dataflow.interior.cs.body.pw.df.c"
+# Error: invalid command name "::.main_pane.dataflow.interior.cs.body.pw.df.c"
+add wave  \
+sim:/tb_rtl_reg_file/dut/addr_1 \
+sim:/tb_rtl_reg_file/dut/addr_2
+restart -f; run -all
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(36)
+#    Time: 144 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 36
+# Compile of tb_rtl_reg_file.sv was successful.
+# Compile of reg_file.sv was successful.
+# 2 compiles, 0 failed with no errors.
+restart -f; run -all
+# Loading work.tb_rtl_reg_file
+# Loading work.reg_file
+# Loading work.decoder
+# Loading work.multiplexer_32input
+# Loading work.register
+# ------------------Begin reg_file.sv testbench
+# 
+# Test 1: write data to each register
+# ** Note: $stop    : C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv(36)
+#    Time: 144 ps  Iteration: 0  Instance: /tb_rtl_reg_file
+# Break in Module tb_rtl_reg_file at C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv line 36
