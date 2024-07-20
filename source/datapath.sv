@@ -11,10 +11,12 @@
      **      - Connect output of data memory (RAM) to the "writedata" port of 
      **          the register bank
     */
-module datapath (clk, rst_n, rb_wren, alu_control, ram_write, ram_read, ram_writedata, ram_readdata, rom_read);
-    logic clk, rst_n, rb_wren, ram_write, ram_read, rom_read;
-    logic [31:0] ram_writedata, ram_readdata;
-    logic [31:0] A_out, B_out;
+module datapath (logic clk, logic rst_n, logic rb_wren, logic ram_write, logic ram_read,  logic rom_read,
+                logic [2:0] alu_control,  
+                logic [4:0] rs_1, rs_2, rd_0;
+                logic [31:0] ram_writedata, logic [31:0] ram_readdata);
+
+    logic [31:0] A_out, B_out, data_memory_out;
 
 
     /**
@@ -29,29 +31,37 @@ module datapath (clk, rst_n, rb_wren, alu_control, ram_write, ram_read, ram_writ
      **             just one register output and a constant into the two 
      **             ports of the ALU)
     */
-    regfile REGISTER_BANK  (.clk(clk),
-                            .reset_n(rst_n),
-                            .rs1(),
-                            .rs2(),
-                            .rd(),
-                            .write(),
-                            .writedata(),
-                            .readdata_1(A_out),
-                            .readdata_2(B_out));
+    reg_file REGISTER_BANK      (.clk(clk),
+                                .reset_n(rst_n),
+                                .rs1(rs_1),
+                                .rs2(rs_2),
+                                .rd(rd_0),
+                                .write(rb_wren),
+                                .writedata(data_memory_out),
+                                .readdata_1(A_out),
+                                .readdata_2(B_out));
 
-    alu ALU    (.Ain(A_out),
-                .Bin(B_out),
-                .ALUop(),
-                .out(),
-                .status());
+    alu ALU                     (.Ain(A_out),
+                                .Bin(B_out),
+                                .ALUop(alu_control),
+                                .out(),
+                                .status());
 
-    register #(32) PC  (.clk(clk),
-                        .reset(rst_n),
-                        .in(),
-                        .enable(pc_en),
-                        .out());
+    register #(32) PC           (.clk(clk),
+                                .reset(rst_n),
+                                .in(),
+                                .enable(pc_en),
+                                .out());
 
-    
+    memory DATA_MEMORY          (.clock(clk),
+                                .address(),
+                                .data(),
+                                .wren(),
+                                .q(data_memory_out));
 
-
+    memory INSTRUCTION_MEMORY   (.clock(clk),
+                                .address(),
+                                .data(),
+                                .wren(),
+                                .q());
 endmodule: datapath 
