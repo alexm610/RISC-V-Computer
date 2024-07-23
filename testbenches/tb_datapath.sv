@@ -6,6 +6,8 @@ module tb_datapath;
     logic [4:0] rs_1, rs_2, rd_0;
     logic [31:0] writedata, alu_result;
     int i = 0;
+    int j = 0;
+    int counter = 0;
     int correct_answer = 0;
 
     datapath dut (.*);
@@ -38,22 +40,18 @@ module tb_datapath;
             end
         end
 
-        $display("Test 2: operate on registers X23 and X4 - ADD");
-        rs_1 = 32'd4;
-        rs_2 = 32'd23;
         alu_control = 3'b010;
-        correct_answer = ((4+1) * 2) + ((23+1) * 2);
-        #8; 
-        assert(alu_result == correct_answer) else $error("Addition failed: expected %d, instead got %d", correct_answer, alu_result);
-
-        $display("Test 3: operate on registers X17 and X9 - SUB");
-        rs_1 = 32'd17;
-        rs_2 = 32'd9;
-        alu_control = 3'b110;
-        correct_answer = ((17+1) * 2) - ((9+1) * 2);
-        #8; 
-        assert(alu_result == correct_answer) else $error("Addition failed: expected %d, instead got %d", correct_answer, alu_result);
-
+        for (i = 1; i < 32; i = i + 1) begin
+            for (j = 1; j < 32; j = j + 1) begin
+                $display("Test %d: ADD X%d X%d\n", counter+1, i[4:0], j[4:0]);
+                rs_1 = i[4:0];
+                rs_2 = j[4:0];
+                correct_answer = ((rs_1 + 1) * 2) + ((rs_2 + 1) * 2);
+                #8;
+                assert(alu_result == correct_answer) else $error("Addition failed: expected %d, instead got %d", correct_answer, alu_result);
+                counter = counter + 1;
+            end
+        end
 
         #4; 
         $stop;
