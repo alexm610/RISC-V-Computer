@@ -1,8 +1,0 @@
-C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv {1 {vlog -work work -sv -stats=none C:/Users/alexm/math/RISC-V-Computer/testbenches/tb_rtl_reg_file.sv
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module tb_rtl_reg_file
-
-Top level modules:
-	tb_rtl_reg_file
-
-} {} {}}

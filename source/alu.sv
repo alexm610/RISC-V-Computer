@@ -4,10 +4,11 @@ module alu (Ain, Bin, ALUop, out, status);
     input logic [2:0] ALUop;
     input logic [31:0] Ain, Bin;
     output logic [2:0] status;
-    output logic [31:0] out, dummy_output;
+    output logic [31:0] out;
+    logic [31:0] dummy_output;
     logic overflow;
 
-    AddSub #(32) overflow_detection (Ain, Bin, 1, dummy_output, overflow);
+    AddSub #(32) overflow_detection (Ain, Bin, 32'h1, dummy_output, overflow);
 
     always @(*) begin
         case (ALUop) 
@@ -24,7 +25,7 @@ module alu (Ain, Bin, ALUop, out, status);
     // set status bits: status = {NEGATIVE, OVERFLOW, ZERO}
     always @(*) begin
         case (out) 
-            32'd0: status[0] = 1
+            32'd0: status[0] = 1;
             default: status[0] = 0;
         endcase
         case (overflow)
