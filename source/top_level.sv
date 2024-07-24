@@ -4,7 +4,7 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
                     output logic [9:0] LEDR);
 
     cpu PROCESSOR   (.clk(CLOCK_50),
-                    .rst_n(KEY[3]),
+                    .rst_n(KEY[3])
                     );
 
     memory DATA_MEMORY          (.clock(clk),
