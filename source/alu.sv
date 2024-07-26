@@ -15,9 +15,11 @@ module alu (Ain, Bin, ALUop, out, status);
             // Instructions needing the ALU: BEQ, ADD, SUB, AND, OR
             3'b010: out = Ain + Bin;
             3'b110: out = Ain - Bin;
-            3'b000: out = Ain & Bin;
+            3'b000: out = Ain ^ Bin;
             3'b001: out = Ain | Bin;
-            //3'b111: out = set less than (SLT) -> I don't know what this means yet
+            3'b000: out = Ain & Bin;
+            3'b000: out = Ain << Bin;
+            3'b000: out = Ain >> Bin;
             default: out = 32'd0;
         endcase
     end
