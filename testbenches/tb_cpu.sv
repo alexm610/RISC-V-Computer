@@ -3,6 +3,7 @@
 module tb_cpu;
     logic clk, rst_n;
     logic [7:0] LED;
+    logic [31:0] instruction, PC_out;
     int i = 0;
     int j = 0;
     int counter = 0;
@@ -18,8 +19,10 @@ module tb_cpu;
     end
 
     initial begin
-        rst_n = 1'b1; #2;
+        
 
+        /*
+        rst_n = 1'b1; #2;
         $readmemh("C:\\Users\\alexm\\math\\RISC-V-Computer\\testbenches\\add.mem", mem_file_1);
         for (i = 0; i < 2; i = i + 1) begin
             dut.im_en = 1'b1;
@@ -28,23 +31,26 @@ module tb_cpu;
             #2;
         end
         dut.im_en = 1'b0;
+        */
+
 
         $display("------ Begin cpu.sv testbench ------");
         $display("");
         /*
-        tEST 1
+        TEST 1
 
-        ADD X2, X3, X5
-        ADD X7, X4, X6
+        ADDI X3, X13, 34 // immediate is in decimal form
+        0x02268193
+
         */
 
         error = 1'b0;
+        instruction = 32'h02268193;
+        rst_n = 1'b1; #2;
+        rst_n = 1'b0; #2;
+        rst_n = 1'b1; #2;
 
-        rst_n = 1; #2;
-        rst_n = 0; #2;
-        rst_n = 1; #2;
-
-        #4;
+        #400;
         if (!error) begin
             $display("No errors thrown!");
         end else begin

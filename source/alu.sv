@@ -17,9 +17,9 @@ module alu (Ain, Bin, ALUop, out, status);
             3'b110: out = Ain - Bin;
             3'b000: out = Ain ^ Bin;
             3'b001: out = Ain | Bin;
-            3'b000: out = Ain & Bin;
-            3'b000: out = Ain << Bin;
-            3'b000: out = Ain >> Bin;
+            3'b011: out = Ain & Bin; // not correct here onwards
+            3'b101: out = Ain << Bin;
+            3'b100: out = Ain >> Bin;
             default: out = 32'd0;
         endcase
     end
