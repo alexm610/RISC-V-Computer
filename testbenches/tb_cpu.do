@@ -3,9 +3,9 @@ quietly WaveActivateNextPane {} 0
 add wave -noupdate -divider -height 40 CPU
 add wave -noupdate /tb_cpu/dut/clk
 add wave -noupdate /tb_cpu/dut/rst_n
-add wave -noupdate /tb_cpu/dut/instruction
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/instruction
 add wave -noupdate /tb_cpu/dut/LED
-add wave -noupdate /tb_cpu/dut/PC_out
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_out
 add wave -noupdate /tb_cpu/dut/reg_bank_write
 add wave -noupdate /tb_cpu/dut/PC_en
 add wave -noupdate /tb_cpu/dut/im_en
@@ -21,7 +21,7 @@ add wave -noupdate -radix hexadecimal /tb_cpu/dut/datapath_out
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_in
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm
 add wave -noupdate /tb_cpu/dut/state
-add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm_I_TYPE
+add wave -noupdate -radix decimal /tb_cpu/dut/imm_I_TYPE
 add wave -noupdate -divider -height 40 DATAPATH
 add wave -noupdate /tb_cpu/dut/HW/write_rb
 add wave -noupdate /tb_cpu/dut/HW/alu_source
@@ -80,12 +80,16 @@ add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/REGISTER_BANK/x30
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/REGISTER_BANK/x31
 add wave -noupdate -divider -height 40 ALU
 add wave -noupdate /tb_cpu/dut/HW/ALU/ALUop
-add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/ALU/Ain
-add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/ALU/Bin
+add wave -noupdate -radix decimal /tb_cpu/dut/HW/ALU/Ain
+add wave -noupdate -radix decimal /tb_cpu/dut/HW/ALU/Bin
 add wave -noupdate /tb_cpu/dut/HW/ALU/status
-add wave -noupdate /tb_cpu/dut/HW/ALU/out
+add wave -noupdate -radix binary /tb_cpu/dut/HW/ALU/out
+add wave -noupdate -divider -height 40 PC
+add wave -noupdate /tb_cpu/dut/PC/enable
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC/in
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC/out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {20 ps} 0}
+WaveRestoreCursors {{Cursor 1} {79 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 278
 configure wave -valuecolwidth 100
@@ -101,4 +105,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {350 ps} {409 ps}
+WaveRestoreZoom {52 ps} {84 ps}
