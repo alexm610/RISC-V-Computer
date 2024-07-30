@@ -6,6 +6,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     logic [2:0] alu_OP, funct3;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
+    logic [11:0] imm_I_TYPE;
     logic [31:0] datapath_out, PC_in, imm;
     enum {START, OPERATE_ALU, WRITE_BACK, INCREMENT_PC, COMPLETE_R} state;
 
@@ -24,7 +25,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     register #(32) PC           (.clock(clk),
                                 .reset(rst_n),
                                 .in(PC_in),
-                                .enable(PC_en),
+                                .enable(1'b1),
                                 .out(PC_out));
 
     always @(posedge clk) begin
@@ -42,7 +43,8 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     assign funct7     = instruction[31:25];
     assign opcode     = instruction[6:0];
     assign imm_I_TYPE = instruction[31:20];
-    assign imm        = imm_I_TYPE;
+    assign imm        = {{20{1'b0}}, imm_I_TYPE};
+    assign alu_OP     = funct3;
 
     always @(posedge clk) begin
         if (!rst_n) begin

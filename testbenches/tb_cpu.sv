@@ -4,7 +4,7 @@ module tb_cpu;
     logic clk, rst_n;
     logic [7:0] LED;
     logic [31:0] instruction, PC_out;
-    int i = 0;
+    int i = 4;
     int j = 0;
     int counter = 0;
     int correct_answer = 0;
@@ -50,7 +50,20 @@ module tb_cpu;
         rst_n = 1'b0; #2;
         rst_n = 1'b1; #2;
 
-        #400;
+        wait(PC_out == i);
+        i = i + 4;
+        
+        /*
+        TEST 2
+
+        ADDI X29, X0, 198 // immediate is in decimal form
+        0x0C600E93
+        */
+        instruction = 32'h0C600E93; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
+        
         if (!error) begin
             $display("No errors thrown!");
         end else begin

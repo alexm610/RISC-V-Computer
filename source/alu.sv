@@ -1,4 +1,4 @@
-//`include "defines.sv"
+`include "defines.sv"
 
 module alu (Ain, Bin, ALUop, out, status);
     input logic [2:0] ALUop;
@@ -13,13 +13,13 @@ module alu (Ain, Bin, ALUop, out, status);
     always @(*) begin
         case (ALUop) 
             // Instructions needing the ALU: BEQ, ADD, SUB, AND, OR
-            3'b010: out = Ain + Bin;
+            `ADD: out = Ain + Bin;
             3'b110: out = Ain - Bin;
-            3'b000: out = Ain ^ Bin;
+            `XOR: out = Ain ^ Bin;
             3'b001: out = Ain | Bin;
             3'b011: out = Ain & Bin; // not correct here onwards
             3'b101: out = Ain << Bin;
-            3'b100: out = Ain >> Bin;
+            3'b111: out = Ain >> Bin;
             default: out = 32'd0;
         endcase
     end
