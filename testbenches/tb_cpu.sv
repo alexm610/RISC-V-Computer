@@ -103,6 +103,26 @@ module tb_cpu;
         wait(PC_out == i);
         i = i + 4;
 
+        /*
+        TEST 7
+
+        ANDI X9, X20, 21 // immediate is in decimal form
+        0X015A7493
+        */
+        instruction = 32'h015A7493; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
+        /*
+        TEST 8
+
+        ANDI X25, X29, 115 // immediate is in decimal form
+        0X073EFC93
+        */
+        instruction = 32'h073EFC93; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
 
         if (!error) begin
             $display("No errors thrown!");
