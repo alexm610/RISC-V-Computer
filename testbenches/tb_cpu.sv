@@ -63,7 +63,27 @@ module tb_cpu;
         wait(PC_out == i);
         i = i + 4;
 
-        
+        /*
+        TEST 3
+
+        XORI X20, X30, 76 // immediate is in decimal form
+        0x04CF4A13
+        */
+        instruction = 32'h04CF4A13; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
+        /*
+        TEST 4
+
+        XORI X15, X7, 203 // immediate is in decimal form
+        0x04CF4A13
+        */
+        instruction = 32'h0CB3C793; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
+
         if (!error) begin
             $display("No errors thrown!");
         end else begin
