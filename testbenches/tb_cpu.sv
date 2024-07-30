@@ -77,9 +77,29 @@ module tb_cpu;
         TEST 4
 
         XORI X15, X7, 203 // immediate is in decimal form
-        0x04CF4A13
+        0x0CB3C793
         */
         instruction = 32'h0CB3C793; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
+        /*
+        TEST 5
+
+        ORI X12, X6, 43 // immediate is in decimal form
+        0x02B36613
+        */
+        instruction = 32'h02B36613; #2;
+        wait(PC_out == i);
+        i = i + 4;
+
+        /*
+        TEST 6
+
+        ORI X19, X31, 172 // immediate is in decimal form
+        0X0ACFE993
+        */
+        instruction = 32'h0ACFE993; #2;
         wait(PC_out == i);
         i = i + 4;
 

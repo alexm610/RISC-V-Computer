@@ -10,3 +10,4 @@
 /* ALUop */
 `define ADD             3'b000
 `define XOR             3'b100
+`define OR              3'b110

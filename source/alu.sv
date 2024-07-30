@@ -12,13 +12,9 @@ module alu (Ain, Bin, ALUop, out, status);
 
     always @(*) begin
         case (ALUop) 
-            `ADD: out = Ain + Bin;
-            3'b110: out = Ain - Bin;
-            `XOR: out = Ain ^ Bin;
-            3'b001: out = Ain | Bin;
-            3'b011: out = Ain & Bin; 
-            3'b101: out = Ain << Bin;
-            3'b111: out = Ain >> Bin;
+            `ADD:   out = Ain + Bin;
+            `XOR:   out = Ain ^ Bin;
+            `OR:    out = Ain | Bin;
             default: out = 32'd0;
         endcase
     end
