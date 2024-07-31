@@ -58,8 +58,8 @@ endmodule: reg_file
 module register (clock, reset, in, enable, out);
     parameter k = 32;
     input logic clock, reset, enable;
-    input logic[k-1:0] in;
-    output logic [k-1:0] out;
+    input logic [k-1:0] in;
+    output logic signed [k-1:0] out;
 
     always @(posedge clock) begin
         if (!reset) begin
