@@ -82,7 +82,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                 end
                 COMPLETE_R: begin
                     state <= START;
-                    PC_en <= 0;
+                    PC_en <= 1'b0;
                 end
             endcase
         end

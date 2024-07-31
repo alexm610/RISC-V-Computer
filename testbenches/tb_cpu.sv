@@ -135,6 +135,29 @@ module tb_cpu;
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X31.out == (dut.HW.REGISTER_BANK.X15.out << 3));
 
+        /*
+        TEST 11
+
+        SRLI X18, X17, 2 // immediate is in decimal form
+        0x0028d913
+        */
+        instruction = 32'h0028d913; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X18.out == (dut.HW.REGISTER_BANK.X17.out >> 2));
+
+        /*
+        TEST 12
+
+        SRLI X6, X9, 1 // immediate is in decimal form
+        0x0014d313
+        */
+        instruction = 32'h0014d313; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X6.out == (dut.HW.REGISTER_BANK.X9.out >> 1));
+        
+
         if (!error) begin
             $display("No errors thrown!");
         end else begin
