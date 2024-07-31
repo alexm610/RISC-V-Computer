@@ -2,7 +2,7 @@
 
 module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction, 
             output logic [7:0] LED, output logic [31:0] PC_out);
-    logic reg_bank_write, PC_en, im_en, alu_SRC;
+    logic reg_bank_write, PC_en, alu_SRC;
     logic [2:0] alu_OP, funct3;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
@@ -36,15 +36,15 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
         end
     end
 
-    assign rs1        = instruction[19:15];
-    assign rs2        = instruction[24:20];
-    assign rd0        = instruction[11:7];
-    assign funct3     = instruction[14:12];
-    assign funct7     = instruction[31:25];
-    assign opcode     = instruction[6:0];
-    assign imm_I_TYPE = instruction[31:20];
-    assign imm        = {{20{1'b0}}, imm_I_TYPE};
-    assign alu_OP     = funct3;
+    assign rs1          = instruction[19:15];
+    assign rs2          = instruction[24:20];
+    assign rd0          = instruction[11:7];
+    assign funct3       = instruction[14:12];
+    assign funct7       = instruction[31:25];
+    assign opcode       = instruction[6:0];
+    assign imm_I_TYPE   = instruction[31:20];
+    assign imm          = {{20{1'b0}}, imm_I_TYPE};
+    assign alu_OP       = funct3;
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -65,7 +65,6 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                 end
                 OPERATE_ALU: begin
                     state <= WRITE_BACK;
-
                     if (opcode == `R_TYPE) begin
                         alu_SRC <= 1'b1;
                     end else if (opcode == `I_TYPE) begin

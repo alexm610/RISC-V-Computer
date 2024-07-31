@@ -12,3 +12,4 @@
 `define XOR             3'b100
 `define OR              3'b110
 `define AND             3'b111
+`define SL              3'b001

@@ -8,7 +8,6 @@ add wave -noupdate /tb_cpu/dut/LED
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_out
 add wave -noupdate /tb_cpu/dut/reg_bank_write
 add wave -noupdate /tb_cpu/dut/PC_en
-add wave -noupdate /tb_cpu/dut/im_en
 add wave -noupdate /tb_cpu/dut/alu_SRC
 add wave -noupdate /tb_cpu/dut/alu_OP
 add wave -noupdate /tb_cpu/dut/funct3
@@ -89,7 +88,7 @@ add wave -noupdate /tb_cpu/dut/PC/enable
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC/in
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC/out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {79 ps} 0}
+WaveRestoreCursors {{Cursor 1} {60 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 278
 configure wave -valuecolwidth 100

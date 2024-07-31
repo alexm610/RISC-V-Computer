@@ -19,21 +19,6 @@ module tb_cpu;
     end
 
     initial begin
-        
-
-        /*
-        rst_n = 1'b1; #2;
-        $readmemh("C:\\Users\\alexm\\math\\RISC-V-Computer\\testbenches\\add.mem", mem_file_1);
-        for (i = 0; i < 2; i = i + 1) begin
-            dut.im_en = 1'b1;
-            dut.pc_in = i[8:0];
-            dut.data_in = mem_file_1[i];
-            #2;
-        end
-        dut.im_en = 1'b0;
-        */
-
-
         $display("------ Begin cpu.sv testbench ------");
         $display("");
         /*
@@ -52,7 +37,7 @@ module tb_cpu;
 
         wait(PC_out == i);
         i = i + 4;
-        
+        assert(dut.HW.REGISTER_BANK.X3.out == 32'd34);
         /*
         TEST 2
 
@@ -62,7 +47,7 @@ module tb_cpu;
         instruction = 32'h0C600E93; #2;
         wait(PC_out == i);
         i = i + 4;
-
+        assert(dut.HW.REGISTER_BANK.X29.out == 32'd198);
         /*
         TEST 3
 
@@ -72,7 +57,7 @@ module tb_cpu;
         instruction = 32'h04CF4A13; #2;
         wait(PC_out == i);
         i = i + 4;
-
+        assert(dut.HW.REGISTER_BANK.X20.out == 32'd76);
         /*
         TEST 4
 
@@ -82,6 +67,7 @@ module tb_cpu;
         instruction = 32'h0CB3C793; #2;
         wait(PC_out == i);
         i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X15.out == 32'd203);
 
         /*
         TEST 5
@@ -92,6 +78,7 @@ module tb_cpu;
         instruction = 32'h02B36613; #2;
         wait(PC_out == i);
         i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X12.out == 32'd43);
 
         /*
         TEST 6
@@ -102,6 +89,7 @@ module tb_cpu;
         instruction = 32'h0ACFE993; #2;
         wait(PC_out == i);
         i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X19.out == 32'd172);
 
         /*
         TEST 7
@@ -112,6 +100,7 @@ module tb_cpu;
         instruction = 32'h015A7493; #2;
         wait(PC_out == i);
         i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X9.out == (32'd21 & dut.HW.REGISTER_BANK.X20.out));
 
         /*
         TEST 8
@@ -122,6 +111,7 @@ module tb_cpu;
         instruction = 32'h073EFC93; #2;
         wait(PC_out == i);
         i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X25.out == (32'd115 & dut.HW.REGISTER_BANK.X29.out));
 
 
         if (!error) begin

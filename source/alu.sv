@@ -16,6 +16,7 @@ module alu (Ain, Bin, ALUop, out, status);
             `XOR:   out = Ain ^ Bin;
             `OR:    out = Ain | Bin;
             `AND:   out = Ain & Bin;
+            `SL:    out = Ain << Bin[4:0];
             default: out = 32'd0;
         endcase
     end
