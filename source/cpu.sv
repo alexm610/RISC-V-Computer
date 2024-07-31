@@ -2,7 +2,7 @@
 
 module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction, 
             output logic [7:0] LED, output logic [31:0] PC_out);
-    logic reg_bank_write, PC_en, alu_SRC;
+    logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero;
     logic [2:0] alu_OP, funct3;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
@@ -20,7 +20,10 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                                 .rd_0(rd0),
                                 .writedata(datapath_out),
                                 .alu_result(datapath_out),
-                                .immediate(imm));
+                                .immediate(imm),
+                                .negative(negative),
+                                .overflow(overflow),
+                                .zero(zero));
 
     register #(32) PC           (.clock(clk),
                                 .reset(rst_n),
