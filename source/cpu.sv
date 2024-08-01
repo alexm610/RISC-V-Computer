@@ -1,10 +1,11 @@
+`include "defines.sv"
 module cpu (input logic clk, input logic rst_n, output logic [7:0] LED);
     logic reg_bank_write, pc_en, im_en;
     logic [2:0] alu_OP, funct3;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
     logic [31:0] instruction_mem_out, datapath_out, data_mem_out, pc_in, pc_out, data_in;
-    enum {START, DECODE} state;
+    enum {START, OPERATE_ALU, WRITE_BACK, INCREMENT_PC, COMPLETE_R} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -16,7 +17,7 @@ module cpu (input logic clk, input logic rst_n, output logic [7:0] LED);
                                 .writedata(datapath_out),
                                 .alu_result(datapath_out));
 
-    register #(32) PC           (.clk(clk),
+    register #(32) PC           (.clock(clk),
                                 .reset(rst_n),
                                 .in(pc_in),
                                 .enable(pc_en),
@@ -58,7 +59,7 @@ module cpu (input logic clk, input logic rst_n, output logic [7:0] LED);
             case (state) 
                 START: begin
                     case (opcode)
-                        R_TYPE: begin
+                        `R_TYPE: begin
                             state <= OPERATE_ALU;
 
 
