@@ -3,7 +3,8 @@
 module tb_cpu;
     logic clk, rst_n;
     logic [7:0] LED;
-    int i = 0;
+    logic [31:0] instruction, PC_out;
+    int i = 4;
     int j = 0;
     int counter = 0;
     int correct_answer = 0;
@@ -18,33 +19,200 @@ module tb_cpu;
     end
 
     initial begin
-        rst_n = 1'b1; #2;
-
-        $readmemh("C:\\Users\\alexm\\math\\RISC-V-Computer\\testbenches\\add.mem", mem_file_1);
-        for (i = 0; i < 5; i = i + 1) begin
-            dut.im_en = 1'b1;
-            dut.pc_in = i[8:0];
-            dut.data_in = mem_file_1[i];
-            #2;
-        end
-        dut.im_en = 1'b0;
-
         $display("------ Begin cpu.sv testbench ------");
         $display("");
         /*
-        tEST 1
+        TEST 1
 
-        ADD X2, X3, X5
-        ADD X7, X4, X6
+        ADDI X3, X13, 34 // immediate is in decimal form
+        0x02268193
+
         */
 
         error = 1'b0;
+        instruction = 32'h02268193;
+        rst_n = 1'b1; #2;
+        rst_n = 1'b0; #2;
+        rst_n = 1'b1; #2;
 
-        rst_n = 1; #2;
-        rst_n = 0; #2;
-        rst_n = 1; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X3.out == 32'd34);
+        /*
+        TEST 2
 
-        #4;
+        ADDI X29, X0, 198 // immediate is in decimal form
+        0x0C600E93
+        */
+        instruction = 32'h0C600E93; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X29.out == 32'd198);
+        /*
+        TEST 3
+
+        XORI X20, X30, 76 // immediate is in decimal form
+        0x04CF4A13
+        */
+        instruction = 32'h04CF4A13; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X20.out == 32'd76);
+        /*
+        TEST 4
+
+        XORI X15, X7, 203 // immediate is in decimal form
+        0x0CB3C793
+        */
+        instruction = 32'h0CB3C793; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X15.out == 32'd203);
+
+        /*
+        TEST 5
+
+        ORI X12, X6, 43 // immediate is in decimal form
+        0x02B36613
+        */
+        instruction = 32'h02B36613; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X12.out == 32'd43);
+
+        /*
+        TEST 6
+
+        ORI X19, X31, 172 // immediate is in decimal form
+        0X0ACFE993
+        */
+        instruction = 32'h0ACFE993; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X19.out == 32'd172);
+
+        /*
+        TEST 7
+
+        ANDI X9, X20, 21 // immediate is in decimal form
+        0X015A7493
+        */
+        instruction = 32'h015A7493; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X9.out == (32'd21 & dut.HW.REGISTER_BANK.X20.out));
+
+        /*
+        TEST 8
+
+        ANDI X25, X29, 115 // immediate is in decimal form
+        0X073EFC93
+        */
+        instruction = 32'h073EFC93; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X25.out == (32'd115 & dut.HW.REGISTER_BANK.X29.out));
+
+        /*
+        TEST 9
+
+        SLLI X17, X9, 9 // immediate is in decimal form
+        0x00949893
+        */
+        instruction = 32'h00949893; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X17.out == (dut.HW.REGISTER_BANK.X9.out << 9));
+
+        /*
+        TEST 10
+
+        SLLI X31, X15, 3 // immediate is in decimal form
+        0x00379f93
+        */
+        instruction = 32'h00379f93; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X31.out == (dut.HW.REGISTER_BANK.X15.out << 3));
+
+        /*
+        TEST 11
+
+        SRLI X18, X17, 2 // immediate is in decimal form
+        0x0028d913
+        */
+        instruction = 32'h0028d913; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X18.out == (dut.HW.REGISTER_BANK.X17.out >> 2));
+
+        /*
+        TEST 12
+
+        SRLI X6, X9, 1 // immediate is in decimal form
+        0x0014d313
+        */
+        instruction = 32'h0014d313; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X6.out == (dut.HW.REGISTER_BANK.X9.out >> 1));
+        
+        /*
+        TEST 13
+
+        ADDI, X2, X0, 1 // immediate is in decimal form
+        0x00100113
+        */
+        instruction = 32'h00100113; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X2.out == (32'd1));
+
+        /*
+        TEST 14
+
+        SLLI X1, X2, 31 // immediate is in decimal form
+        0x01f11093
+        */
+        instruction = 32'h01f11093; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X1.out == (dut.HW.REGISTER_BANK.X2.out << 32'd31));
+
+
+        /*
+        TEST 15
+
+        SRAI X12, X1, 2 // immediate is in decimal form
+        0x4020d613
+        */
+        instruction = 32'h4020d613; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X12.out == (dut.HW.REGISTER_BANK.X1.out >>> 2));
+
+        /*
+        TEST 16
+
+        SRLI X27, X12, 1 // immediate is in decimal form
+        0x00165d93
+        */
+        instruction = 32'h00165d93; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X27.out == (dut.HW.REGISTER_BANK.X12.out >> 1));
+        
+        /*
+        TEST 17
+
+        SRAI X28, X27, 1 // immediate is in decimal form
+        0x401dde13
+        */
+        instruction = 32'h401dde13; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+
         if (!error) begin
             $display("No errors thrown!");
         end else begin
