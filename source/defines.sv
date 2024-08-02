@@ -7,6 +7,8 @@
 `define U_TYPE_AUIPC    7'b0010111
 `define J_TYPE_JAL      7'b1101111
 `define J_TYPE_JALR     7'b1100111
+`define LOAD_TYPE       7'b0000011
+
 /* ALUop */
 `define ADD             3'b000
 `define XOR             3'b100
@@ -14,3 +16,5 @@
 `define AND             3'b111
 `define SL              3'b001
 `define SR              3'b101
+`define SLT             3'b010
+`define SLTU            3'b011

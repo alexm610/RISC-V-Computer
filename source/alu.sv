@@ -19,11 +19,13 @@ module alu (Ain, Bin, ALUop, out, status);
             `SL:    out = Ain << Bin[4:0];
             `SR: begin    
                 if (Bin[10]) begin
-                    out = Ain >>> Bin[4:0];
+                    out = Ain >>> Bin[4:0]; // arithmetic shift right
                 end else begin
-                    out = Ain >> Bin[4:0];
+                    out = Ain >> Bin[4:0]; // logical shift right
                 end
             end
+            `SLT:   out = (Ain < Bin) ? 32'h1 : 32'h0;
+            `SLTU:  out = (Ain < Bin) ? 32'h1 : 32'h0;
             default: out = 32'd0;
         endcase
     end

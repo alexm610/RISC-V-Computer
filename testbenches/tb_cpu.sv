@@ -1,9 +1,9 @@
 `timescale 1ps/1ps
 
 module tb_cpu;
-    logic clk, rst_n;
-    logic [7:0] LED;
-    logic [31:0] instruction, PC_out;
+    logic clk, rst_n, data_memory_write;
+    logic [9:0] data_memory_address;
+    logic [31:0] instruction, readdata, PC_out, RS2_readdata, conduit;
     int i = 4;
     int j = 0;
     int counter = 0;
@@ -28,7 +28,7 @@ module tb_cpu;
         0x02268193
 
         */
-
+        readdata = 32'h0BADF00D;
         error = 1'b0;
         instruction = 32'h02268193;
         rst_n = 1'b1; #2;
@@ -212,6 +212,45 @@ module tb_cpu;
         wait(PC_out == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+
+        /*
+        TEST 18
+
+        LB X0, 0(X2) // immediate is in decimal form
+        0x00010003
+        */
+        readdata = 32'h0BADF01D;
+        instruction = 32'h00010003; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        //assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+        #2;
+
+        /*
+        TEST 19
+
+        LH X4, 0(X2) // immediate is in decimal form
+        0x00011203
+        */
+        readdata = 32'h0BADF01D;
+        instruction = 32'h00011203; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        //assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+        #2;
+
+        /*
+        TEST 20
+
+        LW X13, 0(X2) // immediate is in decimal form
+        0x00012683
+        */
+        readdata = 32'h0BADF01D;
+        instruction = 32'h00012683; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        //assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+        #2;
 
         if (!error) begin
             $display("No errors thrown!");
