@@ -8,7 +8,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     logic [6:0] opcode, funct7;
     logic [11:0] imm_I_TYPE;
     logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux;
-    enum {START, OPERATE_ALU, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2} state;
+    enum {START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -40,6 +40,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
             default: readdata_mux = readdata;
         endcase
     end
+
     assign datapath_in          = mem_or_reg ? readdata_mux : datapath_out;
     assign conduit              = datapath_out;
     assign rs1                  = instruction[19:15];
@@ -76,35 +77,19 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     mem_or_reg          <= 1'b0;
                     case (opcode)
                         `R_TYPE: begin
-                            state <= OPERATE_ALU;
+                            state       <= WRITE_BACK;
+                            alu_SRC     <= 1'b1;
                         end
                         `I_TYPE: begin
-                            state <= OPERATE_ALU; 
+                            state       <= WRITE_BACK;
+                            alu_SRC     <= 1'b0; 
                         end       
                         `LOAD_TYPE: begin
-                            state <= OPERATE_ALU;
+                            state       <= ACCESS_MEMORY_1;
+                            alu_SRC     <= 1'b0;
                         end                 
                         default: state <= START;
                     endcase
-                end
-                OPERATE_ALU: begin
-                    case (state)
-                        `R_TYPE:    state <= WRITE_BACK;
-                        `I_TYPE:    state <= WRITE_BACK;
-                        `LOAD_TYPE: state <= ACCESS_MEMORY_1;
-                        default:    state <= START;
-                    endcase
-
-                    if (opcode == `R_TYPE) begin
-                        state   <= WRITE_BACK;
-                        alu_SRC <= 1'b1;
-                    end else if (opcode == `I_TYPE) begin
-                        state   <= WRITE_BACK;
-                        alu_SRC <= 1'b0;
-                    end else if (opcode == `LOAD_TYPE) begin
-                        state   <= ACCESS_MEMORY_1;
-                        alu_SRC <= 1'b0;
-                    end 
                 end
                 WRITE_BACK: begin
                     state           <= INCREMENT_PC;
