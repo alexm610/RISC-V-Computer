@@ -107,13 +107,13 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     end 
                 end
                 WRITE_BACK: begin
-                    state <= INCREMENT_PC;
-                    reg_bank_write <= 1'b1;
+                    state           <= INCREMENT_PC;
+                    reg_bank_write  <= 1'b1;
                 end
                 INCREMENT_PC: begin
-                    state <= COMPLETE;
-                    reg_bank_write <= 1'b0;
-                    PC_en <= 1'b1;
+                    state           <= COMPLETE;
+                    reg_bank_write  <= 1'b0;
+                    PC_en           <= 1'b1;
                 end
                 COMPLETE: begin
                     state <= START;
