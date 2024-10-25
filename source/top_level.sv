@@ -32,5 +32,4 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
                             .writedata(d_mem_writedata),
                             .readbyte(),
                             .readword(readdata));
-
 endmodule: top_level

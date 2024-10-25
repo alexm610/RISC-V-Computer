@@ -14,7 +14,9 @@
 `define XOR             3'b100
 `define OR              3'b110
 `define AND             3'b111
-`define SL              3'b001
-`define SR              3'b101
+`define SLL             3'b001
+`define SRL             3'b101
+`define SRA             3'b101
 `define SLT             3'b010
 `define SLTU            3'b011
+`define SUB             3'b000

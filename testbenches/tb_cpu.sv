@@ -21,6 +21,7 @@ module tb_cpu;
     initial begin
         $display("------ Begin cpu.sv testbench ------");
         $display("");
+       
         /*
         TEST 1
 
@@ -221,9 +222,11 @@ module tb_cpu;
         */
         readdata = 32'h0BADF01D;
         instruction = 32'h00010003; #2;
+        $display(PC_out);
         wait(PC_out == i);
+        $display(PC_out);
         i = i + 4;
-        //assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+        assert(dut.HW.REGISTER_BANK.X0.out == ({24'h0, readdata[7:0]}));
         #2;
 
         /*
@@ -236,7 +239,7 @@ module tb_cpu;
         instruction = 32'h00011203; #2;
         wait(PC_out == i);
         i = i + 4;
-        //assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({16'h0, readdata[15:0]}));
         #2;
 
         /*
@@ -249,8 +252,95 @@ module tb_cpu;
         instruction = 32'h00012683; #2;
         wait(PC_out == i);
         i = i + 4;
-        //assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
+        assert(dut.HW.REGISTER_BANK.X13.out == (readdata[31:0]));
         #2;
+
+        /*
+        TEST 21
+
+        STLI X13, X9, 3 // immediate is in decimal form
+        0x0034a693
+        */
+        instruction = 32'h0034A693; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X13.out == ((dut.HW.REGISTER_BANK.X9.out < 3) ? 1 : 0));
+        #2;
+
+        /*
+        TEST 22
+
+        STLI X13, X9, 5 // immediate is in decimal form
+        0x0054a693
+        */
+        instruction = 32'h0054a693; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X13.out == ((dut.HW.REGISTER_BANK.X9.out < 5) ? 1 : 0));
+        #2;
+
+        /*
+        TEST 23
+
+        ADDI X1, X0, 127 // immediate is in decimal form
+        0xFFF00093
+
+        */
+        readdata = 32'h0BADF00D;
+        error = 1'b0;
+        instruction = 32'h07F00093;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X1.out == 32'h7F); // number should be sign extended
+
+        /*
+        TEST 24
+
+        SLTI X2, X1, -128
+        0Xf800a113
+        */
+        instruction = 32'hF800A113;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X2.out == 32'h0); // signed comparison: 127 is not less than -128
+
+        /*
+        TEST 24
+
+        SLTIU X2, X1, -128
+        0xF800B113
+        */
+        instruction = 32'hF800B113;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X2.out == 32'h1); // unsigned comparison: 127 is less than -128(unsigned)
+
+        /*
+        TEST 25
+
+        ADD X14, X2, X3
+        0x00310733
+        */
+        instruction = 32'h00310733;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X14.out == (dut.HW.REGISTER_BANK.X2.out + dut.HW.REGISTER_BANK.X3.out));
+
+        /*
+        TEST 26
+
+        SUB X15, X2, X3
+        0x402187b3
+        */
+        instruction = 32'h402187B3;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X15.out == (dut.HW.REGISTER_BANK.X3.out - dut.HW.REGISTER_BANK.X2.out));
 
         if (!error) begin
             $display("No errors thrown!");

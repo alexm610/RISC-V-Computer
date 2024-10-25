@@ -1,5 +1,5 @@
 module datapath (input logic clk, rst_n, write_rb, alu_source,
-                input logic [2:0] alu_control,  
+                input logic [3:0] alu_control,  
                 input logic [4:0] rs_1, rs_2, rd_0,
                 input logic [31:0] writedata, immediate,
                 output logic negative, overflow, zero,

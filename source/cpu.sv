@@ -3,12 +3,13 @@
 module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction, input logic [31:0] readdata, 
             output logic data_memory_write, output logic [31:0] conduit, output logic [31:0] RS2_readdata, output logic [9:0] data_memory_address, output logic [31:0] PC_out);
     logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg;
-    logic [2:0] alu_OP, funct3;
+    logic [2:0] funct3;
+    logic [3:0] alu_OP;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
     logic [11:0] imm_I_TYPE;
     logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux;
-    enum {START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2} state;
+    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -50,8 +51,8 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     assign funct7               = instruction[31:25];
     assign opcode               = instruction[6:0];
     assign imm_I_TYPE           = instruction[31:20];
-    assign imm                  = {{20{1'b0}}, imm_I_TYPE};
-    assign alu_OP               = funct3;
+    assign imm                  = {{20{imm_I_TYPE[11]}}, imm_I_TYPE};
+    assign alu_OP               = {funct7[5], funct3};
     assign data_memory_address  = datapath_out[9:0];
 
     always @(posedge clk) begin
@@ -68,8 +69,13 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
             reg_bank_write      <= 1'b0;
             data_memory_write   <= 1'b0;
             mem_or_reg          <= 1'b0;
+            state               <= WAIT;
         end else begin
             case (state) 
+                WAIT: begin
+                    PC_en       <= 1'b0;
+                    state       <= START;
+                end
                 START: begin
                     PC_en               <= 1'b0;
                     reg_bank_write      <= 1'b0;
@@ -92,26 +98,25 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     endcase
                 end
                 WRITE_BACK: begin
-                    state           <= INCREMENT_PC;
+                    state           <= COMPLETE; 
                     reg_bank_write  <= 1'b1;
                 end
-                INCREMENT_PC: begin
-                    state           <= COMPLETE;
-                    reg_bank_write  <= 1'b0;
-                    PC_en           <= 1'b1;
-                end
                 COMPLETE: begin
-                    state <= START;
-                    PC_en <= 1'b0;
+                    state <= INCREMENT_PC;
+                    PC_en <= 1'b1;
+                    reg_bank_write  <= 1'b0;
+                end
+                INCREMENT_PC: begin
+                    state   <= WAIT;
+                    PC_en   <= 1'b0;
                 end
                 ACCESS_MEMORY_1: begin
                     state       <= ACCESS_MEMORY_2;
                     mem_or_reg  <= 1'b1;
                 end
                 ACCESS_MEMORY_2: begin
-                    state           <= INCREMENT_PC; 
+                    state           <= COMPLETE;
                     reg_bank_write  <= 1'b1;
-
                 end
             endcase
         end

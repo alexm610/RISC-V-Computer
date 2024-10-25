@@ -1,32 +1,31 @@
 `include "defines.sv"
 
 module alu (Ain, Bin, ALUop, out, status);
-    input logic [2:0] ALUop;
+    input logic [3:0] ALUop;
     input logic signed [31:0] Ain, Bin;
     output logic [2:0] status;
     output logic [31:0] out;
+    logic [4:0] shamt; 
     logic [31:0] dummy_output;
     logic overflow;
 
+    assign shamt = Bin[4:0];
     AddSub #(32) overflow_detection (Ain, Bin, 32'h1, dummy_output, overflow);
 
     always @(*) begin
-        case (ALUop) 
-            `ADD:   out = Ain + Bin;
-            `XOR:   out = Ain ^ Bin;
-            `OR:    out = Ain | Bin;
-            `AND:   out = Ain & Bin;
-            `SL:    out = Ain << Bin[4:0];
-            `SR: begin    
-                if (Bin[10]) begin
-                    out = Ain >>> Bin[4:0]; // arithmetic shift right
-                end else begin
-                    out = Ain >> Bin[4:0]; // logical shift right
-                end
-            end
-            `SLT:   out = (Ain < Bin) ? 32'h1 : 32'h0;
-            `SLTU:  out = (Ain < Bin) ? 32'h1 : 32'h0;
-            default: out = 32'd0;
+        case ({ALUop[3], ALUop[2:0]}) 
+            {1'b0, `ADD}:       out = Ain + Bin;
+            {1'b0, `XOR}:       out = Ain ^ Bin;
+            {1'b0, `OR}:        out = Ain | Bin;
+            {1'b0, `AND}:       out = Ain & Bin;
+            {1'b0, `SLL}:       out = Ain << shamt;
+            {1'b1, `SRA}:       out = Ain >>> shamt; // arithmetic shift right
+            {1'b0, `SRL}:       out = Ain >> shamt; // logical shift right
+            {1'b0, `SLT}:       out = (Ain < Bin) ? 32'h1 : 32'h0;
+            {1'b1, `SLTU}:      out = (unsigned'(Ain) < unsigned'(Bin)) ? 32'h1 : 32'h0;
+            {1'b0, `SLTU}:      out = (unsigned'(Ain) < unsigned'(Bin)) ? 32'h1 : 32'h0;
+            {1'b1, `SUB}:       out = Ain - Bin;
+            default:    out = 32'd0;
         endcase
     end
 
@@ -59,3 +58,10 @@ module AddSub (a, b, sub, s, ovf);
     assign {c1, s[n-2:0]} = a[n-2:0] + (b[n-2:0] ^ {n-1{sub}}) + sub;
 	assign {c2, s[n-1]} = a[n-1] + (b[n-1] ^ sub) + c1;
 endmodule: AddSub
+/*
+        01111111    10000000
+
+s       127         -128                        
+u       127          128
+
+*/
