@@ -217,14 +217,14 @@ module tb_cpu;
         /*
         TEST 18
 
-        LB X0, 0(X2) // immediate is in decimal form
-        0x00010003
+        LB X4, 0(X2) // immediate is in decimal form
+        0x00010203
         */
         readdata = 32'h0BADF01D;
-        instruction = 32'h00010003; #2;
+        instruction = 32'h00010203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X0.out == ({24'h0, readdata[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{readdata[7]}}, readdata[7:0]}));
         #2;
 
         /*
@@ -237,7 +237,7 @@ module tb_cpu;
         instruction = 32'h00011203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({16'h0, readdata[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{readdata[15]}}, readdata[15:0]}));
         #2;
 
         /*
@@ -472,7 +472,57 @@ module tb_cpu;
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X7.out == (32'h1));
 
+        /*
+        TEST 37
 
+        LBU X4, 0(X2) // immediate is in decimal form
+        0x00014203
+        */
+        readdata = 32'hFFFFFFFF;
+        instruction = 32'h00014203; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{1'b0}}, readdata[7:0]}));
+        #2;
+
+        /*
+        TEST 38
+
+        LB X4, 0(X2) // immediate is in decimal form
+        0x00014203
+        */
+        readdata = 32'hFFFFFFFF;
+        instruction = 32'h00010203; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{readdata[7]}}, readdata[7:0]}));
+        #2;
+
+        /*
+        TEST 39
+
+        LHU X4, 0(X2) // immediate is in decimal form
+        0x00015203
+        */
+        readdata = 32'hFFFFFFFF;
+        instruction = 32'h00015203; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{1'b0}}, readdata[15:0]}));
+        #2;
+
+        /*
+        TEST 40
+
+        LH X4, 0(X2) // immediate is in decimal form
+        0x00011203
+        */
+        readdata = 32'hFFFFFFFF;
+        instruction = 32'h00011203; #2;
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{readdata[15]}}, readdata[15:0]}));
+        #2;
 
 
         if (!error) begin

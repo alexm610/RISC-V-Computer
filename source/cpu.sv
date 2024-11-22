@@ -35,9 +35,11 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
 
     always @(funct3) begin
         case (funct3) 
-            32'h0: readdata_mux = readdata[7:0];
-            32'h1: readdata_mux = readdata[15:0];
+            32'h0: readdata_mux = {{24{readdata[7]}}, readdata[7:0]};       // sign-extended byte load
+            32'h1: readdata_mux = {{16{readdata[15]}}, readdata[15:0]};     // sign-extended half-word load
             32'h2: readdata_mux = readdata[31:0];
+            32'h4: readdata_mux = {{24{1'b0}}, readdata[7:0]};              // zero-extended byte load
+            32'h5: readdata_mux = {{16{1'b0}}, readdata[15:0]};             // zero-extended half-word load
             default: readdata_mux = readdata;
         endcase
     end
