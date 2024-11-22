@@ -10,13 +10,11 @@
 `define LOAD_TYPE       7'b0000011
 
 /* ALUop */
-`define ADD             3'b000
+`define ADDSUB          3'b000
 `define XOR             3'b100
 `define OR              3'b110
 `define AND             3'b111
 `define SLL             3'b001
-`define SRL             3'b101
-`define SRA             3'b101
+`define SR              3'b101
 `define SLT             3'b010
 `define SLTU            3'b011
-`define SUB             3'b000

@@ -222,9 +222,7 @@ module tb_cpu;
         */
         readdata = 32'h0BADF01D;
         instruction = 32'h00010003; #2;
-        $display(PC_out);
         wait(PC_out == i);
-        $display(PC_out);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X0.out == ({24'h0, readdata[7:0]}));
         #2;
@@ -341,6 +339,141 @@ module tb_cpu;
         wait(PC_out == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X15.out == (dut.HW.REGISTER_BANK.X3.out - dut.HW.REGISTER_BANK.X2.out));
+
+        /*
+        TEST 27
+
+        XOR X13, X1, X9
+        0x0090C6B3
+        */
+        instruction = 32'h0090C6B3;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X13.out == (dut.HW.REGISTER_BANK.X1.out ^ dut.HW.REGISTER_BANK.X9.out));
+
+        /*
+        TEST 28
+
+        OR X11, X4, X25
+        0x019265b3
+        */
+        instruction = 32'h019265B3;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X11.out == (dut.HW.REGISTER_BANK.X4.out | dut.HW.REGISTER_BANK.X25.out));
+
+        /*
+        TEST 29
+
+        AND X30, X20, X9
+        0x009a7f33
+        */
+        instruction = 32'h009A7F33;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X30.out == (dut.HW.REGISTER_BANK.X20.out & dut.HW.REGISTER_BANK.X9.out));
+
+        /*
+        TEST 30
+
+        SLL X26, X9, X2
+        0x00249d33
+        */
+        instruction = 32'h00249D33;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X26.out == (dut.HW.REGISTER_BANK.X9.out << dut.HW.REGISTER_BANK.X2.out));
+
+        /*
+        TEST 31
+
+        SRL X8, X17, X6
+        0x0068d433
+        */
+        instruction = 32'h0068d433;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X8.out == (dut.HW.REGISTER_BANK.X17.out >> dut.HW.REGISTER_BANK.X6.out));
+
+        /*
+        TEST 31
+
+        SRA X22, X12, X2
+        0x40265b33
+        */
+        instruction = 32'h40265B33;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X22.out == (dut.HW.REGISTER_BANK.X12.out >>> dut.HW.REGISTER_BANK.X2.out));
+
+        /*
+        TEST 32
+
+        SRL X22, X12, X2
+        0x00265b33
+        */
+        instruction = 32'h00265B33;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X22.out == (dut.HW.REGISTER_BANK.X12.out >> dut.HW.REGISTER_BANK.X2.out));
+
+        /*
+        TEST 33
+
+        ADDI X5, X0, 7
+        0x00700293
+        */
+        instruction = 32'h00700293;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X5.out == (32'd7));
+
+        /*
+        TEST 34
+
+        ADDI X6, X0, -8
+        0xff800313
+        */
+        instruction = 32'hFF800313;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X6.out == (32'h0 - 32'd8));
+
+        /*
+        TEST 35
+
+        SLT X7, X5, X6
+        0x0062a3b3
+        */
+        instruction = 32'h0062A3B3;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X7.out == (32'h0));
+
+        /*
+        TEST 36
+
+        SLTU X7, X5, X6
+        0x0062B3B3
+        */
+        instruction = 32'h0062B3B3;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X7.out == (32'h1));
+
+
+
 
         if (!error) begin
             $display("No errors thrown!");

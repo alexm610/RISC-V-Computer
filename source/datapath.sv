@@ -23,6 +23,7 @@ module datapath (input logic clk, rst_n, write_rb, alu_source,
     alu ALU                     (.Ain(A_in),
                                 .Bin(B_in),
                                 .ALUop(alu_control),
+                                .ALUsrc(alu_source),
                                 .out(alu_result),
                                 .status({negative, overflow, zero}));
 endmodule: datapath 

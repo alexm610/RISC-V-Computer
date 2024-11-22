@@ -30,5 +30,4 @@ module memory   (input logic clock, input logic reset_n, input logic write,
             endcase
         end
     end
-
 endmodule: memory

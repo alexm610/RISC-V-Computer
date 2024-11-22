@@ -1,6 +1,7 @@
 `include "defines.sv"
 
-module alu (Ain, Bin, ALUop, out, status);
+module alu (Ain, Bin, ALUop, out, status, ALUsrc);
+    input logic ALUsrc;
     input logic [3:0] ALUop;
     input logic signed [31:0] Ain, Bin;
     output logic [2:0] status;
@@ -13,19 +14,16 @@ module alu (Ain, Bin, ALUop, out, status);
     AddSub #(32) overflow_detection (Ain, Bin, 32'h1, dummy_output, overflow);
 
     always @(*) begin
-        case ({ALUop[3], ALUop[2:0]}) 
-            {1'b0, `ADD}:       out = Ain + Bin;
-            {1'b0, `XOR}:       out = Ain ^ Bin;
-            {1'b0, `OR}:        out = Ain | Bin;
-            {1'b0, `AND}:       out = Ain & Bin;
-            {1'b0, `SLL}:       out = Ain << shamt;
-            {1'b1, `SRA}:       out = Ain >>> shamt; // arithmetic shift right
-            {1'b0, `SRL}:       out = Ain >> shamt; // logical shift right
-            {1'b0, `SLT}:       out = (Ain < Bin) ? 32'h1 : 32'h0;
-            {1'b1, `SLTU}:      out = (unsigned'(Ain) < unsigned'(Bin)) ? 32'h1 : 32'h0;
-            {1'b0, `SLTU}:      out = (unsigned'(Ain) < unsigned'(Bin)) ? 32'h1 : 32'h0;
-            {1'b1, `SUB}:       out = Ain - Bin;
-            default:    out = 32'd0;
+        casex ({ALUop[2:0]}) 
+            {`ADDSUB}:      out = ALUsrc ? (ALUop[3] ? Ain - Bin : Ain + Bin) : Ain + Bin;
+            {`XOR}:         out = Ain ^ Bin;
+            {`OR}:          out = Ain | Bin;
+            {`AND}:         out = Ain & Bin;
+            {`SLL}:         out = Ain << shamt;
+            {`SR}:          out = ALUop[3] ? Ain >>> shamt : Ain >> shamt; // arithmetic shift right
+            {`SLT}:         out = (Ain < Bin) ? 32'h1 : 32'h0;
+            {`SLTU}:        out = (unsigned'(Ain) < unsigned'(Bin)) ? 32'h1 : 32'h0;
+            default:        out = 32'd0;
         endcase
     end
 
