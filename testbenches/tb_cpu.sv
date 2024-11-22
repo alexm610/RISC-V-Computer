@@ -524,6 +524,19 @@ module tb_cpu;
         assert(dut.HW.REGISTER_BANK.X4.out == ({{16{readdata[15]}}, readdata[15:0]}));
         #2;
 
+        /*
+        TEST 41
+
+        ADD X11, X0 X0 // assert that X0 is hardwired to zero 
+        0x000005B3
+        */
+        instruction = 32'h000005B3;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.HW.REGISTER_BANK.X11.out == (32'h0));
+        #2;
+
 
         if (!error) begin
             $display("No errors thrown!");
