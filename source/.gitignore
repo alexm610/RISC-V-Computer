@@ -1,6 +1,12 @@
 /db
 /work
 /greybox_tmp
+/incremental_db
+/output_files
+/simulation
 *.qpf
 *.qsf
 *.qws
+*.bak
+*.qws
+c5_pin_model_dump.txt

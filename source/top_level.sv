@@ -3,7 +3,7 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
                     output logic [6:0] HEX3, output logic [6:0] HEX4, output logic [6:0] HEX5,
                     output logic [9:0] LEDR);
 
-    logic write_d_mem;
+    logic write_d_mem, test_write;
     logic [9:0] program_counter, address_d_mem;
     logic [31:0] instruction, dummy_instr_writedata, datapath_output, readdata, d_mem_writedata;
 
@@ -19,7 +19,7 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
 
     memory INSTRUCTION_MEM  (.clock(CLOCK_50),
                             .reset_n(KEY[3]),
-                            .write(1'b0),
+                            .write(test_write),
                             .address(program_counter),
                             .writedata(dummy_instr_writedata),
                             .readbyte(),

@@ -537,6 +537,49 @@ module tb_cpu;
         assert(dut.HW.REGISTER_BANK.X11.out == (32'h0));
         #2;
 
+        /*
+        TEST 42
+
+        SW X5, 0(X9) 
+        0x0054a023
+        */
+        instruction = 32'h0054A023;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.RS2_readdata == (dut.HW.REGISTER_BANK.X5.out));
+        assert(dut.data_memory_address == (dut.HW.REGISTER_BANK.X9.out));
+        #2;
+
+        /*
+        TEST 43
+
+        SH X6, 0(X13) 
+        0x00669023
+        */
+        instruction = 32'h00669023;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.RS2_readdata == (dut.HW.REGISTER_BANK.X6.out[15:0]));
+        assert(dut.data_memory_address == (dut.HW.REGISTER_BANK.X13.out));
+        #2;
+
+        /*
+        TEST 44
+
+        SB X31, 0(X13) 
+        0x01f68023
+        */
+        instruction = 32'h01F68023;
+
+        wait(PC_out == i);
+        i = i + 4;
+        assert(dut.RS2_readdata == (dut.HW.REGISTER_BANK.X31.out[7:0]));
+        assert(dut.data_memory_address == (dut.HW.REGISTER_BANK.X13.out));
+        #2;
+        
+
 
         if (!error) begin
             $display("No errors thrown!");
