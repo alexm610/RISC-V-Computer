@@ -11,8 +11,10 @@ add wave -noupdate -radix hexadecimal -childformat {{{/tb_cpu/dut/RS2_readdata[3
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/rs2_output
 add wave -noupdate -radix hexadecimal -childformat {{{/tb_cpu/dut/data_memory_address[9]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[8]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[7]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[6]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[5]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[4]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[3]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[2]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[1]} -radix hexadecimal} {{/tb_cpu/dut/data_memory_address[0]} -radix hexadecimal}} -subitemconfig {{/tb_cpu/dut/data_memory_address[9]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[8]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[7]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[6]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[5]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[4]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[3]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[2]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[1]} {-height 15 -radix hexadecimal} {/tb_cpu/dut/data_memory_address[0]} {-height 15 -radix hexadecimal}} /tb_cpu/dut/data_memory_address
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_out
-add wave -noupdate /tb_cpu/dut/reg_bank_write
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_in
+add wave -noupdate /tb_cpu/dut/PC_mux
 add wave -noupdate /tb_cpu/dut/PC_en
+add wave -noupdate /tb_cpu/dut/reg_bank_write
 add wave -noupdate /tb_cpu/dut/alu_SRC
 add wave -noupdate /tb_cpu/dut/negative
 add wave -noupdate /tb_cpu/dut/overflow
@@ -27,8 +29,8 @@ add wave -noupdate /tb_cpu/dut/opcode
 add wave -noupdate /tb_cpu/dut/funct7
 add wave -noupdate /tb_cpu/dut/imm_I_TYPE
 add wave -noupdate /tb_cpu/dut/imm_S_TYPE
+add wave -noupdate /tb_cpu/dut/imm_B_TYPE
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/datapath_out
-add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_in
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/datapath_in
 add wave -noupdate /tb_cpu/dut/state
@@ -99,8 +101,14 @@ add wave -noupdate -divider -height 40 PC
 add wave -noupdate /tb_cpu/dut/PC/enable
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC/in
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC/out
+add wave -noupdate -divider -height 40 PC_MUX
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_MUX/s
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_MUX/a2
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_MUX/a1
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_MUX/a0
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/PC_MUX/out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {455 ps} 0}
+WaveRestoreCursors {{Cursor 1} {4 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 278
 configure wave -valuecolwidth 100
@@ -116,4 +124,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {432 ps} {464 ps}
+WaveRestoreZoom {454 ps} {486 ps}

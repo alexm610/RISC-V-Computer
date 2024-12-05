@@ -1,0 +1,21 @@
+.global _boot
+.text
+
+_boot:
+	addi x21, x0, 10
+    addi x1, x0, 1
+    addi x10, x0, 0
+
+_loop:
+    add x10, x1, x10
+	blt x10, x21, _loop
+    add x2, x0, 15
+
+
+
+00a00a93
+00100093
+00000513
+00a08533
+ff554ee3
+00f00113

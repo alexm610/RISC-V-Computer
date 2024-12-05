@@ -1,0 +1,11 @@
+.global _boot
+.text
+
+_boot:               
+	addi x1, x0, 2000
+   	addi x2, x0, 12
+    sw x1, 0(x2)
+
+7d000093
+00c00113
+00112023

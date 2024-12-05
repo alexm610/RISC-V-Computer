@@ -44,13 +44,9 @@ module tb_top_level();
         release dut.dummy_instr_writedata;
         KEY[3] = 1; #2;
         KEY[3] = 0; #2;
-        KEY[3] = 1;
-        #100;
-
-        KEY[3] = 1; #2;
-        KEY[3] = 0; #2;
-        KEY[3] = 1; #100;
-
+        KEY[3] = 1; #10;
+        @ (posedge dut.datapath_output[0]);
+        #4;
 
         if (!error) begin
             $display("No errors thrown!");

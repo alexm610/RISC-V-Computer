@@ -9,7 +9,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     logic [6:0] opcode, funct7;
     logic [11:0] imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
     logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output;
-    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, COMPARE_1} state;
+    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -56,7 +56,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     end
 
     assign datapath_in          = mem_or_reg ? readdata_mux : datapath_out;
-    assign conduit              = datapath_out;
+    //assign conduit              = datapath_out;
     assign rs1                  = instruction[19:15];
     assign rs2                  = instruction[24:20];
     assign rd0                  = instruction[11:7];
@@ -117,12 +117,40 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                             alu_OP[2:0] <= `ADDSUB;
                         end   
                         `B_TYPE: begin
-                            state       <= COMPARE_1;
+                            case (funct3)
+                                3'h0: begin 
+                                        state       <= BRANCH_EQ;
+                                        alu_OP      <= {1'b1, `ADDSUB}; 
+                                end
+                                3'h1: begin
+                                        state       <= BRANCH_NE;
+                                        alu_OP      <= {1'b1, `ADDSUB};
+                                end
+                                3'h4: begin 
+                                        state       <= BRANCH_LT;
+                                        alu_OP      <= {1'b0, `SLT}; // we don't care what the MSB of alu_OP is when using the "set less than" operation    
+                                end
+                                3'h5: begin 
+                                        state       <= BRANCH_GE;
+                                        alu_OP      <= {1'b0, `SLT};
+                                end
+                                3'h6: begin 
+                                        state       <= BRANCH_LTU;
+                                        alu_OP      <= {1'b0, `SLTU};
+                                end
+                                3'h7: begin 
+                                        state       <= BRANCH_GEU;
+                                        alu_OP      <= {1'b0, `SLTU};
+                                end
+                            endcase
                             alu_SRC     <= 1'b1;
-                            alu_OP      <= {1'b1, `ADDSUB}; // alu_OP[3] must be set HIGH here as to tell ALU to subtract values
                             imm         <= {{19{imm_B_TYPE[11]}}, imm_B_TYPE, 1'b0};    // zeroth bit of immediate for B-type instructions is always zero (for byte alignment)
                         end
-                        default: state <= START;
+                        7'b0000000: begin
+                            conduit[0] <= 1'b1;
+                            state <= START;
+                        end
+                        default: state  <= START;
                     endcase
                 end
                 WRITE_BACK: begin
@@ -154,6 +182,54 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     state <= COMPLETE;
                     data_memory_write <= 1'b0;
                 end
+                BRANCH_EQ: begin
+                    state   <= COMPLETE;
+                    if (zero) begin
+                        PC_mux  <= 3'b010; // add immediate to PC
+                    end else begin
+                        PC_mux  <= 3'b001; // normally increment PC
+                    end
+                end
+                BRANCH_NE: begin
+                    state   <= COMPLETE;
+                    if (!zero) begin
+                        PC_mux  <= 3'b010; // increment PC with immediate
+                    end else begin
+                        PC_mux  <= 3'b001;
+                    end
+                end
+                BRANCH_LT: begin
+                    state   <= COMPLETE;
+                    if (datapath_out == 32'h1) begin // rs1 is less than rs2
+                        PC_mux  <= 3'b010;
+                    end else begin 
+                        PC_mux  <= 3'b001;
+                    end 
+                end 
+                BRANCH_GE: begin
+                    state   <= COMPLETE;
+                    if (datapath_out == 32'h0) begin
+                        PC_mux  <= 3'b010;
+                    end else begin 
+                        PC_mux  <= 3'b001;
+                    end 
+                end 
+                BRANCH_LTU: begin
+                    state   <= COMPLETE;
+                    if (datapath_out == 32'h1) begin 
+                        PC_mux  <= 3'b010;
+                    end else begin 
+                        PC_mux  <= 3'b001;
+                    end 
+                end
+                BRANCH_GEU: begin 
+                    state   <= COMPLETE;
+                    if (datapath_out == 32'h0) begin
+                        PC_mux  <= 3'b010;
+                    end else begin 
+                        PC_mux  <= 3'b001;
+                    end 
+                end 
             endcase
         end
     end

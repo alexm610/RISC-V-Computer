@@ -1,0 +1,19 @@
+.global _boot
+.text
+
+_boot:
+	addi x9, x0, 10
+    addi x1, x0, 1
+
+_loop:
+    sub x9, x9, x1
+	bge x9, x0, _loop
+    add x2, x0, 15
+
+
+
+00a00493
+00100093
+401484b3
+fe14dee3
+00f00113

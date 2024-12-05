@@ -1,0 +1,13 @@
+.global _boot
+.text
+
+_boot:               
+	addi x1, x0, 2037
+   	add x21, x0, x0
+    sw x1, 1(x21)
+    lh x6, 2(x21)
+    
+7f500093
+00000ab3
+001aa0a3
+002a9303
