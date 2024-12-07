@@ -10,7 +10,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     logic [11:0] imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
     logic [31:0] imm_J_TYPE;
     logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output;
-    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3} state;
+    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -252,16 +252,11 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     reg_bank_write  <= 1'b1; // the writedata line into the datapath (into the register bank) has PC_out + 4 on it, so we just need to set write HIGH
                 end
                 JUMP_LINK_2: begin
-                    state           <= JUMP_LINK_3;
-                    reg_bank_write  <= 1'b1;
-                end
-                JUMP_LINK_3: begin
                     state           <= COMPLETE;
-                    reg_bank_write  <= 1'b0;
+                    reg_bank_write  <= 1'b1;
                     jump_link       <= 1'b0;
-                    mem_or_reg      <= 1'b0;
                     alu_OP[2:0]     <= `ADDSUB;
-                    alu_SRC         <= 1'b0; // add imediate to rs1 
+                    alu_SRC         <= 1'b0;
                 end
             endcase
         end
