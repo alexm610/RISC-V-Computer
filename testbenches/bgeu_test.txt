@@ -1,0 +1,30 @@
+.global _boot
+.text
+
+_boot:              
+	addi x18, x0, -128
+    addi x24, x0, 127
+    bge x24, x18, _next
+    addi x1, x0, 1
+    beq x0, x0, _end
+	addi x2, x0, 1
+    beq x0, x0, _end
+ 
+_next: 
+	bgeu x24, x18, _end
+    addi x3, x0, 1
+ 
+ 
+_end: 
+                    
+                    
+
+f8000913
+07f00c13
+012c5a63
+00100093
+00000a63
+00100113
+00000663
+012c7463
+00100193

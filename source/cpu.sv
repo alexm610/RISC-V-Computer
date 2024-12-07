@@ -2,14 +2,15 @@
 
 module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction, input logic [31:0] readdata, 
             output logic data_memory_write, output logic [31:0] conduit, output logic [31:0] RS2_readdata, output logic [9:0] data_memory_address, output logic [31:0] PC_out);
-    logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg;
-    logic [2:0] funct3, PC_mux;
-    logic [3:0] alu_OP;
+    logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg, jump_link;
+    logic [2:0] funct3;
+    logic [3:0] alu_OP, PC_mux;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
     logic [11:0] imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
+    logic [31:0] imm_J_TYPE;
     logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output;
-    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU} state;
+    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -33,7 +34,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                                 .enable(PC_en),
                                 .out(PC_out));
 
-    multiplexer_3input #(32) PC_MUX (.a2(32'h0), .a1(PC_out + imm), .a0(PC_out + 32'h4), .s(PC_mux), .out(PC_in));
+    multiplexer_4input #(32) PC_MUX (.a3(imm + datapath_in), .a2(32'h0), .a1(PC_out + imm), .a0(PC_out + 32'h4), .s(PC_mux), .out(PC_in));
     
     always @(*) begin
         case (funct3) 
@@ -55,7 +56,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
         endcase
     end
 
-    assign datapath_in          = mem_or_reg ? readdata_mux : datapath_out;
+    assign datapath_in          = jump_link ? (PC_out + 32'h4) : (mem_or_reg ? readdata_mux : datapath_out);
     //assign conduit              = datapath_out;
     assign rs1                  = instruction[19:15];
     assign rs2                  = instruction[24:20];
@@ -66,31 +67,35 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     assign imm_I_TYPE           = instruction[31:20];
     assign imm_S_TYPE           = {instruction[31:25], instruction[11:7]}; 
     assign imm_B_TYPE           = {instruction[31], instruction[7], instruction[30:25], instruction[11:8]};
+    assign imm_J_TYPE           = {{12{instruction[31]}}, instruction[19:12], instruction[20], instruction[30:25], instruction[24:21], 1'b0};
     assign data_memory_address  = datapath_out[8:0];
 
     always @(posedge clk) begin
         if (!rst_n) begin
+            jump_link           <= 1'b0;
             PC_en               <= 1'b0;
             reg_bank_write      <= 1'b0;
             data_memory_write   <= 1'b0;
             mem_or_reg          <= 1'b0;
             state               <= WAIT;
             alu_OP              <= 4'h0;
-            PC_mux              <= 3'b100; 
+            PC_mux              <= 4'b0100; 
         end else begin
             case (state) 
                 WAIT: begin
                     PC_en       <= 1'b0;
-                    PC_mux      <= 3'b001;
+                    PC_mux      <= 4'b0001;
                     state       <= START;
+                    jump_link   <= 1'b0;
                 end
                 START: begin
                     PC_en               <= 1'b0;
-                    PC_mux              <= 3'b001;
+                    PC_mux              <= 4'b0001;
                     reg_bank_write      <= 1'b0;
                     data_memory_write   <= 1'b0;
                     mem_or_reg          <= 1'b0;
                     imm                 <= 32'h0;
+                    jump_link           <= 1'b0;
                     case (opcode)
                         `R_TYPE: begin
                             state       <= WRITE_BACK;
@@ -146,6 +151,18 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                             alu_SRC     <= 1'b1;
                             imm         <= {{19{imm_B_TYPE[11]}}, imm_B_TYPE, 1'b0};    // zeroth bit of immediate for B-type instructions is always zero (for byte alignment)
                         end
+                        `J_TYPE_JAL: begin
+                            state           <= JUMP_LINK_1;
+                            jump_link       <= 1'b1;
+                            imm             <= imm_J_TYPE;
+                            PC_mux          <= 4'b0010;
+                        end
+                        `J_TYPE_JALR: begin
+                            state           <= JUMP_LINK_2;
+                            jump_link       <= 1'b1;
+                            imm             <= {{20{imm_I_TYPE[11]}}, imm_I_TYPE};
+                            PC_mux          <= 4'b1000;
+                        end
                         7'b0000000: begin
                             conduit[0] <= 1'b1;
                             state <= START;
@@ -185,51 +202,67 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                 BRANCH_EQ: begin
                     state   <= COMPLETE;
                     if (zero) begin
-                        PC_mux  <= 3'b010; // add immediate to PC
+                        PC_mux  <= 4'b0010; // add immediate to PC
                     end else begin
-                        PC_mux  <= 3'b001; // normally increment PC
+                        PC_mux  <= 4'b0001; // normally increment PC
                     end
                 end
                 BRANCH_NE: begin
                     state   <= COMPLETE;
                     if (!zero) begin
-                        PC_mux  <= 3'b010; // increment PC with immediate
+                        PC_mux  <= 4'b0010; // increment PC with immediate
                     end else begin
-                        PC_mux  <= 3'b001;
+                        PC_mux  <= 4'b0001;
                     end
                 end
                 BRANCH_LT: begin
                     state   <= COMPLETE;
                     if (datapath_out == 32'h1) begin // rs1 is less than rs2
-                        PC_mux  <= 3'b010;
+                        PC_mux  <= 4'b0010;
                     end else begin 
-                        PC_mux  <= 3'b001;
+                        PC_mux  <= 4'b0001;
                     end 
                 end 
                 BRANCH_GE: begin
                     state   <= COMPLETE;
                     if (datapath_out == 32'h0) begin
-                        PC_mux  <= 3'b010;
+                        PC_mux  <= 4'b0010;
                     end else begin 
-                        PC_mux  <= 3'b001;
+                        PC_mux  <= 4'b0001;
                     end 
                 end 
                 BRANCH_LTU: begin
                     state   <= COMPLETE;
                     if (datapath_out == 32'h1) begin 
-                        PC_mux  <= 3'b010;
+                        PC_mux  <= 4'b0010;
                     end else begin 
-                        PC_mux  <= 3'b001;
+                        PC_mux  <= 4'b0001;
                     end 
                 end
                 BRANCH_GEU: begin 
                     state   <= COMPLETE;
                     if (datapath_out == 32'h0) begin
-                        PC_mux  <= 3'b010;
+                        PC_mux  <= 4'b0010;
                     end else begin 
-                        PC_mux  <= 3'b001;
+                        PC_mux  <= 4'b0001;
                     end 
                 end 
+                JUMP_LINK_1: begin
+                    state           <= COMPLETE;
+                    reg_bank_write  <= 1'b1; // the writedata line into the datapath (into the register bank) has PC_out + 4 on it, so we just need to set write HIGH
+                end
+                JUMP_LINK_2: begin
+                    state           <= JUMP_LINK_3;
+                    reg_bank_write  <= 1'b1;
+                end
+                JUMP_LINK_3: begin
+                    state           <= COMPLETE;
+                    reg_bank_write  <= 1'b0;
+                    jump_link       <= 1'b0;
+                    mem_or_reg      <= 1'b0;
+                    alu_OP[2:0]     <= `ADDSUB;
+                    alu_SRC         <= 1'b0; // add imediate to rs1 
+                end
             endcase
         end
     end

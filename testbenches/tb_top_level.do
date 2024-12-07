@@ -11,8 +11,10 @@ add wave -noupdate /tb_top_level/dut/PROCESSOR/data_memory_write
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/RS2_readdata
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/data_memory_address
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/PC_out
-add wave -noupdate /tb_top_level/dut/PROCESSOR/reg_bank_write
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/PC_in
+add wave -noupdate -radix binary /tb_top_level/dut/PROCESSOR/PC_mux
 add wave -noupdate /tb_top_level/dut/PROCESSOR/PC_en
+add wave -noupdate /tb_top_level/dut/PROCESSOR/reg_bank_write
 add wave -noupdate /tb_top_level/dut/PROCESSOR/alu_SRC
 add wave -noupdate /tb_top_level/dut/PROCESSOR/mem_or_reg
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/funct3
@@ -24,8 +26,10 @@ add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/opcode
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/funct7
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_I_TYPE
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_S_TYPE
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_B_TYPE
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_J_TYPE
+add wave -noupdate /tb_top_level/dut/PROCESSOR/jump_link
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/datapath_out
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/PC_in
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/datapath_in
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/readdata_mux
@@ -127,7 +131,7 @@ add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/HW/ALU/shamt
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/HW/ALU/dummy_output
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/HW/ALU/overflow
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {159 ps} 0}
+WaveRestoreCursors {{Cursor 1} {195 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 470
 configure wave -valuecolwidth 100
@@ -143,4 +147,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {138 ps} {182 ps}
+WaveRestoreZoom {158 ps} {180 ps}

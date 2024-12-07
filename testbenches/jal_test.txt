@@ -1,0 +1,33 @@
+.global _boot
+.text
+
+_boot:
+	addi x10, x0, 3 
+    addi x11, x0, 4
+	jal x1, _add
+    addi x10, x0, 5
+    addi x11, x0, 6
+    jal x1, _add
+    addi x5, x0, 4
+    sw x13, 0(x5)
+    beq x0, x0, _end
+    
+_add: 
+	add x12, x11, x10
+	add x13, x12, x13
+	jalr x0, 0(x1)
+	
+_end:
+    
+00300513
+00400593
+01c000ef
+00500513
+00600593
+010000ef
+00400293
+00d2a023
+00000863
+00a58633
+00d606b3
+00008067

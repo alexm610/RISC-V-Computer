@@ -74,21 +74,22 @@ module register (clock, reset, in, enable, out);
     end
 endmodule
 
-module multiplexer_3input (a2, a1, a0, s, out); 
+module multiplexer_4input (a3, a2, a1, a0, s, out); 
     parameter width = 32;
-    input logic [2:0] s; // select signal is one-hot
-    input logic [width-1:0] a2, a1, a0;
+    input logic [3:0] s; // select signal is one-hot
+    input logic [width-1:0] a3, a2, a1, a0;
     output logic [width-1:0] out;
 
     always @(*) begin
         case (s)
-            3'b001: out = a0;
-            3'b010: out = a1;
-            3'b100: out = a2;
+            4'b0001: out = a0;
+            4'b0010: out = a1;
+            4'b0100: out = a2;
+            4'b1000: out = a3;
             default: out = {width{1'b0}};
         endcase     
     end
-endmodule: multiplexer_3input
+endmodule: multiplexer_4input
 
 module multiplexer_32input(a31, a30, a29, a28, a27, a26, a25, a24, a23, a22, a21, a20, a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, s, out); // this multiplexer is the one that takes the register files as input, and outputs data_out
     parameter signal_width = 1;
