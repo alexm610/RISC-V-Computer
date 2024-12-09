@@ -2,15 +2,16 @@
 
 module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction, input logic [31:0] readdata, 
             output logic data_memory_write, output logic [31:0] conduit, output logic [31:0] RS2_readdata, output logic [9:0] data_memory_address, output logic [31:0] PC_out);
-    logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg, jump_link;
+    logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg, jump_link, load_upper_imm;
     logic [2:0] funct3;
     logic [3:0] alu_OP, PC_mux;
     logic [4:0] rs1, rs2, rd0;
     logic [6:0] opcode, funct7;
     logic [11:0] imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
+    logic [19:0] imm_U_TYPE;
     logic [31:0] imm_J_TYPE;
     logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output;
-    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2} state;
+    enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, LOAD_UPPER_IMM_1} state;
 
     datapath HW                 (.clk(clk),
                                 .rst_n(rst_n),
@@ -56,8 +57,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
         endcase
     end
 
-    assign datapath_in          = jump_link ? (PC_out + 32'h4) : (mem_or_reg ? readdata_mux : datapath_out);
-    //assign conduit              = datapath_out;
+    assign datapath_in          = load_upper_imm ? (imm) : (jump_link ? (PC_out + 32'h4) : (mem_or_reg ? readdata_mux : datapath_out));
     assign rs1                  = instruction[19:15];
     assign rs2                  = instruction[24:20];
     assign rd0                  = instruction[11:7];
@@ -68,6 +68,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     assign imm_S_TYPE           = {instruction[31:25], instruction[11:7]}; 
     assign imm_B_TYPE           = {instruction[31], instruction[7], instruction[30:25], instruction[11:8]};
     assign imm_J_TYPE           = {{12{instruction[31]}}, instruction[19:12], instruction[20], instruction[30:25], instruction[24:21], 1'b0};
+    assign imm_U_TYPE           = instruction[31:12];
     assign data_memory_address  = datapath_out[8:0];
 
     always @(posedge clk) begin
@@ -80,6 +81,8 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
             state               <= WAIT;
             alu_OP              <= 4'h0;
             PC_mux              <= 4'b0100; 
+            load_upper_imm      <= 1'b0;
+            conduit[0]          <= 1'b0;
         end else begin
             case (state) 
                 WAIT: begin
@@ -96,6 +99,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     mem_or_reg          <= 1'b0;
                     imm                 <= 32'h0;
                     jump_link           <= 1'b0;
+                    load_upper_imm      <= 1'b0; 
                     case (opcode)
                         `R_TYPE: begin
                             state       <= WRITE_BACK;
@@ -113,7 +117,6 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                             alu_OP[2:0] <= `ADDSUB; 
                             imm         <= {{20{imm_I_TYPE[11]}}, imm_I_TYPE};
                             alu_SRC     <= 1'b0;
-                            
                         end              
                         `S_TYPE: begin
                             state       <= WRITE_MEMORY_1;
@@ -163,6 +166,16 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                             imm             <= {{20{imm_I_TYPE[11]}}, imm_I_TYPE};
                             PC_mux          <= 4'b1000;
                         end
+                        `U_TYPE_LUI: begin
+                            state           <= LOAD_UPPER_IMM_1;
+                            imm             <= (imm_U_TYPE << 12); 
+                            load_upper_imm  <= 1'b1; 
+                        end
+                        `U_TYPE_AUIPC: begin
+                            state           <= LOAD_UPPER_IMM_1;
+                            imm             <= (imm_U_TYPE << 12) + PC_out;
+                            load_upper_imm  <= 1'b1; 
+                        end 
                         7'b0000000: begin
                             conduit[0] <= 1'b1;
                             state <= START;
@@ -257,6 +270,10 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     jump_link       <= 1'b0;
                     alu_OP[2:0]     <= `ADDSUB;
                     alu_SRC         <= 1'b0;
+                end
+                LOAD_UPPER_IMM_1: begin
+                    state           <= COMPLETE; 
+                    reg_bank_write  <= 1'b1; // the U-type immediate is on the datapath_in line, just need to write to destination register 
                 end
             endcase
         end

@@ -6,7 +6,7 @@ module memory   (input logic clock, input logic reset_n, input logic write,
 
     logic [7:0] word_address, byte0, byte1, byte2, byte3;
     logic [31:0] word;
-    logic [7:0] memory [0:1023];
+    logic [7:0] memory [0:4095];
 
     assign word_address = address[9:2];
     assign word         = memory[word_address];

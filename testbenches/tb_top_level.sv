@@ -28,6 +28,23 @@ module tb_top_level();
         KEY[3] = 0; #2;
         KEY[3] = 1; #2;
         SW[0] = 0; #2;
+        
+        j = 0;
+        for (i = 0; i < 1024; i = i + 4) begin
+            force dut.write_d_mem = 1;
+            force dut.address_d_mem = i[7:0];
+            force dut.d_mem_writedata = 32'h0;
+
+            #2;
+            j = j + 1;
+        end
+        dut.test_write = 0;
+        dut.write_d_mem = 0;
+        release dut.write_d_mem;
+        release dut.address_d_mem;
+        release dut.d_mem_writedata;
+        #2;
+        
         $readmemh("instructions.txt", mem_file_1);
         j = 0;
         for (i = 0; i < 256; i = i + 4) begin
@@ -45,6 +62,7 @@ module tb_top_level();
         KEY[3] = 1; #2;
         KEY[3] = 0; #2;
         KEY[3] = 1; #10;
+
         @ (posedge dut.datapath_output[0]);
         #4;
 
