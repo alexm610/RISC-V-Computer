@@ -4,21 +4,32 @@ add wave -noupdate -divider -height 40 DUT
 add wave -noupdate /tb_top_level/dut/CLOCK_50
 add wave -noupdate {/tb_top_level/dut/KEY[3]}
 add wave -noupdate -divider -height 40 PROCESSOR
+add wave -noupdate /tb_top_level/dut/PROCESSOR/clk
 add wave -noupdate /tb_top_level/dut/PROCESSOR/rst_n
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/instruction
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/readdata
-add wave -noupdate /tb_top_level/dut/PROCESSOR/data_memory_write
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/RS2_readdata
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/data_memory_address
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/PC_out
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/PC_in
-add wave -noupdate -radix binary /tb_top_level/dut/PROCESSOR/PC_mux
 add wave -noupdate /tb_top_level/dut/PROCESSOR/PC_en
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/instruction
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/readdata
+add wave -noupdate /tb_top_level/dut/PROCESSOR/read_valid
+add wave -noupdate /tb_top_level/dut/PROCESSOR/byte_enable
+add wave -noupdate /tb_top_level/dut/PROCESSOR/data_memory_write
+add wave -noupdate /tb_top_level/dut/PROCESSOR/conduit
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/RS2_readdata
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/data_memory_address
+add wave -noupdate /tb_top_level/dut/PROCESSOR/data_memory_read
 add wave -noupdate /tb_top_level/dut/PROCESSOR/reg_bank_write
 add wave -noupdate /tb_top_level/dut/PROCESSOR/alu_SRC
+add wave -noupdate /tb_top_level/dut/PROCESSOR/negative
+add wave -noupdate /tb_top_level/dut/PROCESSOR/overflow
+add wave -noupdate /tb_top_level/dut/PROCESSOR/zero
 add wave -noupdate /tb_top_level/dut/PROCESSOR/mem_or_reg
+add wave -noupdate /tb_top_level/dut/PROCESSOR/jump_link
+add wave -noupdate /tb_top_level/dut/PROCESSOR/load_upper_imm
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/shift_amount
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/funct3
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/alu_OP
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/PC_mux
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/rs1
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/rs2
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/rd0
@@ -27,37 +38,45 @@ add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/funct7
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_I_TYPE
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_S_TYPE
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_B_TYPE
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_U_TYPE
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm_J_TYPE
-add wave -noupdate /tb_top_level/dut/PROCESSOR/jump_link
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/datapath_out
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/imm
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/datapath_in
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/readdata_mux
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/rs2_output
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/loaded_data_shifted
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/RS2_temp
 add wave -noupdate /tb_top_level/dut/PROCESSOR/state
+add wave -noupdate -divider -height 40 INTERCONNECT
+add wave -noupdate /tb_top_level/dut/FABRIC/slave_ready
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/slave_address
+add wave -noupdate /tb_top_level/dut/FABRIC/slave_read
+add wave -noupdate /tb_top_level/dut/FABRIC/slave_write
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/slave_writedata
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/slave_readdata
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/master_ready
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/master_enable
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/master_address
+add wave -noupdate /tb_top_level/dut/FABRIC/master_read
+add wave -noupdate /tb_top_level/dut/FABRIC/master_write
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/master_writedata
+add wave -noupdate -radix hexadecimal -childformat {{{/tb_top_level/dut/FABRIC/master_readdata[0]} -radix hexadecimal} {{/tb_top_level/dut/FABRIC/master_readdata[1]} -radix hexadecimal} {{/tb_top_level/dut/FABRIC/master_readdata[2]} -radix hexadecimal}} -subitemconfig {{/tb_top_level/dut/FABRIC/master_readdata[0]} {-height 15 -radix hexadecimal} {/tb_top_level/dut/FABRIC/master_readdata[1]} {-height 15 -radix hexadecimal} {/tb_top_level/dut/FABRIC/master_readdata[2]} {-height 15 -radix hexadecimal}} /tb_top_level/dut/FABRIC/master_readdata
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/FABRIC/slave_module
 add wave -noupdate -divider -height 40 {INSTRUCTION MEMORY}
-add wave -noupdate /tb_top_level/dut/INSTRUCTION_MEM/reset_n
-add wave -noupdate /tb_top_level/dut/INSTRUCTION_MEM/write
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/address
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/writedata
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/readbyte
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/readword
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/word_address
-add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/word
-add wave -noupdate -childformat {{{/tb_top_level/dut/INSTRUCTION_MEM/memory[0]} -radix hexadecimal} {{/tb_top_level/dut/INSTRUCTION_MEM/memory[1]} -radix hexadecimal} {{/tb_top_level/dut/INSTRUCTION_MEM/memory[2]} -radix hexadecimal}} -subitemconfig {{/tb_top_level/dut/INSTRUCTION_MEM/memory[0]} {-height 15 -radix hexadecimal} {/tb_top_level/dut/INSTRUCTION_MEM/memory[1]} {-height 15 -radix hexadecimal} {/tb_top_level/dut/INSTRUCTION_MEM/memory[2]} {-height 15 -radix hexadecimal}} /tb_top_level/dut/INSTRUCTION_MEM/memory
+add wave -noupdate /tb_top_level/dut/INSTRUCTION_MEM/byteena
+add wave -noupdate /tb_top_level/dut/INSTRUCTION_MEM/clock
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/data
+add wave -noupdate /tb_top_level/dut/INSTRUCTION_MEM/wren
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/INSTRUCTION_MEM/q
 add wave -noupdate -divider -height 40 {DATA MEMORY}
-add wave -noupdate /tb_top_level/dut/DATA_MEM/write
-add wave -noupdate /tb_top_level/dut/DATA_MEM/address
-add wave -noupdate /tb_top_level/dut/DATA_MEM/writedata
-add wave -noupdate /tb_top_level/dut/DATA_MEM/readbyte
-add wave -noupdate /tb_top_level/dut/DATA_MEM/readword
-add wave -noupdate /tb_top_level/dut/DATA_MEM/word_address
-add wave -noupdate /tb_top_level/dut/DATA_MEM/byte0
-add wave -noupdate /tb_top_level/dut/DATA_MEM/byte1
-add wave -noupdate /tb_top_level/dut/DATA_MEM/byte2
-add wave -noupdate /tb_top_level/dut/DATA_MEM/byte3
-add wave -noupdate /tb_top_level/dut/DATA_MEM/word
-add wave -noupdate /tb_top_level/dut/DATA_MEM/memory
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/DATA_MEM/address
+add wave -noupdate /tb_top_level/dut/DATA_MEM/byteena
+add wave -noupdate /tb_top_level/dut/DATA_MEM/clock
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/DATA_MEM/data
+add wave -noupdate /tb_top_level/dut/DATA_MEM/wren
+add wave -noupdate -radix hexadecimal /tb_top_level/dut/DATA_MEM/q
 add wave -noupdate -divider -height 40 DATAPATH
 add wave -noupdate /tb_top_level/dut/PROCESSOR/HW/rst_n
 add wave -noupdate /tb_top_level/dut/PROCESSOR/HW/write_rb
@@ -131,7 +150,7 @@ add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/HW/ALU/shamt
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/HW/ALU/dummy_output
 add wave -noupdate -radix hexadecimal /tb_top_level/dut/PROCESSOR/HW/ALU/overflow
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {195 ps} 0}
+WaveRestoreCursors {{Cursor 1} {679 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 366
 configure wave -valuecolwidth 100
@@ -147,4 +166,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {158 ps} {181 ps}
+WaveRestoreZoom {661 ps} {684 ps}

@@ -27,7 +27,7 @@ module tb_top_level();
         KEY[3] = 1; #2;
         KEY[3] = 0; #2;
         KEY[3] = 1; #2;
-        SW[0] = 0; #2;
+        SW = 10'b0110101011; #2;
         
         j = 0;
         for (i = 0; i < 1024; i = i + 4) begin

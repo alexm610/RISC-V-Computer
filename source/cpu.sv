@@ -1,8 +1,9 @@
 `include "defines.sv"
 
-module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction, input logic [31:0] readdata, 
-            output logic data_memory_write, output logic [31:0] conduit, output logic [31:0] RS2_readdata, output logic [9:0] data_memory_address, output logic [31:0] PC_out);
+module cpu  (input logic clk, input logic rst_n, input logic read_valid, input logic [31:0] instruction, input logic [31:0] readdata, 
+            output logic [3:0] byte_enable, output logic data_memory_write, output logic [31:0] conduit, output logic [31:0] RS2_readdata, output logic [9:0] data_memory_address, output logic [31:0] PC_out, output logic data_memory_read);
     logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg, jump_link, load_upper_imm;
+    logic [1:0] shift_amount;
     logic [2:0] funct3;
     logic [3:0] alu_OP, PC_mux;
     logic [4:0] rs1, rs2, rd0;
@@ -10,7 +11,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     logic [11:0] imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
     logic [19:0] imm_U_TYPE;
     logic [31:0] imm_J_TYPE;
-    logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output;
+    logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output, loaded_data_shifted, RS2_temp;
     enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, LOAD_UPPER_IMM_1} state;
 
     datapath HW                 (.clk(clk),
@@ -39,25 +40,55 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
     
     always @(*) begin
         case (funct3) 
-            3'h0: RS2_readdata = {{24{32'h0}}, rs2_output[7:0]};
-            3'h1: RS2_readdata = {{16{32'h0}}, rs2_output[15:0]};
-            3'h2: RS2_readdata = rs2_output;
+            3'h0: RS2_temp = {{24{32'h0}}, rs2_output[7:0]};
+            3'h1: RS2_temp = {{16{32'h0}}, rs2_output[15:0]};
+            3'h2: RS2_temp = rs2_output;
+            default: RS2_temp = rs2_output;
+        endcase
+    end
+
+    always @(*) begin
+        case (shift_amount) 
+            2'b00: RS2_readdata = RS2_temp; 
+            2'b01: RS2_readdata = {RS2_temp, 8'h0};
+            2'b10: RS2_readdata = {RS2_temp, 16'h0};
+            2'b11: RS2_readdata = {RS2_temp, 24'h0};
             default: RS2_readdata = rs2_output;
+        endcase
+    end
+
+    assign shift_amount = datapath_out[1:0];
+
+    always @(*) begin
+        case (shift_amount)
+            2'b00: loaded_data_shifted = readdata[31:0];    // load operation seeks byte/half-word/word starting from first byte
+            2'b01: loaded_data_shifted = readdata[31:8];    // load operation seeks byte/half-word/word starting from second byte
+            2'b10: loaded_data_shifted = readdata[31:15];   // load operation seeks byte/half-word/word starting from third byte
+            2'b11: loaded_data_shifted = readdata[31:24];   // load operation seeks byte/half-word/word starting from fourth byte
         endcase
     end
 
     always @(*) begin
         case (funct3) 
-            32'h0: readdata_mux = {{24{readdata[7]}}, readdata[7:0]};       // sign-extended byte load
-            32'h1: readdata_mux = {{16{readdata[15]}}, readdata[15:0]};     // sign-extended half-word load
-            32'h2: readdata_mux = readdata[31:0];
-            32'h4: readdata_mux = {{24{1'b0}}, readdata[7:0]};              // zero-extended byte load
-            32'h5: readdata_mux = {{16{1'b0}}, readdata[15:0]};             // zero-extended half-word load
-            default: readdata_mux = readdata;
+            32'h0: readdata_mux = {{24{loaded_data_shifted[7]}}, loaded_data_shifted[7:0]};       // sign-extended byte load
+            32'h1: readdata_mux = {{16{loaded_data_shifted[15]}}, loaded_data_shifted[15:0]};     // sign-extended half-word load
+            32'h2: readdata_mux = loaded_data_shifted[31:0];
+            32'h4: readdata_mux = {{24{1'b0}}, loaded_data_shifted[7:0]};              // zero-extended byte load
+            32'h5: readdata_mux = {{16{1'b0}}, loaded_data_shifted[15:0]};             // zero-extended half-word load
+            default: readdata_mux = loaded_data_shifted;
         endcase
     end
 
-    assign datapath_in          = load_upper_imm ? (imm) : (jump_link ? (PC_out + 32'h4) : (mem_or_reg ? readdata_mux : datapath_out));
+    always @(*) begin
+        case (funct3) 
+            3'h0: byte_enable = 4'b0001 << shift_amount;
+            3'h1: byte_enable = 4'b0011 << shift_amount;
+            3'h2: byte_enable = 4'b1111; // no need to shift this, since memory access must be byte-aligned, and here we are writing a whole word, so the shift_amount should always be zero here 
+            default: byte_enable = 4'h0; // this should never occur
+        endcase
+    end
+
+    assign datapath_in          = load_upper_imm ? imm : (jump_link ? (PC_out + 32'h4) : (mem_or_reg ? readdata_mux : datapath_out));
     assign rs1                  = instruction[19:15];
     assign rs2                  = instruction[24:20];
     assign rd0                  = instruction[11:7];
@@ -77,6 +108,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
             PC_en               <= 1'b0;
             reg_bank_write      <= 1'b0;
             data_memory_write   <= 1'b0;
+            data_memory_read    <= 1'b0;
             mem_or_reg          <= 1'b0;
             state               <= WAIT;
             alu_OP              <= 4'h0;
@@ -96,6 +128,7 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                     PC_mux              <= 4'b0001;
                     reg_bank_write      <= 1'b0;
                     data_memory_write   <= 1'b0;
+                    data_memory_read    <= 1'b0;
                     mem_or_reg          <= 1'b0;
                     imm                 <= 32'h0;
                     jump_link           <= 1'b0;
@@ -199,17 +232,19 @@ module cpu  (input logic clk, input logic rst_n, input logic [31:0] instruction,
                 ACCESS_MEMORY_1: begin
                     state       <= ACCESS_MEMORY_2;
                     mem_or_reg  <= 1'b1;
+                    data_memory_read    <= 1'b1;
                 end
                 ACCESS_MEMORY_2: begin
-                    state           <= COMPLETE;
+                    state           <= read_valid ? COMPLETE : ACCESS_MEMORY_2;
                     reg_bank_write  <= 1'b1;
+                    data_memory_read        <= 1'b0;
                 end
                 WRITE_MEMORY_1: begin
                     state       <= WRITE_MEMORY_2;
                     data_memory_write <= 1'b1;
                 end
                 WRITE_MEMORY_2: begin
-                    state <= COMPLETE;
+                    state <= read_valid ? COMPLETE : WRITE_MEMORY_2;
                     data_memory_write <= 1'b0;
                 end
                 BRANCH_EQ: begin

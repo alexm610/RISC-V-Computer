@@ -1,4 +1,4 @@
-module memory   (input logic clock, input logic reset_n, input logic write,
+module memory   (input logic clock, input logic reset_n, input logic write, input logic read,
                 input logic [9:0] address,
                 input logic [31:0] writedata,
                 output logic [7:0] readbyte,
@@ -26,15 +26,16 @@ module memory   (input logic clock, input logic reset_n, input logic write,
                 memory[address + 32'h2] <= writedata[23:16];
                 memory[address + 32'h3] <= writedata[31:24];
             end
-
-            readword <= {byte3, byte2, byte1, byte0};
+            if (read) begin
+                readword <= {byte3, byte2, byte1, byte0};
             
-            case (address[1:0])
-                2'b00: readbyte <= byte0;
-                2'b01: readbyte <= byte1;
-                2'b10: readbyte <= byte2;
-                2'b11: readbyte <= byte3;
-            endcase
+                case (address[1:0])
+                    2'b00: readbyte <= byte0;
+                    2'b01: readbyte <= byte1;
+                    2'b10: readbyte <= byte2;
+                    2'b11: readbyte <= byte3;
+                endcase
+            end
         end
     end
 endmodule: memory

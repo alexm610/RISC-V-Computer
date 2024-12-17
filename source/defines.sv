@@ -18,3 +18,5 @@
 `define SR              3'b101
 `define SLT             3'b010
 `define SLTU            3'b011
+
+`define NUM_SLAVES      1
