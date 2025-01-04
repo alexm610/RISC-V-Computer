@@ -40,8 +40,8 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
     
     always @(*) begin
         case (funct3) 
-            3'h0: RS2_temp = {{24{32'h0}}, rs2_output[7:0]};
-            3'h1: RS2_temp = {{16{32'h0}}, rs2_output[15:0]};
+            3'h0: RS2_temp = {{24{1'b0}}, rs2_output[7:0]};
+            3'h1: RS2_temp = {{16{1'b0}}, rs2_output[15:0]};
             3'h2: RS2_temp = rs2_output;
             default: RS2_temp = rs2_output;
         endcase

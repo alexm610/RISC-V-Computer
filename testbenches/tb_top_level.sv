@@ -4,6 +4,9 @@ module tb_top_level();
     logic CLOCK_50;
     logic [3:0] KEY;
     logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
+    logic [7:0] VGA_R, VGA_G, VGA_B, VGA_X, VGA_Y;
+    logic [2:0] VGA_COLOUR;
+    logic VGA_PLOT, VGA_HS, VGA_VS, VGA_CLK;
     logic [9:0] SW, LEDR;
 
     int i = 4;

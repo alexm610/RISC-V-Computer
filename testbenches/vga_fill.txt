@@ -1,0 +1,10 @@
+.global _boot
+.text
+
+_boot:
+	addi x1, x0, 160    // maximum x-coordinate 
+    addi x2, x0, 120    // maximum y-coordinate
+    
+
+	
+_end:
