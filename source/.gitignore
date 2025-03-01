@@ -10,3 +10,10 @@
 *.bak
 *.qws
 c5_pin_model_dump.txt
+NUL
+*.mif
+*.bin
+*.hex
+*.srec
+*.o
+*.elf

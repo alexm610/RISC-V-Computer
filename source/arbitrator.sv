@@ -20,9 +20,10 @@ module arbitrator  (input logic clk, input logic rst_n,
     logic [3:0] slave_module;
     enum {IDLE, OPERATE, STALL, DONE} state;
 
-    // let RAM be in range:     0x00 - 0x7f
-    // let SW be in range:      0x80 - 0x8f
-    // let LEDR be in range:    0x90 - 0x9f
+    // let RAM be in range:     0x00 - 0x7F
+    // let SW be in range:      0x80 - 0x8F
+    // let LEDR be in range:    0x90 - 0x9F
+    // let VGA be in range:     0xA0 - 0xAF
 
     always @(*) begin   
         if ((slave_address >= 32'h0) && (slave_address <= 32'h7f)) begin
@@ -32,7 +33,7 @@ module arbitrator  (input logic clk, input logic rst_n,
         end else if ((slave_address >= 32'h90) && (slave_address <= 32'h9F)) begin
             slave_module = 3'd4;   // LEDR selected 
         end else if ((slave_address >= 32'hA0) && (slave_address <= 32'hAF)) begin
-            slave_module = 3'd8;
+            slave_module = 3'd8;    // VGA selected 
         end else begin 
             slave_module = 3'd0;   // this shouldn't happen; nothing selected
         end  
