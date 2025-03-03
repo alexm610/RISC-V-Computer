@@ -1,10 +1,8 @@
-module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9:0] SW,
+module risc_v_core    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9:0] SW,
                     output logic [6:0] HEX0, output logic [6:0] HEX1, output logic [6:0] HEX2,
                     output logic [6:0] HEX3, output logic [6:0] HEX4, output logic [6:0] HEX5,
                     output logic [7:0] VGA_R, output logic [7:0] VGA_G, output logic [7:0] VGA_B,
-                    output logic VGA_HS, output logic VGA_VS, output logic VGA_CLK,
-                    output logic [7:0] VGA_X, output logic [7:0] VGA_Y,
-                    output logic [2:0] VGA_COLOUR, output logic VGA_PLOT,
+                    output logic VGA_HS, output logic VGA_VS, output logic VGA_CLK, 
                     output logic [9:0] LEDR);
 
     logic write_d_mem, test_write, read_d_mem, valid;
@@ -27,10 +25,7 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
-    assign VGA_X            = fill_x;
-    assign VGA_Y            = fill_y;
-    assign VGA_PLOT         = fill_plot;
-
+    
     cpu PROCESSOR           (.clk(CLOCK_50),
                             .rst_n(KEY[3]),
                             .read_valid(valid),
@@ -86,8 +81,8 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
                             .write(fabric_write[2]),
                             .writedata(fabric_data_out),
                             .ledr_output(LEDR));
-
-    vga_adapter #(.RESOLUTION("160x120")) VGA (.clock(CLOCK_50),
+    
+    vga_adapter #(.RESOLUTION("160x120")) VGA_0 (.clock(CLOCK_50),
                             .resetn(KEY[3]),
                             .colour(into_vga_colour), // from controller
                             .x(fill_x), // from controller I need to make 
@@ -106,5 +101,5 @@ module top_level    (input logic CLOCK_50, input logic [3:0] KEY, input logic [9
                             .vga_x(fill_x),
                             .vga_y(fill_y),
                             .vga_colour(into_vga_colour),
-                            .vga_plot(fill_plot));
-endmodule: top_level
+                            .vga_plot(fill_plot));                   
+endmodule: risc_v_core

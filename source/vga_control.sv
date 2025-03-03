@@ -9,7 +9,7 @@ module vga_control  (input logic clk, input logic rst_n, input logic start,
     // x-position:  data_in[23:16]
     // colour:      data_in[7:0]
 
-    assign vga_plot     = (data_in[23:16] >= 8'd0 && data_in[23:16] < 8'd160 && data_in[30:24] >= 7'd0 && data_in[30:24] < 7'd120) ? start : 1'b0;
+    assign vga_plot     = (data_in[23:16] >= 8'd0 && data_in[23:16] < 8'd160 && data_in[30:24] >= 7'd0 && data_in[30:24] < 7'd120) ? 1 : 1'b0;
     assign vga_x        = data_in[23:16];
     assign vga_y        = data_in[30:24];
     assign vga_colour   = data_in[7:0];
