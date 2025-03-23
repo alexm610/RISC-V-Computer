@@ -1,7 +1,8 @@
 `include "defines.sv"
 
-module cpu  (input logic clk, input logic rst_n, input logic read_valid, input logic [31:0] instruction, input logic [31:0] readdata, 
-            output logic [3:0] byte_enable, output logic data_memory_write, output logic [31:0] conduit, output logic [31:0] RS2_readdata, output logic [9:0] data_memory_address, output logic [31:0] PC_out, output logic data_memory_read);
+module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic [31:0] instruction, input logic [31:0] DataBus_in, 
+            output logic AS_L, output logic [3:0] byte_enable, output logic WE_L, output logic [31:0] DataBus_out, output logic [9:0] Address, output logic [31:0] PC_out, output logic conduit);
+    
     logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg, jump_link, load_upper_imm;
     logic [1:0] shift_amount;
     logic [2:0] funct3;
@@ -11,7 +12,7 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
     logic [11:0] imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
     logic [19:0] imm_U_TYPE;
     logic [31:0] imm_J_TYPE;
-    logic [31:0] datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output, loaded_data_shifted, RS2_temp;
+    logic [31:0] writedata, datapath_out, PC_in, imm, datapath_in, readdata_mux, rs2_output, loaded_data_shifted, RS2_temp, RS2_readdata;
     enum {WAIT, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, LOAD_UPPER_IMM_1} state;
 
     datapath HW                 (.clk(clk),
@@ -22,7 +23,7 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                                 .rs_1(rs1),
                                 .rs_2(rs2),
                                 .rd_0(rd0),
-                                .writedata(datapath_in),
+                                .writedata(writedata),
                                 .alu_result(datapath_out),
                                 .immediate(imm),
                                 .negative(negative),
@@ -38,57 +39,8 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
 
     multiplexer_4input #(32) PC_MUX (.a3(imm + datapath_in), .a2(32'h0), .a1(PC_out + imm), .a0(PC_out + 32'h4), .s(PC_mux), .out(PC_in));
     
-    always @(*) begin
-        case (funct3) 
-            3'h0: RS2_temp = {{24{1'b0}}, rs2_output[7:0]};
-            3'h1: RS2_temp = {{16{1'b0}}, rs2_output[15:0]};
-            3'h2: RS2_temp = rs2_output;
-            default: RS2_temp = rs2_output;
-        endcase
-    end
-
-    always @(*) begin
-        case (shift_amount) 
-            2'b00: RS2_readdata = RS2_temp; 
-            2'b01: RS2_readdata = {RS2_temp, 8'h0};
-            2'b10: RS2_readdata = {RS2_temp, 16'h0};
-            2'b11: RS2_readdata = {RS2_temp, 24'h0};
-            default: RS2_readdata = rs2_output;
-        endcase
-    end
-
-    assign shift_amount = datapath_out[1:0];
-
-    always @(*) begin
-        case (shift_amount)
-            2'b00: loaded_data_shifted = readdata[31:0];    // load operation seeks byte/half-word/word starting from first byte
-            2'b01: loaded_data_shifted = readdata[31:8];    // load operation seeks byte/half-word/word starting from second byte
-            2'b10: loaded_data_shifted = readdata[31:15];   // load operation seeks byte/half-word/word starting from third byte
-            2'b11: loaded_data_shifted = readdata[31:24];   // load operation seeks byte/half-word/word starting from fourth byte
-        endcase
-    end
-
-    always @(*) begin
-        case (funct3) 
-            32'h0: readdata_mux = {{24{loaded_data_shifted[7]}}, loaded_data_shifted[7:0]};       // sign-extended byte load
-            32'h1: readdata_mux = {{16{loaded_data_shifted[15]}}, loaded_data_shifted[15:0]};     // sign-extended half-word load
-            32'h2: readdata_mux = loaded_data_shifted[31:0];
-            32'h4: readdata_mux = {{24{1'b0}}, loaded_data_shifted[7:0]};              // zero-extended byte load
-            32'h5: readdata_mux = {{16{1'b0}}, loaded_data_shifted[15:0]};             // zero-extended half-word load
-            default: readdata_mux = loaded_data_shifted;
-        endcase
-    end
-
-    always @(*) begin
-        case (funct3) 
-            3'h0: byte_enable = 4'b0001 << shift_amount;
-            3'h1: byte_enable = 4'b0011 << shift_amount;
-            3'h2: byte_enable = 4'b1111; // no need to shift this, since memory access must be byte-aligned, and here we are writing a whole word, so the shift_amount should always be zero here 
-            default: byte_enable = 4'h0; // this should never occur
-        endcase
-    end
-
-    assign datapath_in          = load_upper_imm ? imm : (jump_link ? (PC_out + 32'h4) : (mem_or_reg ? readdata_mux : datapath_out));
+    assign DataBus_out          = rs2_output;
+    assign datapath_in          = mem_or_reg ? DataBus_in : datapath_out;
     assign rs1                  = instruction[19:15];
     assign rs2                  = instruction[24:20];
     assign rd0                  = instruction[11:7];
@@ -100,21 +52,48 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
     assign imm_B_TYPE           = {instruction[31], instruction[7], instruction[30:25], instruction[11:8]};
     assign imm_J_TYPE           = {{12{instruction[31]}}, instruction[19:12], instruction[20], instruction[30:25], instruction[24:21], 1'b0};
     assign imm_U_TYPE           = instruction[31:12];
-    assign data_memory_address  = datapath_out[8:0];
+    assign Address              = datapath_out[8:0];
+
+    always @(*) begin
+        case (funct3) 
+            3'h0: byte_enable   <= 4'b0001;
+            3'h1: byte_enable   <= 4'b0011;
+            3'h2: byte_enable   <= 4'b1111;
+            default: byte_enable <= 4'b0000; 
+        endcase
+    end
+
+    always @(*) begin
+        if (mem_or_reg == 1) begin
+            case (funct3) 
+                3'h0: writedata <= {{24{datapath_in[7]}}, datapath_in[7:0]};
+                3'h1: writedata <= {{16{datapath_in[15]}}, datapath_in[15:0]};
+                3'h2: writedata <= datapath_in;
+                3'h4: writedata <= {{24{1'b0}}, datapath_in[7:0]};
+                3'h5: writedata <= {{16{1'b0}}, datapath_in[15:0]};
+                default: writedata <= 32'bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
+            endcase
+        end else if (jump_link == 1) begin
+            writedata <= PC_out + 4;
+        end else begin  
+            writedata <= datapath_in;
+        end
+    end
 
     always @(posedge clk) begin
         if (!rst_n) begin
             jump_link           <= 1'b0;
             PC_en               <= 1'b0;
             reg_bank_write      <= 1'b0;
-            data_memory_write   <= 1'b0;
-            data_memory_read    <= 1'b0;
+            WE_L                <= 1'b1;
+
             mem_or_reg          <= 1'b0;
             state               <= WAIT;
             alu_OP              <= 4'h0;
             PC_mux              <= 4'b0100; 
             load_upper_imm      <= 1'b0;
-            conduit[0]          <= 1'b0;
+            AS_L                <= 1'b1;
+            conduit             <= 1'b0;
         end else begin
             case (state) 
                 WAIT: begin
@@ -122,17 +101,20 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                     PC_mux      <= 4'b0001;
                     state       <= START;
                     jump_link   <= 1'b0;
+                    //writedata   <= 32'bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
                 end
                 START: begin
                     PC_en               <= 1'b0;
                     PC_mux              <= 4'b0001;
                     reg_bank_write      <= 1'b0;
-                    data_memory_write   <= 1'b0;
-                    data_memory_read    <= 1'b0;
+                    WE_L                <= 1'b1;
+
                     mem_or_reg          <= 1'b0;
                     imm                 <= 32'h0;
                     jump_link           <= 1'b0;
                     load_upper_imm      <= 1'b0; 
+                    AS_L                <= 1'b1;
+                    conduit             <= 1'b0;
                     case (opcode)
                         `R_TYPE: begin
                             state       <= WRITE_BACK;
@@ -147,7 +129,7 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                         end       
                         `LOAD_TYPE: begin
                             state       <= ACCESS_MEMORY_1;
-                            alu_OP[2:0] <= `ADDSUB; 
+                            alu_OP      <= {1'b0, `ADDSUB}; 
                             imm         <= {{20{imm_I_TYPE[11]}}, imm_I_TYPE};
                             alu_SRC     <= 1'b0;
                         end              
@@ -155,7 +137,7 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                             state       <= WRITE_MEMORY_1;
                             imm         <= {{20{imm_S_TYPE[11]}}, imm_S_TYPE};
                             alu_SRC     <= 1'b0;
-                            alu_OP[2:0] <= `ADDSUB;
+                            alu_OP      <= {1'b0, `ADDSUB};
                         end   
                         `B_TYPE: begin
                             case (funct3)
@@ -210,7 +192,7 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                             load_upper_imm  <= 1'b1; 
                         end 
                         7'b0000000: begin
-                            conduit[0] <= 1'b1;
+                            conduit <= 1'b1;
                             state <= START;
                         end
                         default: state  <= START;
@@ -224,6 +206,9 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                     state <= INCREMENT_PC;
                     PC_en <= 1'b1;
                     reg_bank_write  <= 1'b0;
+                    AS_L            <= 1'b1;
+                    WE_L            <= 1'b1;
+                    jump_link       <= 1'b0;
                 end
                 INCREMENT_PC: begin
                     state   <= WAIT;
@@ -232,20 +217,21 @@ module cpu  (input logic clk, input logic rst_n, input logic read_valid, input l
                 ACCESS_MEMORY_1: begin
                     state       <= ACCESS_MEMORY_2;
                     mem_or_reg  <= 1'b1;
-                    data_memory_read    <= 1'b1;
+                    WE_L        <= 1'b1;
+                    AS_L        <= 1'b0;
                 end
                 ACCESS_MEMORY_2: begin
-                    state           <= read_valid ? COMPLETE : ACCESS_MEMORY_2;
+                    state           <= DTAck ? COMPLETE : ACCESS_MEMORY_2;
                     reg_bank_write  <= 1'b1;
-                    data_memory_read        <= 1'b0;
                 end
                 WRITE_MEMORY_1: begin
                     state       <= WRITE_MEMORY_2;
-                    data_memory_write <= 1'b1;
+                    WE_L        <= 1'b0;
+                    AS_L        <= 1'b0;
                 end
                 WRITE_MEMORY_2: begin
-                    state <= read_valid ? COMPLETE : WRITE_MEMORY_2;
-                    data_memory_write <= 1'b0;
+                    state <= DTAck ? COMPLETE : WRITE_MEMORY_2;
+                    WE_L <= 1'b0;
                 end
                 BRANCH_EQ: begin
                     state   <= COMPLETE;

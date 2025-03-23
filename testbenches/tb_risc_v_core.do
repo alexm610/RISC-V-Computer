@@ -1,0 +1,199 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -divider -height 40 TOP_LEVEL
+add wave -noupdate /tb_risc_v_core/dut/CLOCK_50
+add wave -noupdate /tb_risc_v_core/dut/KEY
+add wave -noupdate /tb_risc_v_core/dut/SW
+add wave -noupdate /tb_risc_v_core/dut/HEX0
+add wave -noupdate /tb_risc_v_core/dut/HEX1
+add wave -noupdate /tb_risc_v_core/dut/HEX2
+add wave -noupdate /tb_risc_v_core/dut/HEX3
+add wave -noupdate /tb_risc_v_core/dut/HEX4
+add wave -noupdate /tb_risc_v_core/dut/HEX5
+add wave -noupdate /tb_risc_v_core/dut/VGA_R
+add wave -noupdate /tb_risc_v_core/dut/VGA_G
+add wave -noupdate /tb_risc_v_core/dut/VGA_B
+add wave -noupdate /tb_risc_v_core/dut/VGA_HS
+add wave -noupdate /tb_risc_v_core/dut/VGA_VS
+add wave -noupdate /tb_risc_v_core/dut/VGA_CLK
+add wave -noupdate /tb_risc_v_core/dut/LEDR
+add wave -noupdate /tb_risc_v_core/dut/test_write
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/instruction
+add wave -noupdate /tb_risc_v_core/dut/valid
+add wave -noupdate /tb_risc_v_core/dut/AS_L
+add wave -noupdate /tb_risc_v_core/dut/WE_L
+add wave -noupdate /tb_risc_v_core/dut/byte_enable
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/program_counter
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/address
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/dummy_instr_writedata
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/datapath_output
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/data_in
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/data_out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM_data_out
+add wave -noupdate /tb_risc_v_core/dut/fill_x
+add wave -noupdate /tb_risc_v_core/dut/fill_y
+add wave -noupdate /tb_risc_v_core/dut/fill_plot
+add wave -noupdate /tb_risc_v_core/dut/VGA_R_10
+add wave -noupdate /tb_risc_v_core/dut/VGA_G_10
+add wave -noupdate /tb_risc_v_core/dut/VGA_B_10
+add wave -noupdate /tb_risc_v_core/dut/VGA_BLANK
+add wave -noupdate /tb_risc_v_core/dut/VGA_SYNC
+add wave -noupdate /tb_risc_v_core/dut/into_vga_colour
+add wave -noupdate /tb_risc_v_core/dut/RAM_Select
+add wave -noupdate /tb_risc_v_core/dut/IO_Select
+add wave -noupdate /tb_risc_v_core/dut/Graphics_Select
+add wave -noupdate -divider -height 40 PROCESSOR
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/PC_out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/PC_in
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC_en
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC_mux
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/jump_link
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/DTAck
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/instruction
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_in
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/AS_L
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/byte_enable
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/WE_L
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Address
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/reg_bank_write
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_SRC
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/negative
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/overflow
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/zero
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/mem_or_reg
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/load_upper_imm
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/funct3
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_OP
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rd0
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/opcode
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/funct7
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_I_TYPE
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_S_TYPE
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_B_TYPE
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_U_TYPE
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_J_TYPE
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/writedata
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/datapath_out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/datapath_in
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/readdata_mux
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs2_output
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/loaded_data_shifted
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/RS2_temp
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/RS2_readdata
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/state
+add wave -noupdate -divider -height 40 ADDRESS_DECODER
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/AD/Address
+add wave -noupdate /tb_risc_v_core/dut/AD/RAM_Select_H
+add wave -noupdate /tb_risc_v_core/dut/AD/IO_Select_H
+add wave -noupdate /tb_risc_v_core/dut/AD/Graphics_Select_H
+add wave -noupdate -divider -height 40 INSTRUCTION_MEMORY
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEM/address
+add wave -noupdate /tb_risc_v_core/dut/INSTRUCTION_MEM/byteena
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEM/data
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEM/wren
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEM/q
+add wave -noupdate -divider -height 40 SRAM
+add wave -noupdate /tb_risc_v_core/dut/SRAM/AS_L
+add wave -noupdate /tb_risc_v_core/dut/SRAM/WE_L
+add wave -noupdate /tb_risc_v_core/dut/SRAM/RAM_Select_H
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/Address
+add wave -noupdate /tb_risc_v_core/dut/SRAM/Byte_Enable
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/Data_In
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/Data_Out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/Data_Out_bus
+add wave -noupdate -divider -height 40 DATAPATH
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/write_rb
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/alu_source
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/alu_control
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/rs_1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/rs_2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/rd_0
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/writedata
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/immediate
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/negative
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/overflow
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/zero
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/alu_result
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/rs2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/A_in
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/B_in
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/rs_2_out
+add wave -noupdate -divider -height 40 REGFILE
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/write
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/rs1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/rs2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/rd
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/writedata
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/readdata_1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/readdata_2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/addr_1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/addr_2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/addr_d
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x0
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x3
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x4
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x5
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x6
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x7
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x8
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x9
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x10
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x11
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x12
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x13
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x14
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x15
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x16
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x17
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x18
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x19
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x20
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x21
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x22
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x23
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x24
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x25
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x26
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x27
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x28
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x29
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x30
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/REGISTER_BANK/x31
+add wave -noupdate -divider -height 40 ALU
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/ALUsrc
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/ALUop
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/Ain
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/Bin
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/status
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/out
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/shamt
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/dummy_output
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/overflow
+add wave -noupdate -divider -height 40 PC
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC/enable
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC/in
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC/out
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {678 ps} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 383
+configure wave -valuecolwidth 100
+configure wave -justifyvalue left
+configure wave -signalnamewidth 0
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ps
+update
+WaveRestoreZoom {665 ps} {693 ps}

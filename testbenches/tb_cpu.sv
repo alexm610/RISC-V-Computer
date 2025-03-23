@@ -1,9 +1,10 @@
 `timescale 1ps/1ps
 
 module tb_cpu;
-    logic clk, rst_n, data_memory_write;
-    logic [9:0] data_memory_address;
-    logic [31:0] instruction, readdata, PC_out, RS2_readdata, conduit;
+    logic clk, rst_n, DTAck, AS_L, WE_L;
+    logic [3:0] byte_enable;
+    logic [9:0] Address;
+    logic [31:0] instruction, DataBus_in, DataBus_out, PC_out;
     int i = 4;
     int j = 0;
     int counter = 0;
@@ -29,7 +30,7 @@ module tb_cpu;
         0x02268193
 
         */
-        readdata = 32'h0BADF00D;
+        DataBus_in = 32'h0BADF00D;
         error = 1'b0;
         instruction = 32'h02268193;
         rst_n = 1'b1; #2;
@@ -49,6 +50,7 @@ module tb_cpu;
         wait(PC_out == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X29.out == 32'd198);
+
         /*
         TEST 3
 
@@ -220,11 +222,12 @@ module tb_cpu;
         LB X4, 0(X2) // immediate is in decimal form
         0x00010203
         */
-        readdata = 32'h0BADF01D;
+        DTAck = 1;
+        DataBus_in = 32'h0BADF01D;
         instruction = 32'h00010203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{readdata[7]}}, readdata[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{DataBus_in[7]}}, DataBus_in[7:0]}));
         #2;
 
         /*
@@ -233,11 +236,11 @@ module tb_cpu;
         LH X4, 0(X2) // immediate is in decimal form
         0x00011203
         */
-        readdata = 32'h0BADF01D;
+        DataBus_in = 32'h0BADF01D;
         instruction = 32'h00011203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{readdata[15]}}, readdata[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{DataBus_in[15]}}, DataBus_in[15:0]}));
         #2;
 
         /*
@@ -246,11 +249,11 @@ module tb_cpu;
         LW X13, 0(X2) // immediate is in decimal form
         0x00012683
         */
-        readdata = 32'h0BADF01D;
+        DataBus_in = 32'h0BADF01D;
         instruction = 32'h00012683; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X13.out == (readdata[31:0]));
+        assert(dut.HW.REGISTER_BANK.X13.out == (DataBus_in[31:0]));
         #2;
 
         /*
@@ -284,7 +287,7 @@ module tb_cpu;
         0xFFF00093
 
         */
-        readdata = 32'h0BADF00D;
+        DataBus_in = 32'h0BADF00D;
         error = 1'b0;
         instruction = 32'h07F00093;
 
@@ -472,17 +475,20 @@ module tb_cpu;
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X7.out == (32'h1));
 
+
+    
+
         /*
         TEST 37
 
         LBU X4, 0(X2) // immediate is in decimal form
         0x00014203
         */
-        readdata = 32'hFFFFFFFF;
+        DataBus_in = 32'hFFFFFFFF;
         instruction = 32'h00014203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{1'b0}}, readdata[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{1'b0}}, DataBus_in[7:0]}));
         #2;
 
         /*
@@ -491,11 +497,11 @@ module tb_cpu;
         LB X4, 0(X2) // immediate is in decimal form
         0x00014203
         */
-        readdata = 32'hFFFFFFFF;
+        DataBus_in = 32'hFFFFFFFF;
         instruction = 32'h00010203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{readdata[7]}}, readdata[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{DataBus_in[7]}}, DataBus_in[7:0]}));
         #2;
 
         /*
@@ -504,11 +510,11 @@ module tb_cpu;
         LHU X4, 0(X2) // immediate is in decimal form
         0x00015203
         */
-        readdata = 32'hFFFFFFFF;
+        DataBus_in = 32'hFFFFFFFF;
         instruction = 32'h00015203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{1'b0}}, readdata[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{1'b0}}, DataBus_in[15:0]}));
         #2;
 
         /*
@@ -517,11 +523,11 @@ module tb_cpu;
         LH X4, 0(X2) // immediate is in decimal form
         0x00011203
         */
-        readdata = 32'hFFFFFFFF;
+        DataBus_in = 32'hFFFFFFFF;
         instruction = 32'h00011203; #2;
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{readdata[15]}}, readdata[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{DataBus_in[15]}}, DataBus_in[15:0]}));
         #2;
 
         /*
@@ -547,8 +553,9 @@ module tb_cpu;
 
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.RS2_readdata == (dut.HW.REGISTER_BANK.X5.out));
-        assert(dut.data_memory_address == (dut.HW.REGISTER_BANK.X9.out));
+        assert(DataBus_out == (dut.HW.REGISTER_BANK.X5.out));
+        assert(Address == (dut.HW.REGISTER_BANK.X9.out));
+        assert(byte_enable == 4'b1111);
         #2;
 
         /*
@@ -561,8 +568,9 @@ module tb_cpu;
 
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.RS2_readdata == (dut.HW.REGISTER_BANK.X6.out[15:0]));
-        assert(dut.data_memory_address == (dut.HW.REGISTER_BANK.X13.out));
+        assert(DataBus_out == (dut.HW.REGISTER_BANK.X6.out));
+        assert(Address == (dut.HW.REGISTER_BANK.X13.out));
+        assert(byte_enable == 4'b0011);
         #2;
 
         /*
@@ -575,10 +583,10 @@ module tb_cpu;
 
         wait(PC_out == i);
         i = i + 4;
-        assert(dut.RS2_readdata == (dut.HW.REGISTER_BANK.X31.out[7:0]));
-        assert(dut.data_memory_address == (dut.HW.REGISTER_BANK.X13.out));
+        assert(DataBus_out == (dut.HW.REGISTER_BANK.X31.out));
+        assert(Address == (dut.HW.REGISTER_BANK.X13.out));
+        assert(byte_enable == 4'b0001);
         #2;
-        
 
 
         if (!error) begin
