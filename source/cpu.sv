@@ -1,7 +1,7 @@
 `include "defines.sv"
 
 module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic [31:0] instruction, input logic [31:0] DataBus_in, 
-            output logic AS_L, output logic [3:0] byte_enable, output logic WE_L, output logic [31:0] DataBus_out, output logic [9:0] Address, output logic [31:0] PC_out, output logic conduit);
+            output logic AS_L, output logic [3:0] byte_enable, output logic WE_L, output logic [31:0] DataBus_out, output logic [31:0] Address, output logic [31:0] PC_out, output logic conduit);
     
     logic reg_bank_write, PC_en, alu_SRC, negative, overflow, zero, mem_or_reg, jump_link, load_upper_imm;
     logic [1:0] shift_amount;
@@ -39,7 +39,7 @@ module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic 
 
     multiplexer_4input #(32) PC_MUX (.a3(imm + datapath_in), .a2(32'h0), .a1(PC_out + imm), .a0(PC_out + 32'h4), .s(PC_mux), .out(PC_in));
     
-    assign DataBus_out          = rs2_output;
+    //assign DataBus_out          = rs2_output;
     assign datapath_in          = mem_or_reg ? DataBus_in : datapath_out;
     assign rs1                  = instruction[19:15];
     assign rs2                  = instruction[24:20];
@@ -52,8 +52,9 @@ module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic 
     assign imm_B_TYPE           = {instruction[31], instruction[7], instruction[30:25], instruction[11:8]};
     assign imm_J_TYPE           = {{12{instruction[31]}}, instruction[19:12], instruction[20], instruction[30:25], instruction[24:21], 1'b0};
     assign imm_U_TYPE           = instruction[31:12];
-    assign Address              = datapath_out[8:0];
-
+    //assign Address              = datapath_out[9:0];
+    assign Address              = datapath_out;
+    /*
     always @(*) begin
         case (funct3) 
             3'h0: byte_enable   <= 4'b0001;
@@ -61,6 +62,57 @@ module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic 
             3'h2: byte_enable   <= 4'b1111;
             default: byte_enable <= 4'b0000; 
         endcase
+    end
+    */
+
+    /*
+        We need to determine where RS2 output is written with respect to byte-addressing;
+        
+        If we are to write a byte (SB), then the lowest byte of RS2 output must be written to memory
+            But we need to shift this byte either 0, 1, 2, or 3 bytes to the left, depending on where the Address indicates we are writing to;
+            The memory will only see a word address, but the immediate indicates which byte address to write to for a given word address;
+            SB x1, 0(x0) -> store lowest byte of x1 to word address 0
+            SB x1, 3(x0) -> store lowest byte of x1 to word address 0, byte address 3
+                byte_enable <= 4'b1000;
+                shift RS2 output 24 to left
+    */
+    always @(*) begin                      
+        case (Address[1:0])
+            2'b00: DataBus_out <= rs2_output;        // Byte address = 0; 
+            2'b01: DataBus_out <= rs2_output << 8;   // Byte address = 1; 
+            2'b10: DataBus_out <= rs2_output << 16;  // Byte address = 2;
+            2'b11: DataBus_out <= rs2_output << 24;  // Byte address = 3;
+        endcase 
+    end
+
+    always @(*) begin
+        byte_enable <= 4'b0000; // disable byte_enable by default
+
+        if (funct3 == 3'h0) begin
+            case (Address[1:0]) 
+                2'b00: byte_enable <= 4'b0001; // we are writing a byte at no offset
+                2'b01: byte_enable <= 4'b0010; // we are writing a byte at offset = 1
+                2'b10: byte_enable <= 4'b0100; // writing a byte at offset = 2
+                2'b11: byte_enable <= 4'b1000; // writing a byte at offset = 3
+            endcase 
+        end 
+
+        if (funct3 == 3'h1) begin
+            case (Address[1:0]) 
+                2'b00: byte_enable <= 4'b0011; // writing a half-word at offset = 0
+                2'b01: byte_enable <= 4'b0110; // writing a half-word at offset = 1
+                2'b10: byte_enable <= 4'b1100; // writing a half-word at offset = 2
+                default: byte_enable <= 4'b0000; // we cannot write a half word at offset = 3, as this is misaligned
+            endcase 
+        end
+
+        if (funct3 == 3'h2) begin
+            byte_enable <= 4'b0000; // disable byte_enable, unless condition below is met
+
+            if (Address[1:0] == 2'b00) begin
+                byte_enable <= 4'b1111;
+            end
+        end
     end
 
     always @(*) begin
@@ -71,7 +123,7 @@ module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic 
                 3'h2: writedata <= datapath_in;
                 3'h4: writedata <= {{24{1'b0}}, datapath_in[7:0]};
                 3'h5: writedata <= {{16{1'b0}}, datapath_in[15:0]};
-                default: writedata <= 32'bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
+                default: writedata <= 32'd0;
             endcase
         end else if (jump_link == 1) begin
             writedata <= PC_out + 4;
@@ -81,7 +133,7 @@ module cpu  (input logic clk, input logic rst_n, input logic DTAck, input logic 
     end
 
     always @(posedge clk) begin
-        if (!rst_n) begin
+        if (rst_n == 0) begin
             jump_link           <= 1'b0;
             PC_en               <= 1'b0;
             reg_bank_write      <= 1'b0;

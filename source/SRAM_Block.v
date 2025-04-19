@@ -14,7 +14,7 @@
 
 // PROGRAM		"Quartus Prime"
 // VERSION		"Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
-// CREATED		"Fri Mar 21 15:41:51 2025"
+// CREATED		"Thu Apr 17 15:35:37 2025"
 
 module SRAM_Block(
 	Clock,
@@ -42,10 +42,9 @@ wire	SYNTHESIZED_WIRE_0;
 wire	SYNTHESIZED_WIRE_1;
 wire	SYNTHESIZED_WIRE_2;
 wire	SYNTHESIZED_WIRE_3;
-wire	SYNTHESIZED_WIRE_12;
+wire	SYNTHESIZED_WIRE_11;
 wire	SYNTHESIZED_WIRE_5;
-wire	SYNTHESIZED_WIRE_6;
-wire	SYNTHESIZED_WIRE_13;
+wire	SYNTHESIZED_WIRE_12;
 
 
 
@@ -82,27 +81,21 @@ ram_block	b2v_inst3(
 	.data(Data_In[7:0]),
 	.q(Data_Out_bus[7:0]));
 
-assign	SYNTHESIZED_WIRE_12 =  ~AS_L;
+assign	SYNTHESIZED_WIRE_11 =  ~AS_L;
 
 assign	SYNTHESIZED_WIRE_5 =  ~WE_L;
 
-assign	SYNTHESIZED_WIRE_13 = RAM_Select_H & SYNTHESIZED_WIRE_12 & SYNTHESIZED_WIRE_5;
+assign	SYNTHESIZED_WIRE_12 = RAM_Select_H & SYNTHESIZED_WIRE_11 & SYNTHESIZED_WIRE_5;
 
 
-tri_state_buffer	b2v_inst333(
-	.Enable(SYNTHESIZED_WIRE_6),
-	.DataIn(Data_Out_bus),
-	.DataOut(Data_Out));
+assign	SYNTHESIZED_WIRE_0 = SYNTHESIZED_WIRE_12 & Byte_Enable[3];
 
-assign	SYNTHESIZED_WIRE_6 = RAM_Select_H & WE_L & SYNTHESIZED_WIRE_12;
+assign	SYNTHESIZED_WIRE_1 = SYNTHESIZED_WIRE_12 & Byte_Enable[2];
 
-assign	SYNTHESIZED_WIRE_0 = SYNTHESIZED_WIRE_13 & Byte_Enable[3];
+assign	SYNTHESIZED_WIRE_3 = SYNTHESIZED_WIRE_12 & Byte_Enable[0];
 
-assign	SYNTHESIZED_WIRE_1 = SYNTHESIZED_WIRE_13 & Byte_Enable[2];
+assign	SYNTHESIZED_WIRE_2 = SYNTHESIZED_WIRE_12 & Byte_Enable[1];
 
-assign	SYNTHESIZED_WIRE_3 = SYNTHESIZED_WIRE_13 & Byte_Enable[0];
-
-assign	SYNTHESIZED_WIRE_2 = SYNTHESIZED_WIRE_13 & Byte_Enable[1];
-
+assign	Data_Out = Data_Out_bus;
 
 endmodule

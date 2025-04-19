@@ -1,0 +1,8 @@
+/work
+/.vs
+*.sdc
+*.qsf
+*.bin
+*.elf
+*.mif
+*.srec

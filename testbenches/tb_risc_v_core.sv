@@ -8,6 +8,7 @@ module tb_risc_v_core();
     logic [2:0] VGA_COLOUR;
     logic VGA_PLOT, VGA_HS, VGA_VS, VGA_CLK;
     logic [9:0] SW, LEDR;
+    logic [35:0] GPIO_0, GPIO_1;
 
     int i = 4;
     int j = 0;
@@ -69,7 +70,7 @@ module tb_risc_v_core();
         KEY[3] = 1; #10;
 
         //#200;
-        @ (posedge LEDR[0]);
+        @ (posedge LEDR[9]);
         #4;
 
         if (!error) begin

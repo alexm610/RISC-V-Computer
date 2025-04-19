@@ -17,3 +17,5 @@ NUL
 *.srec
 *.o
 *.elf
+*.json
+*.qip

@@ -1,5 +1,5 @@
 module address_decoder (
-        input logic [9:0] Address, 
+        input logic [31:0] Address, 
  
         output logic RAM_Select_H,
         output logic IO_Select_H,
@@ -11,15 +11,15 @@ module address_decoder (
 		IO_Select_H			<= 0;
 		Graphics_Select_H	<= 0;
 
-		if ((Address >= 10'h000) && (Address <= 10'h3FF)) begin
+		if ((Address >= 32'h00000000) && (Address <= 10'h03FFFFFF)) begin
 			RAM_Select_H		<= 1;
 		end
 
-		if ((Address >= 10'h400) && (Address <= 10'h40F)) begin
+		if ((Address >= 32'h04000000) && (Address <= 32'h0400FFFF)) begin
 			IO_Select_H			<= 1;
 		end
 
-		if ((Address >= 10'h410) && (Address <= 10'h41F)) begin
+		if ((Address >= 32'h04010000) && (Address <= 32'h0401000F)) begin
 			Graphics_Select_H	<= 1;
 		end
 	end

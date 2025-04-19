@@ -5,7 +5,7 @@ _boot:
 	addi x21, x0, 160    
     addi x22, x0, 120   
     addi x24, x0, 8     
-    addi x23, x0, 160    
+    addi x23, x0, 816
     addi x3, x0, 0      
     addi x1, x0, 0      
     addi x2, x0, 0      
@@ -34,8 +34,8 @@ _incY:
     beq x0, x0, _fill   
 	
 _end: 
-    addi x1, x0, 128
-    addi x2, x0, 144
+    addi x1, x0, 768
+    addi x2, x0, 784
 
 _loop:
     lw x6, 0(x1)

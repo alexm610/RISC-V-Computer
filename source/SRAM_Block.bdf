@@ -39,7 +39,7 @@ refer to the applicable agreement for further details.
 	(input)
 	(rect -136 104 32 120)
 	(text "INPUT" (rect 125 0 153 10)(font "Arial" (font_size 6)))
-	(text "AS_L" (rect 5 0 30 17)(font "Intel Clear" ))
+	(text "AS_L" (rect 5 0 29 17)(font "Intel Clear" ))
 	(pt 168 8)
 	(drawing
 		(line (pt 84 12)(pt 109 12))
@@ -72,7 +72,7 @@ refer to the applicable agreement for further details.
 	(input)
 	(rect -136 16 32 32)
 	(text "INPUT" (rect 125 0 153 10)(font "Arial" (font_size 6)))
-	(text "RAM_Select_H" (rect 5 0 77 17)(font "Intel Clear" ))
+	(text "RAM_Select_H" (rect 5 0 76 17)(font "Intel Clear" ))
 	(pt 168 8)
 	(drawing
 		(line (pt 84 12)(pt 109 12))
@@ -104,7 +104,7 @@ refer to the applicable agreement for further details.
 	(input)
 	(rect -152 552 32 568)
 	(text "INPUT" (rect 141 0 169 10)(font "Arial" (font_size 6)))
-	(text "Byte_Enable[3..0]" (rect 5 0 90 17)(font "Intel Clear" ))
+	(text "Byte_Enable[3..0]" (rect 5 0 89 17)(font "Intel Clear" ))
 	(pt 184 8)
 	(drawing
 		(line (pt 100 12)(pt 125 12))
@@ -120,7 +120,7 @@ refer to the applicable agreement for further details.
 	(input)
 	(rect -136 128 32 144)
 	(text "INPUT" (rect 125 0 153 10)(font "Arial" (font_size 6)))
-	(text "Address[9..0]" (rect 5 0 67 17)(font "Intel Clear" ))
+	(text "Address[9..0]" (rect 5 0 66 17)(font "Intel Clear" ))
 	(pt 168 8)
 	(drawing
 		(line (pt 84 12)(pt 109 12))
@@ -740,35 +740,6 @@ refer to the applicable agreement for further details.
 		(arc (pt 31 36)(pt 31 12)(rect 19 12 44 37))
 	)
 )
-(symbol
-	(rect 880 56 1088 136)
-	(text "tri_state_buffer" (rect 5 0 81 12)(font "Arial" ))
-	(text "inst333" (rect 8 64 43 76)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "Enable" (rect 0 0 33 12)(font "Arial" ))
-		(text "Enable" (rect 21 27 54 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "DataIn[31..0]" (rect 0 0 64 12)(font "Arial" ))
-		(text "DataIn[31..0]" (rect 21 43 85 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48)(line_width 3))
-	)
-	(port
-		(pt 208 32)
-		(output)
-		(text "DataOut[31..0]" (rect 0 0 73 12)(font "Arial" ))
-		(text "DataOut[31..0]" (rect 126 27 199 39)(font "Arial" ))
-		(line (pt 208 32)(pt 192 32)(line_width 3))
-	)
-	(drawing
-		(rectangle (rect 16 16 192 64))
-	)
-)
 (connector
 	(pt 464 328)
 	(pt 480 328)
@@ -1047,12 +1018,6 @@ refer to the applicable agreement for further details.
 	(bus)
 )
 (connector
-	(text "Data_Out_bus[31..0]" (rect 810 88 907 105)(font "Intel Clear" ))
-	(pt 768 104)
-	(pt 880 104)
-	(bus)
-)
-(connector
 	(text "Data_Out_bus[31..24]" (rect 696 88 799 105)(font "Intel Clear" ))
 	(pt 696 104)
 	(pt 768 104)
@@ -1137,6 +1102,17 @@ refer to the applicable agreement for further details.
 (connector
 	(pt 768 88)
 	(pt 880 88)
+)
+(connector
+	(pt 1088 104)
+	(pt 1088 88)
+	(bus)
+)
+(connector
+	(text "Data_Out_bus[31..0]" (rect 810 88 907 105)(font "Intel Clear" ))
+	(pt 768 104)
+	(pt 1088 104)
+	(bus)
 )
 (junction (pt 464 184))
 (junction (pt 464 328))
