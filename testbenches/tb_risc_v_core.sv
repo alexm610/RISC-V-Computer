@@ -9,9 +9,9 @@ module tb_risc_v_core();
     logic VGA_PLOT, VGA_HS, VGA_VS, VGA_CLK;
     logic [9:0] SW, LEDR;
     logic [35:0] GPIO_0, GPIO_1;
-
-    int i = 4;
-    int j = 0;
+    
+    reg [31:0] i;
+    reg [31:0] j;
     int counter = 0;
     int correct_answer = 0;
     logic error;
@@ -28,9 +28,9 @@ module tb_risc_v_core();
         $display("------ Begin risc_v_core.sv testbench ------");
         $display("");
         error = 0;
-        KEY[3] = 1; #2;
-        KEY[3] = 0; #2;
-        KEY[3] = 1; #2;
+        KEY[0] = 1; #2;
+        KEY[0] = 0; #2;
+        KEY[0] = 1; #2;
         SW = 10'b0110101011; #2;
         
         j = 0;
@@ -50,12 +50,13 @@ module tb_risc_v_core();
         release dut.address;
         release dut.data_out;
         #2;
-
+        //KEY[0] = 0;
         $readmemh("instructions.txt", mem_file_1);
         j = 0;
-        for (i = 0; i < 256; i = i + 4) begin
+        for (i = 0; i < 1024; i = i + 4) begin
             dut.test_write = 1;
-            force dut.program_counter = i[7:0];
+            //force dut.program_counter = i;
+            force dut.address = i;
             force dut.dummy_instr_writedata = mem_file_1[j];
             
             #2;
@@ -63,11 +64,12 @@ module tb_risc_v_core();
         end
         dut.test_write = 0;
         #2;
-        release dut.program_counter;
+        //release dut.program_counter;
+        release dut.address;
         release dut.dummy_instr_writedata;
-        KEY[3] = 1; #2;
-        KEY[3] = 0; #2;
-        KEY[3] = 1; #10;
+        KEY[0] = 1; #2;
+        KEY[0] = 0; #2;
+        KEY[0] = 1; #10;
 
         //#200;
         @ (posedge LEDR[9]);

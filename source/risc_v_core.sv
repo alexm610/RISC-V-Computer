@@ -19,10 +19,10 @@ module risc_v_core (
     output logic [9:0] LEDR
 );
 
-    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L;
+    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L;
     logic [3:0] byte_enable;
     logic [3:0] fabric_write, fabric_read;
-    logic [9:0] program_counter;//, address;
+    logic [31:0] program_counter;//, address;
     logic [31:0] address;
     logic [31:0] instruction, dummy_instr_writedata, datapath_output, data_in, data_out, fabric_data_out, ram_output, sw_output, ledr_output, SRAM_data_out, data_out_IO, data_out_SRAM;
     logic [31:0] readdata_bus [0:2];
@@ -50,7 +50,8 @@ module risc_v_core (
                             .DataBus_out(data_out),
                             .byte_enable(byte_enable),
                             .AS_L(AS_L),
-                            .conduit(done));
+                            .conduit(done),
+                            .Reset_Out(Reset_L));
 
     address_decoder AD      (.Address(address),
                             .RAM_Select_H(RAM_Select),
@@ -66,7 +67,8 @@ module risc_v_core (
     );
 
     ram INSTRUCTION_MEM     (.clock(CLOCK_50),
-                            .address(program_counter >> 2),
+                            //.address(program_counter >> 2),
+                            .address(address),
                             .byteena(4'b1111),
                             .wren(test_write),
                             .data(dummy_instr_writedata),
@@ -82,7 +84,7 @@ module risc_v_core (
                             .Data_Out(data_out_SRAM));
     
 	IO_Handler IO   		(.Clock(CLOCK_50),
-                            .Reset_L(KEY[0]),
+                            .Reset_L(Reset_L),
 							.LEDR_output(LEDR[8:0]),
 							.SW_input(SW),
                             .HEX5_output(HEX5),
@@ -104,7 +106,7 @@ module risc_v_core (
     );
            
     vga_control VGA_CONTROL (.clk(CLOCK_50),
-                            .rst_n(KEY[0]),
+                            .rst_n(Reset_L),
                             .data_in(data_out),
                             .ready(vga_ready), // output to arbiter/cpu
                             .VGA_Select(Graphics_Select),
@@ -115,7 +117,7 @@ module risc_v_core (
                             .vga_plot(fill_plot));  
 
     vga_adapter             #(.RESOLUTION("160x120")) VGA_0 (.clock(CLOCK_50),
-                            .resetn(KEY[0]),
+                            .resetn(Reset_L),
                             .colour(into_vga_colour), // from controller
                             .x(fill_x), // from controller I need to make 
                             .y(fill_y), // from controller 

@@ -1,10 +1,9 @@
 `timescale 1ps/1ps
 
 module tb_cpu;
-    logic clk, rst_n, DTAck, AS_L, WE_L;
-    logic [3:0] byte_enable;
-    logic [9:0] Address;
-    logic [31:0] instruction, DataBus_in, DataBus_out, PC_out;
+    logic Clock, Reset_L, DTAck, AS_L, WE_L, Conduit, Reset_Out;
+    logic [3:0] Byte_Enable;
+    logic [31:0] Instruction, DataBus_In, DataBus_Out, Address;
     int i = 4;
     int j = 0;
     int counter = 0;
@@ -15,8 +14,8 @@ module tb_cpu;
     cpu dut (.*);
 
     initial forever begin
-        clk = 1; #1;
-        clk = 0; #1;
+        Clock = 1; #1;
+        Clock = 0; #1;
     end
 
     initial begin
@@ -30,14 +29,14 @@ module tb_cpu;
         0x02268193
 
         */
-        DataBus_in = 32'h0BADF00D;
+        DataBus_In = 32'h0BADF00D;
         error = 1'b0;
-        instruction = 32'h02268193;
-        rst_n = 1'b1; #2;
-        rst_n = 1'b0; #2;
-        rst_n = 1'b1; #2;
+        Instruction = 32'h02268193;
+        Reset_L = 1'b1; #2;
+        Reset_L = 1'b0; #2;
+        Reset_L = 1'b1; #2;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X3.out == 32'd34);
         /*
@@ -46,8 +45,8 @@ module tb_cpu;
         ADDI X29, X0, 198 // immediate is in decimal form
         0x0C600E93
         */
-        instruction = 32'h0C600E93; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0C600E93; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X29.out == 32'd198);
 
@@ -57,8 +56,8 @@ module tb_cpu;
         XORI X20, X30, 76 // immediate is in decimal form
         0x04CF4A13
         */
-        instruction = 32'h04CF4A13; #2;
-        wait(PC_out == i);
+        Instruction = 32'h04CF4A13; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X20.out == 32'd76);
         /*
@@ -67,8 +66,8 @@ module tb_cpu;
         XORI X15, X7, 203 // immediate is in decimal form
         0x0CB3C793
         */
-        instruction = 32'h0CB3C793; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0CB3C793; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X15.out == 32'd203);
 
@@ -78,8 +77,8 @@ module tb_cpu;
         ORI X12, X6, 43 // immediate is in decimal form
         0x02B36613
         */
-        instruction = 32'h02B36613; #2;
-        wait(PC_out == i);
+        Instruction = 32'h02B36613; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X12.out == 32'd43);
 
@@ -89,8 +88,8 @@ module tb_cpu;
         ORI X19, X31, 172 // immediate is in decimal form
         0X0ACFE993
         */
-        instruction = 32'h0ACFE993; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0ACFE993; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X19.out == 32'd172);
 
@@ -100,8 +99,8 @@ module tb_cpu;
         ANDI X9, X20, 21 // immediate is in decimal form
         0X015A7493
         */
-        instruction = 32'h015A7493; #2;
-        wait(PC_out == i);
+        Instruction = 32'h015A7493; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X9.out == (32'd21 & dut.HW.REGISTER_BANK.X20.out));
 
@@ -111,8 +110,8 @@ module tb_cpu;
         ANDI X25, X29, 115 // immediate is in decimal form
         0X073EFC93
         */
-        instruction = 32'h073EFC93; #2;
-        wait(PC_out == i);
+        Instruction = 32'h073EFC93; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X25.out == (32'd115 & dut.HW.REGISTER_BANK.X29.out));
 
@@ -122,8 +121,8 @@ module tb_cpu;
         SLLI X17, X9, 9 // immediate is in decimal form
         0x00949893
         */
-        instruction = 32'h00949893; #2;
-        wait(PC_out == i);
+        Instruction = 32'h00949893; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X17.out == (dut.HW.REGISTER_BANK.X9.out << 9));
 
@@ -133,8 +132,8 @@ module tb_cpu;
         SLLI X31, X15, 3 // immediate is in decimal form
         0x00379f93
         */
-        instruction = 32'h00379f93; #2;
-        wait(PC_out == i);
+        Instruction = 32'h00379f93; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X31.out == (dut.HW.REGISTER_BANK.X15.out << 3));
 
@@ -144,8 +143,8 @@ module tb_cpu;
         SRLI X18, X17, 2 // immediate is in decimal form
         0x0028d913
         */
-        instruction = 32'h0028d913; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0028d913; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X18.out == (dut.HW.REGISTER_BANK.X17.out >> 2));
 
@@ -155,8 +154,8 @@ module tb_cpu;
         SRLI X6, X9, 1 // immediate is in decimal form
         0x0014d313
         */
-        instruction = 32'h0014d313; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0014d313; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X6.out == (dut.HW.REGISTER_BANK.X9.out >> 1));
         
@@ -166,8 +165,8 @@ module tb_cpu;
         ADDI, X2, X0, 1 // immediate is in decimal form
         0x00100113
         */
-        instruction = 32'h00100113; #2;
-        wait(PC_out == i);
+        Instruction = 32'h00100113; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X2.out == (32'd1));
 
@@ -177,8 +176,8 @@ module tb_cpu;
         SLLI X1, X2, 31 // immediate is in decimal form
         0x01f11093
         */
-        instruction = 32'h01f11093; #2;
-        wait(PC_out == i);
+        Instruction = 32'h01f11093; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X1.out == (dut.HW.REGISTER_BANK.X2.out << 32'd31));
 
@@ -189,8 +188,8 @@ module tb_cpu;
         SRAI X12, X1, 2 // immediate is in decimal form
         0x4020d613
         */
-        instruction = 32'h4020d613; #2;
-        wait(PC_out == i);
+        Instruction = 32'h4020d613; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X12.out == (dut.HW.REGISTER_BANK.X1.out >>> 2));
 
@@ -200,8 +199,8 @@ module tb_cpu;
         SRLI X27, X12, 1 // immediate is in decimal form
         0x00165d93
         */
-        instruction = 32'h00165d93; #2;
-        wait(PC_out == i);
+        Instruction = 32'h00165d93; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X27.out == (dut.HW.REGISTER_BANK.X12.out >> 1));
         
@@ -211,8 +210,8 @@ module tb_cpu;
         SRAI X28, X27, 1 // immediate is in decimal form
         0x401dde13
         */
-        instruction = 32'h401dde13; #2;
-        wait(PC_out == i);
+        Instruction = 32'h401dde13; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X28.out == (dut.HW.REGISTER_BANK.X27.out >>> 1));
 
@@ -223,11 +222,11 @@ module tb_cpu;
         0x00010203
         */
         DTAck = 1;
-        DataBus_in = 32'h0BADF01D;
-        instruction = 32'h00010203; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'h0BADF01D;
+        Instruction = 32'h00010203; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{DataBus_in[7]}}, DataBus_in[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{DataBus_In[7]}}, DataBus_In[7:0]}));
         #2;
 
         /*
@@ -236,11 +235,11 @@ module tb_cpu;
         LH X4, 0(X2) // immediate is in decimal form
         0x00011203
         */
-        DataBus_in = 32'h0BADF01D;
-        instruction = 32'h00011203; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'h0BADF01D;
+        Instruction = 32'h00011203; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{DataBus_in[15]}}, DataBus_in[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{DataBus_In[15]}}, DataBus_In[15:0]}));
         #2;
 
         /*
@@ -249,11 +248,11 @@ module tb_cpu;
         LW X13, 0(X2) // immediate is in decimal form
         0x00012683
         */
-        DataBus_in = 32'h0BADF01D;
-        instruction = 32'h00012683; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'h0BADF01D;
+        Instruction = 32'h00012683; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X13.out == (DataBus_in[31:0]));
+        assert(dut.HW.REGISTER_BANK.X13.out == (DataBus_In[31:0]));
         #2;
 
         /*
@@ -262,8 +261,8 @@ module tb_cpu;
         STLI X13, X9, 3 // immediate is in decimal form
         0x0034a693
         */
-        instruction = 32'h0034A693; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0034A693; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X13.out == ((dut.HW.REGISTER_BANK.X9.out < 3) ? 1 : 0));
         #2;
@@ -274,8 +273,8 @@ module tb_cpu;
         STLI X13, X9, 5 // immediate is in decimal form
         0x0054a693
         */
-        instruction = 32'h0054a693; #2;
-        wait(PC_out == i);
+        Instruction = 32'h0054a693; #2;
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X13.out == ((dut.HW.REGISTER_BANK.X9.out < 5) ? 1 : 0));
         #2;
@@ -287,11 +286,11 @@ module tb_cpu;
         0xFFF00093
 
         */
-        DataBus_in = 32'h0BADF00D;
+        DataBus_In = 32'h0BADF00D;
         error = 1'b0;
-        instruction = 32'h07F00093;
+        Instruction = 32'h07F00093;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X1.out == 32'h7F); // number should be sign extended
 
@@ -301,9 +300,9 @@ module tb_cpu;
         SLTI X2, X1, -128
         0Xf800a113
         */
-        instruction = 32'hF800A113;
+        Instruction = 32'hF800A113;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X2.out == 32'h0); // signed comparison: 127 is not less than -128
 
@@ -313,9 +312,9 @@ module tb_cpu;
         SLTIU X2, X1, -128
         0xF800B113
         */
-        instruction = 32'hF800B113;
+        Instruction = 32'hF800B113;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X2.out == 32'h1); // unsigned comparison: 127 is less than -128(unsigned)
 
@@ -325,9 +324,9 @@ module tb_cpu;
         ADD X14, X2, X3
         0x00310733
         */
-        instruction = 32'h00310733;
+        Instruction = 32'h00310733;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X14.out == (dut.HW.REGISTER_BANK.X2.out + dut.HW.REGISTER_BANK.X3.out));
 
@@ -337,9 +336,9 @@ module tb_cpu;
         SUB X15, X2, X3
         0x402187b3
         */
-        instruction = 32'h402187B3;
+        Instruction = 32'h402187B3;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X15.out == (dut.HW.REGISTER_BANK.X3.out - dut.HW.REGISTER_BANK.X2.out));
 
@@ -349,9 +348,9 @@ module tb_cpu;
         XOR X13, X1, X9
         0x0090C6B3
         */
-        instruction = 32'h0090C6B3;
+        Instruction = 32'h0090C6B3;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X13.out == (dut.HW.REGISTER_BANK.X1.out ^ dut.HW.REGISTER_BANK.X9.out));
 
@@ -361,9 +360,9 @@ module tb_cpu;
         OR X11, X4, X25
         0x019265b3
         */
-        instruction = 32'h019265B3;
+        Instruction = 32'h019265B3;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X11.out == (dut.HW.REGISTER_BANK.X4.out | dut.HW.REGISTER_BANK.X25.out));
 
@@ -373,9 +372,9 @@ module tb_cpu;
         AND X30, X20, X9
         0x009a7f33
         */
-        instruction = 32'h009A7F33;
+        Instruction = 32'h009A7F33;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X30.out == (dut.HW.REGISTER_BANK.X20.out & dut.HW.REGISTER_BANK.X9.out));
 
@@ -385,9 +384,9 @@ module tb_cpu;
         SLL X26, X9, X2
         0x00249d33
         */
-        instruction = 32'h00249D33;
+        Instruction = 32'h00249D33;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X26.out == (dut.HW.REGISTER_BANK.X9.out << dut.HW.REGISTER_BANK.X2.out));
 
@@ -397,9 +396,9 @@ module tb_cpu;
         SRL X8, X17, X6
         0x0068d433
         */
-        instruction = 32'h0068d433;
+        Instruction = 32'h0068d433;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X8.out == (dut.HW.REGISTER_BANK.X17.out >> dut.HW.REGISTER_BANK.X6.out));
 
@@ -409,9 +408,9 @@ module tb_cpu;
         SRA X22, X12, X2
         0x40265b33
         */
-        instruction = 32'h40265B33;
+        Instruction = 32'h40265B33;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X22.out == (dut.HW.REGISTER_BANK.X12.out >>> dut.HW.REGISTER_BANK.X2.out));
 
@@ -421,9 +420,9 @@ module tb_cpu;
         SRL X22, X12, X2
         0x00265b33
         */
-        instruction = 32'h00265B33;
+        Instruction = 32'h00265B33;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X22.out == (dut.HW.REGISTER_BANK.X12.out >> dut.HW.REGISTER_BANK.X2.out));
 
@@ -433,9 +432,9 @@ module tb_cpu;
         ADDI X5, X0, 7
         0x00700293
         */
-        instruction = 32'h00700293;
+        Instruction = 32'h00700293;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X5.out == (32'd7));
 
@@ -445,9 +444,9 @@ module tb_cpu;
         ADDI X6, X0, -8
         0xff800313
         */
-        instruction = 32'hFF800313;
+        Instruction = 32'hFF800313;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X6.out == (32'h0 - 32'd8));
 
@@ -457,9 +456,9 @@ module tb_cpu;
         SLT X7, X5, X6
         0x0062a3b3
         */
-        instruction = 32'h0062A3B3;
+        Instruction = 32'h0062A3B3;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X7.out == (32'h0));
 
@@ -469,9 +468,9 @@ module tb_cpu;
         SLTU X7, X5, X6
         0x0062B3B3
         */
-        instruction = 32'h0062B3B3;
+        Instruction = 32'h0062B3B3;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X7.out == (32'h1));
 
@@ -484,11 +483,11 @@ module tb_cpu;
         LBU X4, 0(X2) // immediate is in decimal form
         0x00014203
         */
-        DataBus_in = 32'hFFFFFFFF;
-        instruction = 32'h00014203; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'hFFFFFFFF;
+        Instruction = 32'h00014203; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{1'b0}}, DataBus_in[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{1'b0}}, DataBus_In[7:0]}));
         #2;
 
         /*
@@ -497,11 +496,11 @@ module tb_cpu;
         LB X4, 0(X2) // immediate is in decimal form
         0x00014203
         */
-        DataBus_in = 32'hFFFFFFFF;
-        instruction = 32'h00010203; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'hFFFFFFFF;
+        Instruction = 32'h00010203; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{DataBus_in[7]}}, DataBus_in[7:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{24{DataBus_In[7]}}, DataBus_In[7:0]}));
         #2;
 
         /*
@@ -510,11 +509,11 @@ module tb_cpu;
         LHU X4, 0(X2) // immediate is in decimal form
         0x00015203
         */
-        DataBus_in = 32'hFFFFFFFF;
-        instruction = 32'h00015203; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'hFFFFFFFF;
+        Instruction = 32'h00015203; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{1'b0}}, DataBus_in[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{1'b0}}, DataBus_In[15:0]}));
         #2;
 
         /*
@@ -523,11 +522,11 @@ module tb_cpu;
         LH X4, 0(X2) // immediate is in decimal form
         0x00011203
         */
-        DataBus_in = 32'hFFFFFFFF;
-        instruction = 32'h00011203; #2;
-        wait(PC_out == i);
+        DataBus_In = 32'hFFFFFFFF;
+        Instruction = 32'h00011203; #2;
+        wait(Address == i);
         i = i + 4;
-        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{DataBus_in[15]}}, DataBus_in[15:0]}));
+        assert(dut.HW.REGISTER_BANK.X4.out == ({{16{DataBus_In[15]}}, DataBus_In[15:0]}));
         #2;
 
         /*
@@ -536,9 +535,9 @@ module tb_cpu;
         ADD X11, X0 X0 // assert that X0 is hardwired to zero 
         0x000005B3
         */
-        instruction = 32'h000005B3;
+        Instruction = 32'h000005B3;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
         assert(dut.HW.REGISTER_BANK.X11.out == (32'h0));
         #2;
@@ -549,13 +548,13 @@ module tb_cpu;
         SW X5, 0(X9) 
         0x0054a023
         */
-        instruction = 32'h0054A023;
+        Instruction = 32'h0054A023;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
-        assert(DataBus_out == (dut.HW.REGISTER_BANK.X5.out));
+        assert(DataBus_Out == (dut.HW.REGISTER_BANK.X5.out));
         assert(Address == (dut.HW.REGISTER_BANK.X9.out));
-        assert(byte_enable == 4'b1111);
+        assert(Byte_Enable == 4'b1111);
         #2;
 
         /*
@@ -564,13 +563,13 @@ module tb_cpu;
         SH X6, 0(X13) 
         0x00669023
         */
-        instruction = 32'h00669023;
+        Instruction = 32'h00669023;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
-        assert(DataBus_out == (dut.HW.REGISTER_BANK.X6.out));
+        assert(DataBus_Out == (dut.HW.REGISTER_BANK.X6.out));
         assert(Address == (dut.HW.REGISTER_BANK.X13.out));
-        assert(byte_enable == 4'b0011);
+        assert(Byte_Enable == 4'b0011);
         #2;
 
         /*
@@ -579,13 +578,13 @@ module tb_cpu;
         SB X31, 0(X13) 
         0x01f68023
         */
-        instruction = 32'h01F68023;
+        Instruction = 32'h01F68023;
 
-        wait(PC_out == i);
+        wait(Address == i);
         i = i + 4;
-        assert(DataBus_out == (dut.HW.REGISTER_BANK.X31.out));
+        assert(DataBus_Out == (dut.HW.REGISTER_BANK.X31.out));
         assert(Address == (dut.HW.REGISTER_BANK.X13.out));
-        assert(byte_enable == 4'b0001);
+        assert(Byte_Enable == 4'b0001);
         #2;
 
 
@@ -597,8 +596,4 @@ module tb_cpu;
 
         $stop;
     end 
-
-
-
-
 endmodule: tb_cpu

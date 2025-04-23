@@ -2,14 +2,14 @@ ENTRY(_start)
 
 MEMORY
 {
-    RAM (rwx) : ORIGIN = 0x00000000, LENGTH = 64K
+    ROM (rx)    : ORIGIN = 0x00000000, LENGTH = 4K
+    RAM (rwx)   : ORIGIN = 0x00000000, LENGTH = 64M
 }
 
 SECTIONS
 {
     .text : {
         *(.text*)
-        *(.rodata*)
     } > RAM
 
     .data : {
@@ -22,7 +22,7 @@ SECTIONS
     } > RAM
 
     .stack : {
-        _stack_top = .;
-        . = . + 0x1000; 
+        . = ORIGIN(RAM) + LENGTH(RAM);
+        _stack_top = .; 
     } > RAM
 }
