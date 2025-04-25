@@ -3,7 +3,7 @@
 module tb_cpu;
     logic Clock, Reset_L, DTAck, AS_L, WE_L, Conduit, Reset_Out;
     logic [3:0] Byte_Enable;
-    logic [31:0] Instruction, DataBus_In, DataBus_Out, Address;
+    logic [31:0] Instruction, DataBus_In, DataBus_Out, Address, address_dummy;
     int i = 4;
     int j = 0;
     int counter = 0;
@@ -549,11 +549,12 @@ module tb_cpu;
         0x0054a023
         */
         Instruction = 32'h0054A023;
-
+        
+        address_dummy = dut.HW.REGISTER_BANK.X9.out;
         wait(Address == i);
         i = i + 4;
         assert(DataBus_Out == (dut.HW.REGISTER_BANK.X5.out));
-        assert(Address == (dut.HW.REGISTER_BANK.X9.out));
+        assert(address_dummy == (dut.HW.REGISTER_BANK.X9.out));
         assert(Byte_Enable == 4'b1111);
         #2;
 
@@ -564,12 +565,12 @@ module tb_cpu;
         0x00669023
         */
         Instruction = 32'h00669023;
-
+        address_dummy = dut.HW.REGISTER_BANK.X13.out;
         wait(Address == i);
         i = i + 4;
         assert(DataBus_Out == (dut.HW.REGISTER_BANK.X6.out));
-        assert(Address == (dut.HW.REGISTER_BANK.X13.out));
-        assert(Byte_Enable == 4'b0011);
+        assert(address_dummy == (dut.HW.REGISTER_BANK.X13.out));
+        assert(Byte_Enable == 4'b0000); // cannot store half-word at address offset = 3, thus byte enable should be disabled
         #2;
 
         /*
@@ -579,12 +580,12 @@ module tb_cpu;
         0x01f68023
         */
         Instruction = 32'h01F68023;
-
+        address_dummy = dut.HW.REGISTER_BANK.X13.out;
         wait(Address == i);
         i = i + 4;
         assert(DataBus_Out == (dut.HW.REGISTER_BANK.X31.out));
-        assert(Address == (dut.HW.REGISTER_BANK.X13.out));
-        assert(Byte_Enable == 4'b0001);
+        assert(address_dummy == (dut.HW.REGISTER_BANK.X13.out));
+        assert(Byte_Enable == 4'b1000);
         #2;
 
 

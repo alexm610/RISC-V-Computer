@@ -17,7 +17,8 @@ module cpu (
 
     // CPU signals
     enum {INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1} State;
-    logic           mem_or_reg, jump_link, load_upper_imm;
+    logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch;
+    logic [1:0]     Program_Counter_Increment;
     logic [2:0]     funct3;
     logic [6:0]     funct7, opcode;
     logic [11:0]    imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
@@ -60,7 +61,8 @@ module cpu (
     assign imm_B_TYPE           = {Current_Instruction[31], Current_Instruction[7], Current_Instruction[30:25], Current_Instruction[11:8]};
     assign imm_J_TYPE           = {{12{Current_Instruction[31]}}, Current_Instruction[19:12], Current_Instruction[20], Current_Instruction[30:25], Current_Instruction[24:21], 1'b0};
     assign imm_U_TYPE           = Current_Instruction[31:12];
-    assign Address              = Program_Counter;
+    assign Address              = instruction_fetch ? Program_Counter : datapath_out;
+    assign DataBus_Out          = rs2_output;
     
     always @(*) begin
         Byte_Enable <= 4'b0000; // disable Byte_Enable by default
@@ -126,11 +128,16 @@ module cpu (
             reg_bank_write      <= 0;
             load_upper_imm      <= 0;
             Conduit             <= 0;
+            Program_Counter_Increment <= 2'b00;
+            Reset_Out           <= 0;
+            instruction_fetch   <= 1;
         end else begin
             case (State) 
                 INITIALIZE: begin
                     State       <= START;
                     Current_Instruction <= Instruction;
+                    Reset_Out <= 1;
+                    instruction_fetch   <= 1;
                 end
                 START: begin
                     case (opcode)
@@ -150,12 +157,14 @@ module cpu (
                             alu_OP      <= {1'b0, `ADDSUB}; 
                             imm         <= {{20{imm_I_TYPE[11]}}, imm_I_TYPE};
                             alu_SRC     <= 1'b0;
+                            instruction_fetch <= 0;
                         end              
                         `S_TYPE: begin
                             State       <= WRITE_MEMORY_1;
                             imm         <= {{20{imm_S_TYPE[11]}}, imm_S_TYPE};
                             alu_SRC     <= 1'b0;
                             alu_OP      <= {1'b0, `ADDSUB};
+                            instruction_fetch <= 0;
                         end   
                         `B_TYPE: begin
                             case (funct3)
@@ -218,7 +227,8 @@ module cpu (
                     State           <= COMPLETE; 
                     reg_bank_write  <= 1'b1;
                     // increment program counter to next instruction, ie., no jumping
-                    Program_Counter <= Program_Counter + 32'h4;
+                    //Program_Counter <= Program_Counter + 32'h4;
+                    Program_Counter_Increment <= 2'b00;
                 end
                 COMPLETE: begin
                     State <= INCREMENT_PC;
@@ -228,6 +238,17 @@ module cpu (
                     WE_L            <= 1'b1;
                     AS_L            <= 1'b1;
                     load_upper_imm  <= 0;
+                    instruction_fetch <= 1;
+                    if (Program_Counter_Increment == 2'b00) begin
+                        // increment program counter by 4
+                        Program_Counter <= Program_Counter + 32'h4;
+                    end else if (Program_Counter_Increment == 2'b01) begin
+                        // increment program counter by immediate
+                        Program_Counter <= Program_Counter + imm;
+                    end else if (Program_Counter_Increment == 2'b10) begin
+                        // set program counter to output of data path
+                        Program_Counter <= datapath_out;
+                    end
                 end
                 INCREMENT_PC: begin
                     State   <= START;
@@ -244,7 +265,8 @@ module cpu (
                     State           <= DTAck ? COMPLETE : ACCESS_MEMORY_2;
                     reg_bank_write  <= 1'b1;
                     // increment program counter to next instruction, ie., no jumping
-                    Program_Counter <= Program_Counter + 32'h4;
+                    // Program_Counter <= Program_Counter + 32'h4;
+                    Program_Counter_Increment <= 2'b00;
                 end
                 WRITE_MEMORY_1: begin
                     State       <= WRITE_MEMORY_2;
@@ -254,66 +276,79 @@ module cpu (
                 WRITE_MEMORY_2: begin
                     State <= DTAck ? COMPLETE : WRITE_MEMORY_2;
                     // increment program counter to next instruction, ie., no jumping
-                    Program_Counter <= Program_Counter + 32'h4;
+                    //Program_Counter <= Program_Counter + 32'h4;
+                    Program_Counter_Increment <= 2'b00;
                 end
                 BRANCH_EQ: begin
                     State   <= COMPLETE;
                     if (zero) begin
                         // add immediate to PC
-                        Program_Counter <= Program_Counter + imm;
+                        // Program_Counter <= Program_Counter + imm;
+                        Program_Counter_Increment <= 2'b01;
                     end else begin
                         // normally increment PC
-                        Program_Counter <= Program_Counter + 32'h4;
+                        //Program_Counter <= Program_Counter + 32'h4;
+                        Program_Counter_Increment <= 2'b00;
                     end
                 end
                 BRANCH_NE: begin
                     State   <= COMPLETE;
                     if (!zero) begin
                         // increment PC with immediate
-                        Program_Counter <= Program_Counter + imm;
+                        //Program_Counter <= Program_Counter + imm;
+                        Program_Counter_Increment <= 2'b01;
                     end else begin
                         // increment program counter to next instruction
-                        Program_Counter <= Program_Counter + 32'h4;
+                        //Program_Counter <= Program_Counter + 32'h4;
+                        Program_Counter_Increment <= 2'b00;
                     end
                 end
                 BRANCH_LT: begin
                     State   <= COMPLETE;
                     if (datapath_out == 32'h1) begin // rs1 is less than rs2
                         // increment PC with immediate
-                        Program_Counter <= Program_Counter + imm;
+                        //Program_Counter <= Program_Counter + imm;
+                        Program_Counter_Increment <= 2'b01;
                     end else begin 
                         // increment program counter to next instruction
-                        Program_Counter <= Program_Counter + 32'h4;
+                        //Program_Counter <= Program_Counter + 32'h4;
+                        Program_Counter_Increment <= 2'b00;
                     end 
                 end 
                 BRANCH_GE: begin
                     State   <= COMPLETE;
                     if (datapath_out == 32'h0) begin
                         // increment PC with immediate
-                        Program_Counter <= Program_Counter + imm;
+                        //Program_Counter <= Program_Counter + imm;
+                        Program_Counter_Increment <= 2'b01;
                     end else begin 
                         // increment program counter to next instruction
-                        Program_Counter <= Program_Counter + 32'h4;
+                        //Program_Counter <= Program_Counter + 32'h4;
+                        Program_Counter_Increment <= 2'b00;
                     end 
                 end 
                 BRANCH_LTU: begin
                     State   <= COMPLETE;
                     if (datapath_out == 32'h1) begin 
                         // increment PC with immediate
-                        Program_Counter <= Program_Counter + imm;
+                        //Program_Counter <= Program_Counter + imm;
+                        Program_Counter_Increment <= 2'b01;
                     end else begin 
                         // increment program counter to next instruction
-                        Program_Counter <= Program_Counter + 32'h4;
+                        //Program_Counter <= Program_Counter + 32'h4;
+                        Program_Counter_Increment <= 2'b00;
                     end 
                 end
                 BRANCH_GEU: begin 
                     State   <= COMPLETE;
                     if (datapath_out == 32'h0) begin
                         // increment PC with immediate
-                        Program_Counter <= Program_Counter + imm;
+                        //Program_Counter <= Program_Counter + imm;
+                        Program_Counter_Increment <= 2'b01;
                     end else begin 
                         // increment program counter to next instruction
-                        Program_Counter <= Program_Counter + 32'h4;
+                        Program_Counter_Increment <= 2'b00;
+                        //Program_Counter <= Program_Counter + 32'h4;
                     end 
                 end 
                 JUMP_LINK_1: begin
@@ -323,7 +358,8 @@ module cpu (
                     // we need to turn jump_link off now, so the writedata line into the data path doesn't get updated with what the program counter becomes; the destination register must have PC + 4, not PC + imm
                     jump_link       <= 0;
                     // increment program counter with immediate
-                    Program_Counter <= Program_Counter + imm;
+                    //Program_Counter <= Program_Counter + imm;
+                    Program_Counter_Increment <= 2'b01;
                 end
                 JUMP_LINK_2: begin
                     State           <= JUMP_LINK_3;
@@ -343,14 +379,15 @@ module cpu (
                     reg_bank_write  <= 0;
 
                     // program counter gets RS1 + imm
-                    Program_Counter <= datapath_out;
-
+                    //Program_Counter <= datapath_out;
+                    Program_Counter_Increment <= 2'b10;
                 end
                 LOAD_UPPER_IMM_1: begin
                     State           <= COMPLETE; 
                     reg_bank_write  <= 1'b1; // the U-type immediate is on the datapath_in line, just need to write to destination register 
                     // program counter is normally incremented
-                    Program_Counter <= Program_Counter + 32'h4;
+                    //Program_Counter <= Program_Counter + 32'h4;
+                    Program_Counter_Increment <= 2'b00;
                 end
             endcase 
         end

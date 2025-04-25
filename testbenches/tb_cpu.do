@@ -4,50 +4,51 @@ add wave -noupdate -divider -height 40 CPU
 add wave -noupdate /tb_cpu/dut/Clock
 add wave -noupdate /tb_cpu/dut/Reset_L
 add wave -noupdate /tb_cpu/dut/DTAck
-add wave -noupdate /tb_cpu/dut/Instruction
-add wave -noupdate /tb_cpu/dut/DataBus_In
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/Instruction
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/DataBus_In
 add wave -noupdate /tb_cpu/dut/AS_L
 add wave -noupdate /tb_cpu/dut/Byte_Enable
 add wave -noupdate /tb_cpu/dut/WE_L
-add wave -noupdate /tb_cpu/dut/DataBus_Out
-add wave -noupdate /tb_cpu/dut/Address
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/DataBus_Out
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/Address
+add wave -noupdate /tb_cpu/dut/instruction_fetch
 add wave -noupdate /tb_cpu/dut/Conduit
 add wave -noupdate /tb_cpu/dut/Reset_Out
 add wave -noupdate /tb_cpu/dut/State
 add wave -noupdate /tb_cpu/dut/mem_or_reg
 add wave -noupdate /tb_cpu/dut/jump_link
 add wave -noupdate /tb_cpu/dut/load_upper_imm
-add wave -noupdate /tb_cpu/dut/funct3
-add wave -noupdate /tb_cpu/dut/funct7
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/funct3
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/funct7
 add wave -noupdate /tb_cpu/dut/opcode
-add wave -noupdate /tb_cpu/dut/imm_I_TYPE
-add wave -noupdate /tb_cpu/dut/imm_S_TYPE
-add wave -noupdate /tb_cpu/dut/imm_B_TYPE
-add wave -noupdate /tb_cpu/dut/imm_U_TYPE
-add wave -noupdate /tb_cpu/dut/imm_J_TYPE
-add wave -noupdate /tb_cpu/dut/datapath_in
-add wave -noupdate /tb_cpu/dut/Program_Counter
-add wave -noupdate /tb_cpu/dut/Current_Instruction
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm_I_TYPE
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm_S_TYPE
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm_B_TYPE
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm_U_TYPE
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm_J_TYPE
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/datapath_in
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/Program_Counter
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/Current_Instruction
 add wave -noupdate /tb_cpu/dut/reg_bank_write
 add wave -noupdate /tb_cpu/dut/alu_SRC
 add wave -noupdate /tb_cpu/dut/negative
 add wave -noupdate /tb_cpu/dut/overflow
 add wave -noupdate /tb_cpu/dut/zero
-add wave -noupdate /tb_cpu/dut/alu_OP
-add wave -noupdate /tb_cpu/dut/rs1
-add wave -noupdate /tb_cpu/dut/rs2
-add wave -noupdate /tb_cpu/dut/rd0
-add wave -noupdate /tb_cpu/dut/writedata
-add wave -noupdate /tb_cpu/dut/datapath_out
-add wave -noupdate /tb_cpu/dut/imm
-add wave -noupdate /tb_cpu/dut/rs2_output
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/alu_OP
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/rs1
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/rs2
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/rd0
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/writedata
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/datapath_out
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/imm
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/rs2_output
 add wave -noupdate -divider -height 40 DATAPATH
 add wave -noupdate /tb_cpu/dut/HW/write_rb
 add wave -noupdate /tb_cpu/dut/HW/alu_source
 add wave -noupdate /tb_cpu/dut/HW/alu_control
-add wave -noupdate /tb_cpu/dut/HW/rs_1
-add wave -noupdate /tb_cpu/dut/HW/rs_2
-add wave -noupdate /tb_cpu/dut/HW/rd_0
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/rs_1
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/rs_2
+add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/rd_0
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/writedata
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/immediate
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/alu_result
@@ -105,10 +106,10 @@ add wave -noupdate -radix decimal /tb_cpu/dut/HW/ALU/Bin
 add wave -noupdate /tb_cpu/dut/HW/ALU/status
 add wave -noupdate -radix hexadecimal /tb_cpu/dut/HW/ALU/out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {458 ps} 0}
+WaveRestoreCursors {{Cursor 1} {385 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 274
-configure wave -valuecolwidth 100
+configure wave -valuecolwidth 224
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 configure wave -snapdistance 10
@@ -121,4 +122,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {468 ps} {485 ps}
+WaveRestoreZoom {336 ps} {395 ps}
