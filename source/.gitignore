@@ -19,3 +19,14 @@ NUL
 *.elf
 *.json
 *.qip
+*.ppf
+*.sip
+*.spd
+*.cmp
+*.f
+*.vo
+*.var
+*.lib
+*.tcl
+*.sh
+*.setup

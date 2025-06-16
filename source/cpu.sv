@@ -16,14 +16,15 @@ module cpu (
 );
 
     // CPU signals
-    enum {INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1} State;
-    logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch;
+    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1} State;
+    logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch, save_pc;
     logic [1:0]     Program_Counter_Increment;
     logic [2:0]     funct3;
     logic [6:0]     funct7, opcode;
     logic [11:0]    imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
     logic [19:0]    imm_U_TYPE;
-    logic [31:0]    imm_J_TYPE, datapath_in, Program_Counter, Current_Instruction;
+    logic [20:0]    imm_J_TYPE;
+    logic [31:0]    datapath_in, Program_Counter, Current_Instruction;
 
     // Data path signals
     logic           reg_bank_write, alu_SRC, negative, overflow, zero;
@@ -49,6 +50,15 @@ module cpu (
         .rs2(rs2_output)
     );
 
+    //ram PROGRAM_COUNTER (
+    //    .clock(Clock),
+    //    .address(Program_Counter >> 2),
+    //    .byteena(4'b1111),
+    //    .wren(save_pc),
+    //    .data(Instruction),
+    //    .q()
+    //);
+
     assign datapath_in          = mem_or_reg ? DataBus_In : datapath_out;
     assign rs1                  = Current_Instruction[19:15];
     assign rs2                  = Current_Instruction[24:20];
@@ -59,7 +69,7 @@ module cpu (
     assign imm_I_TYPE           = Current_Instruction[31:20];
     assign imm_S_TYPE           = {Current_Instruction[31:25], Current_Instruction[11:7]}; 
     assign imm_B_TYPE           = {Current_Instruction[31], Current_Instruction[7], Current_Instruction[30:25], Current_Instruction[11:8]};
-    assign imm_J_TYPE           = {{12{Current_Instruction[31]}}, Current_Instruction[19:12], Current_Instruction[20], Current_Instruction[30:25], Current_Instruction[24:21], 1'b0};
+    assign imm_J_TYPE           = {Current_Instruction[31], Current_Instruction[19:12], Current_Instruction[20], Current_Instruction[30:21], 1'b0};
     assign imm_U_TYPE           = Current_Instruction[31:12];
     assign Address              = instruction_fetch ? Program_Counter : datapath_out;
     assign DataBus_Out          = rs2_output;
@@ -138,8 +148,10 @@ module cpu (
                     Current_Instruction <= Instruction;
                     Reset_Out <= 1;
                     instruction_fetch   <= 1;
+                    save_pc <= 1;
                 end
                 START: begin
+                    save_pc <= 0;
                     case (opcode)
                         `R_TYPE: begin
                             State       <= WRITE_BACK;
@@ -199,7 +211,7 @@ module cpu (
                         `J_TYPE_JAL: begin
                             State           <= JUMP_LINK_1;
                             jump_link       <= 1'b1;
-                            imm             <= imm_J_TYPE;
+                            imm             <= {{11{imm_J_TYPE[20]}}, imm_J_TYPE};
                         end
                         `J_TYPE_JALR: begin
                             State           <= JUMP_LINK_2;
@@ -239,6 +251,7 @@ module cpu (
                     AS_L            <= 1'b1;
                     load_upper_imm  <= 0;
                     instruction_fetch <= 1;
+                    jump_link       <= 0;
                     if (Program_Counter_Increment == 2'b00) begin
                         // increment program counter by 4
                         Program_Counter <= Program_Counter + 32'h4;
@@ -251,9 +264,13 @@ module cpu (
                     end
                 end
                 INCREMENT_PC: begin
-                    State   <= START;
-                    // latch the new instruction
+                    State   <= LATCH_INSTRUCTION;
+                    // delay one clock cycle for new instruction to appear on output bus of SRAM
+                end
+                LATCH_INSTRUCTION: begin
+                    State <= START;
                     Current_Instruction <= Instruction;
+                    save_pc <= 1;
                 end
                 ACCESS_MEMORY_1: begin
                     State       <= ACCESS_MEMORY_2;
@@ -355,8 +372,7 @@ module cpu (
                     State           <= COMPLETE;
                     // the writedata line into the datapath (into the register bank) has PC_out + 4 on it, so we just need to set write HIGH
                     reg_bank_write  <= 1'b1; 
-                    // we need to turn jump_link off now, so the writedata line into the data path doesn't get updated with what the program counter becomes; the destination register must have PC + 4, not PC + imm
-                    jump_link       <= 0;
+                    jump_link       <= 1;
                     // increment program counter with immediate
                     //Program_Counter <= Program_Counter + imm;
                     Program_Counter_Increment <= 2'b01;

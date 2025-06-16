@@ -124,7 +124,7 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
                 LCD_WriteEnable <= 1;
                 LCD_CommandOrDisplayData <= 1;
             end
-        end
+        end 
     end
 endmodule: IO_Handler
 

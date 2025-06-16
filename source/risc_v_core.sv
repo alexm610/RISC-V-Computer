@@ -20,6 +20,8 @@ module risc_v_core (
 );
 
     logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L;
+    logic [7:0] data_out_RS232;
+    logic CLOCK_25;
     logic [3:0] byte_enable;
     logic [3:0] fabric_write, fabric_read;
     logic [31:0] program_counter;//, address;
@@ -38,20 +40,44 @@ module risc_v_core (
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
     assign LEDR[9]          = done;
-    
-    cpu PROCESSOR           (.clk(CLOCK_50),
-                            .rst_n(KEY[0]),
-                            .DTAck(1'b1),
-                            .instruction(instruction),
-                            .PC_out(program_counter),
-                            .WE_L(WE_L),
-                            .Address(address),
-                            .DataBus_in(data_in),
-                            .DataBus_out(data_out),
-                            .byte_enable(byte_enable),
-                            .AS_L(AS_L),
-                            .conduit(done),
-                            .Reset_Out(Reset_L));
+    /*
+    clock25_0002 CLOCK_25_MHz (
+        .refclk(CLOCK_50),
+        .rst(Reset_L),
+        .outclk_0(CLOCK_25),
+        .locked()
+    );
+	 */
+    /*
+    OnChipM68xxIO RS232_MODULE (
+        .IOSelect(IO_Select),
+        .Clk(CLOCK_25),
+        .Reset_L(Reset_L),
+        .Clock_50Mhz(CLOCK_50),
+        .RS232_RxData(GPIO_0[35]),
+        .UDS_L(),
+        .WE_L(WE_L),
+        .AS_L(AS_L),
+        .Address(address),
+        .DataIn(data_out[7:0]),
+        .RS232_TxData(GPIO_1[35]),
+        .ACIA_IRQ(),
+        .DataOut(data_out_RS232)
+    );
+    */
+    cpu PROCESSOR (
+        .Clock(CLOCK_50),
+        .Reset_L(KEY[0]),
+        .DTAck(1'b1),
+        .Instruction(instruction),
+        .DataBus_In(data_in),
+        .AS_L(AS_L),
+        .Byte_Enable(byte_enable),
+        .WE_L(WE_L),
+        .DataBus_Out(data_out),
+        .Address(address),
+        .Conduit(done),
+        .Reset_Out(Reset_L));
 
     address_decoder AD      (.Address(address),
                             .RAM_Select_H(RAM_Select),
@@ -68,7 +94,7 @@ module risc_v_core (
 
     ram INSTRUCTION_MEM     (.clock(CLOCK_50),
                             //.address(program_counter >> 2),
-                            .address(address),
+                            .address(address>>2),
                             .byteena(4'b1111),
                             .wren(test_write),
                             .data(dummy_instr_writedata),
@@ -78,11 +104,11 @@ module risc_v_core (
                             .AS_L(AS_L),
                             .WE_L(WE_L),
                             .RAM_Select_H(RAM_Select),
-                            .Address(address >> 2),
+                            .Address(address),
                             .Byte_Enable(byte_enable),
                             .Data_In(data_out),
                             .Data_Out(data_out_SRAM));
-    
+
 	IO_Handler IO   		(.Clock(CLOCK_50),
                             .Reset_L(Reset_L),
 							.LEDR_output(LEDR[8:0]),
@@ -116,7 +142,7 @@ module risc_v_core (
                             .vga_colour(into_vga_colour),
                             .vga_plot(fill_plot));  
 
-    vga_adapter             #(.RESOLUTION("160x120")) VGA_0 (.clock(CLOCK_50),
+    vga_adapter             #(.RESOLUTION("160x120")) VGA_0 (.clock(CLOCK_25),
                             .resetn(Reset_L),
                             .colour(into_vga_colour), // from controller
                             .x(fill_x), // from controller I need to make 

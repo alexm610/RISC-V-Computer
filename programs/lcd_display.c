@@ -68,6 +68,7 @@ void LCD_line1(char *message) {
 
 int main (void) {
     int x, y, colour;
+    char *message1, *message2;
 
     colour = 0;
     for (y=0; y<120; y++) {
@@ -76,9 +77,10 @@ int main (void) {
             colour++;
         }
     }
-
-    LCD_line0("Alex");
-    LCD_line1("Hel");
+    message1 = "Alex";
+    message2 = "Hello World!";
+    LCD_line0(message1);
+    LCD_line1(message2);
 
     while (1) {
         LEDR = SWITCHES;

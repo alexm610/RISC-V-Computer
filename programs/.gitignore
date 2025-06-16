@@ -6,3 +6,4 @@
 *.elf
 *.mif
 *.srec
+*.hex

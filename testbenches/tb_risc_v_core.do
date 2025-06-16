@@ -43,51 +43,50 @@ add wave -noupdate /tb_risc_v_core/dut/RAM_Select
 add wave -noupdate /tb_risc_v_core/dut/IO_Select
 add wave -noupdate /tb_risc_v_core/dut/Graphics_Select
 add wave -noupdate -divider -height 40 PROCESSOR
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/state
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/instruction
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/rst_n
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/PC_out
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/PC_in
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC_en
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC_mux
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/jump_link
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Clock
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Reset_L
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/State
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/DTAck
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_in
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Instruction
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_In
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/AS_L
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/byte_enable
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Byte_Enable
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/WE_L
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_Out
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Address
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/reg_bank_write
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_SRC
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/negative
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/overflow
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/zero
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Conduit
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Reset_Out
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/mem_or_reg
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/jump_link
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/load_upper_imm
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/funct3
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_OP
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs1
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs2
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rd0
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/opcode
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/funct7
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/instruction_fetch
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Program_Counter_Increment
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/funct3
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/funct7
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/opcode
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_I_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_S_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_B_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_U_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_J_TYPE
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/datapath_in
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Program_Counter
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Current_Instruction
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/reg_bank_write
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_SRC
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/negative
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/overflow
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/zero
+add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_OP
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs1
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs2
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rd0
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/writedata
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/datapath_out
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/datapath_in
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/readdata_mux
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/rs2_output
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/loaded_data_shifted
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/RS2_temp
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/RS2_readdata
 add wave -noupdate -divider -height 40 ADDRESS_DECODER
-add wave -noupdate -radix hexadecimal -childformat {{{/tb_risc_v_core/dut/AD/Address[31]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[30]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[29]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[28]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[27]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[26]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[25]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[24]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[23]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[22]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[21]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[20]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[19]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[18]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[17]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[16]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[15]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[14]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[13]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[12]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[11]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[10]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[9]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[8]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[7]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[6]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[5]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[4]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[3]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[2]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[1]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[0]} -radix hexadecimal}} -subitemconfig {{/tb_risc_v_core/dut/AD/Address[31]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[30]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[29]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[28]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[27]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[26]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[25]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[24]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[23]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[22]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[21]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[20]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[19]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[18]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[17]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[16]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[15]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[14]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[13]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[12]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[11]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[10]} {-radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[9]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[8]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[7]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[6]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[5]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[4]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[3]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[2]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[1]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[0]} {-height 15 -radix hexadecimal}} /tb_risc_v_core/dut/AD/Address
+add wave -noupdate -radix hexadecimal -childformat {{{/tb_risc_v_core/dut/AD/Address[31]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[30]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[29]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[28]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[27]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[26]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[25]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[24]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[23]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[22]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[21]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[20]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[19]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[18]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[17]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[16]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[15]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[14]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[13]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[12]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[11]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[10]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[9]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[8]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[7]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[6]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[5]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[4]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[3]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[2]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[1]} -radix hexadecimal} {{/tb_risc_v_core/dut/AD/Address[0]} -radix hexadecimal}} -subitemconfig {{/tb_risc_v_core/dut/AD/Address[31]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[30]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[29]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[28]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[27]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[26]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[25]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[24]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[23]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[22]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[21]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[20]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[19]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[18]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[17]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[16]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[15]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[14]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[13]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[12]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[11]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[10]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[9]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[8]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[7]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[6]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[5]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[4]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[3]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[2]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[1]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/AD/Address[0]} {-height 15 -radix hexadecimal}} /tb_risc_v_core/dut/AD/Address
 add wave -noupdate /tb_risc_v_core/dut/AD/RAM_Select_H
 add wave -noupdate /tb_risc_v_core/dut/AD/IO_Select_H
 add wave -noupdate /tb_risc_v_core/dut/AD/Graphics_Select_H
@@ -218,10 +217,6 @@ add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/out
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/shamt
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/dummy_output
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/overflow
-add wave -noupdate -divider -height 40 PC
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC/enable
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC/in
-add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/PC/out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {684 ps} 0}
 quietly wave cursor active 1
@@ -239,4 +234,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {107485 ps} {107519 ps}
+WaveRestoreZoom {0 ps} {34 ps}

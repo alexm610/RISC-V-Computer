@@ -14,7 +14,7 @@
 
 // PROGRAM		"Quartus Prime"
 // VERSION		"Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
-// CREATED		"Thu Apr 17 15:35:37 2025"
+// CREATED		"Mon Apr 28 17:44:01 2025"
 
 module SRAM_Block(
 	Clock,
@@ -32,7 +32,7 @@ input wire	Clock;
 input wire	AS_L;
 input wire	WE_L;
 input wire	RAM_Select_H;
-input wire	[9:0] Address;
+input wire	[11:0] Address;
 input wire	[3:0] Byte_Enable;
 input wire	[31:0] Data_In;
 output wire	[31:0] Data_Out;
@@ -42,9 +42,9 @@ wire	SYNTHESIZED_WIRE_0;
 wire	SYNTHESIZED_WIRE_1;
 wire	SYNTHESIZED_WIRE_2;
 wire	SYNTHESIZED_WIRE_3;
-wire	SYNTHESIZED_WIRE_11;
-wire	SYNTHESIZED_WIRE_5;
 wire	SYNTHESIZED_WIRE_12;
+wire	SYNTHESIZED_WIRE_5;
+wire	SYNTHESIZED_WIRE_13;
 
 
 
@@ -81,20 +81,29 @@ ram_block	b2v_inst3(
 	.data(Data_In[7:0]),
 	.q(Data_Out_bus[7:0]));
 
-assign	SYNTHESIZED_WIRE_11 =  ~AS_L;
+assign	SYNTHESIZED_WIRE_12 =  ~AS_L;
 
 assign	SYNTHESIZED_WIRE_5 =  ~WE_L;
 
-assign	SYNTHESIZED_WIRE_12 = RAM_Select_H & SYNTHESIZED_WIRE_11 & SYNTHESIZED_WIRE_5;
+assign	SYNTHESIZED_WIRE_13 = RAM_Select_H & SYNTHESIZED_WIRE_12 & SYNTHESIZED_WIRE_5;
 
 
-assign	SYNTHESIZED_WIRE_0 = SYNTHESIZED_WIRE_12 & Byte_Enable[3];
+assign	SYNTHESIZED_WIRE_0 = SYNTHESIZED_WIRE_13 & Byte_Enable[3];
 
-assign	SYNTHESIZED_WIRE_1 = SYNTHESIZED_WIRE_12 & Byte_Enable[2];
+assign	SYNTHESIZED_WIRE_1 = SYNTHESIZED_WIRE_13 & Byte_Enable[2];
 
-assign	SYNTHESIZED_WIRE_3 = SYNTHESIZED_WIRE_12 & Byte_Enable[0];
+assign	SYNTHESIZED_WIRE_3 = SYNTHESIZED_WIRE_13 & Byte_Enable[0];
 
-assign	SYNTHESIZED_WIRE_2 = SYNTHESIZED_WIRE_12 & Byte_Enable[1];
+assign	SYNTHESIZED_WIRE_2 = SYNTHESIZED_WIRE_13 & Byte_Enable[1];
+
+
+shadow	b2v_inst8(
+	.wren(SYNTHESIZED_WIRE_13),
+	.clock(Clock),
+	.address(Address),
+	.byteena(Byte_Enable),
+	.data(Data_In)
+	);
 
 assign	Data_Out = Data_Out_bus;
 

@@ -13,7 +13,7 @@ module address_decoder (
 		IO_Select_H			<= 0;
 		Graphics_Select_H	<= 0;
 
-		if ((Address >= 32'h00000000) && (Address <= 10'h00000FFF)) begin
+		if ((Address >= 32'h00000000) && (Address <= 32'h00000FFF)) begin
 			ROM_Select_H		<= 1;
 		end
 
