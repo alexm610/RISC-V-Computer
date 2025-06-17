@@ -8,7 +8,7 @@ OFLAGS = -O binary
 SRECFLAGS1 = -Output -Memory_Initialization_File 32
 SRECFLAGS2 = -Output_Block_Size 4 -DISable Execution_Start_Address
 SRECFLAGS3 = -byte-swap 4
-HEXDUMPFLAGS = -e '"%08x\n"'
+HEXDUMPFLAGS = -v -e '"%08x\n"'
 OBJS = instructions.elf
 BINS = instructions.bin
 SRECS = instructions.srec
@@ -35,4 +35,4 @@ instructions.elf: $(SRCS) $(HDRS)
 	$(CC) $(LDFLAGS) linker.ld $(CFLAGS) $(OBJS) start.s $(SRCS)
 
 clean: 
-	$(RM) -f *.bin *.elf *.mif *.srec
+	$(RM) -f *.bin *.elf *.mif *.srec *.hex
