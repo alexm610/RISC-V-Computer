@@ -10,4 +10,4 @@ As of June 16, 2025, all RV32I base integer instructions have been successfully 
 - I2C controller for external connection to an EEPROM and an ADC connected to various sensors
 - UART controller for serial communication with a terminal
 
-The end goal of this project is to compile and run DOOM 1993. 
+The end goal of this project is to run DOOM (1993) for my Dad to play, for the first time since the game was initially released.
