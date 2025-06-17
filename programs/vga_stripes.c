@@ -1,9 +1,7 @@
-#define VGA         *(volatile unsigned long *)(0x330)
-#define SWITCHES    *(volatile unsigned long *)(0x300)
-#define LEDR        *(volatile unsigned long *)(0x310)
+#include "instructions.h"
 
-int main (void) {
-    int x, y, colour, vga_setting;
+void print_stripes(void) {
+    int x, y, colour;
 
     colour = 0;
     for (y=0; y<120; y++) {
@@ -11,9 +9,5 @@ int main (void) {
             VGA |= (y << 24) | (x << 16) | colour;
             colour++;
         }
-    }
-
-    while (1) {
-        LEDR = SWITCHES;
     }
 }

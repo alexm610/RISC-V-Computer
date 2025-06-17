@@ -13,6 +13,10 @@ OBJS = instructions.elf
 BINS = instructions.bin
 SRECS = instructions.srec
 MIFS = instructions.mif
+SRCS = instructions.c rs232.c lcd_display.c vga_stripes.c  
+HDRS = instructions.h
+
+all: instructions.mif
 
 instructions.mif: $(SRECS)
 	$(SREC) $(SRECFLAGS1) $(SRECS) $(SRECFLAGS2) > $(MIFS)
@@ -27,8 +31,8 @@ instructions.srec: $(BINS)
 instructions.bin: $(OBJS)
 	$(OBJCOPY) $(OFLAGS) $(OBJS) $(BINS)
 
-instructions.elf: instructions.c
-	$(CC) $(LDFLAGS) linker.ld $(CFLAGS) instructions.elf start.s instructions.c
+instructions.elf: $(SRCS) $(HDRS)
+	$(CC) $(LDFLAGS) linker.ld $(CFLAGS) $(OBJS) start.s $(SRCS)
 
 clean: 
 	$(RM) -f *.bin *.elf *.mif *.srec

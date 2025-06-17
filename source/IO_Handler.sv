@@ -1,7 +1,7 @@
 `include "defines.sv"
 
-module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] SW_input, input logic AS_L, input logic WE_L, input logic IO_Select, input logic [31:0] Address, input logic [31:0] IO_data_in, 
-                    output logic [6:0] HEX0_output, output logic [6:0] HEX1_output, output logic [6:0] HEX2_output, output logic [6:0] HEX3_output, output logic [6:0] HEX4_output, output logic [6:0] HEX5_output, output logic [8:0] LEDR_output, output logic [31:0] IO_data_out,
+module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] SW_input, input logic AS_L, input logic WE_L, input logic IO_Select, input logic [31:0] Address, input logic [31:0] IO_data_in, input logic [3:0] byte_enable,
+                    output logic [6:0] HEX0_output, output logic [6:0] HEX1_output, output logic [6:0] HEX2_output, output logic [6:0] HEX3_output, output logic [6:0] HEX4_output, output logic [6:0] HEX5_output, output logic [8:0] LEDR_output, output logic [31:0] IO_data_out, output logic UART_Rx, output logic UART_Tx,
     output logic RS_pin,
     output logic E_pin,
     output logic RW_pin,
@@ -12,8 +12,24 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
     wire [6:0]  hex0_wire, hex1_wire, hex2_wire, hex3_wire, hex4_wire, hex5_wire;
     reg [6:0]   HEX0_writedata, HEX1_writedata, HEX2_writedata, HEX3_writedata, HEX4_writedata, HEX5_writedata;
     reg [8:0]   LEDR_writedata;
-    reg [31:0]  IO_writedata;
+    reg [31:0]  IO_writedata, UART_data_out;
     logic LCD_WriteEnable, LCD_CommandOrDisplayData;
+
+    OnChipM68xxIO UART_CONTROLLER (
+        .IOSelect(IO_Select),
+        .Clk(Clock),
+        .Reset_L(Reset_L),
+        .Clock_50Mhz(Clock),
+        .RS232_RxData(UART_Rx),
+        .UDS_L(~byte_enable[0]),
+        .WE_L(WE_L),
+        .AS_L(AS_L),
+        .Address(Address),
+        .DataIn(IO_data_in[7:0]),
+        .RS232_TxData(UART_Tx),
+        .ACIA_IRQ(),
+        .DataOut(UART_data_out)
+    );
 
     LCD_Controller LCD (
         .Clk(Clock),
@@ -124,7 +140,9 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
                 LCD_WriteEnable <= 1;
                 LCD_CommandOrDisplayData <= 1;
             end
-        end 
+        end else if ((Address[15:4] == 12'h004) && (byte_enable[0] == 1) && (AS_L == 0)) begin
+            IO_writedata        <= UART_data_out;
+        end
     end
 endmodule: IO_Handler
 

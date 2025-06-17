@@ -14,7 +14,7 @@
 
 // PROGRAM		"Quartus Prime"
 // VERSION		"Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
-// CREATED		"Tue May 06 15:03:10 2025"
+// CREATED		"Mon Jun 16 11:32:14 2025"
 
 module OnChipM68xxIO(
 	IOSelect,
@@ -58,6 +58,15 @@ assign	SYNTHESIZED_WIRE_8 = 0;
 
 
 
+M68xxIODecoder	b2v_inst(
+	.IOSelect(IOSelect),
+	.UDS_L(UDS_L),
+	.AS_L(AS_L),
+	.Address(Address),
+	.ACIA1_Port_Enable(SYNTHESIZED_WIRE_2),
+	.ACIA1_Baud_Enable(SYNTHESIZED_WIRE_0));
+
+
 ACIA_BaudRate_Generator	b2v_inst1(
 	.Clk_50Mhz(Clock_50Mhz),
 	.Enable_H(SYNTHESIZED_WIRE_0),
@@ -86,14 +95,6 @@ ACIA_6850	b2v_inst16(
 
 assign	SYNTHESIZED_WIRE_1 =  ~Reset_L;
 
-
-
-communication_decoder	b2v_inst2(
-	.IOSelect(IOSelect),
-	.AS_L(AS_L),
-	.Address(Address),
-	.ACIA1_Port_Enable(SYNTHESIZED_WIRE_2),
-	.ACIA1_Baud_Enable(SYNTHESIZED_WIRE_0));
 
 
 endmodule

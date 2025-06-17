@@ -1,9 +1,4 @@
-#define VGA                     *(volatile unsigned long *)(0x04010000)
-#define SWITCHES                *(volatile unsigned long *)(0x04000000)
-#define LEDR                    *(volatile unsigned long *)(0x04000004)
-#define HEX                     *(volatile unsigned long *)(0x04000008)
-#define LCD_Command_Register    *(volatile unsigned long *)(0x0400000C)
-#define LCD_Data_Register       *(volatile unsigned long *)(0x04000010)
+#include "instructions.h"
 
 void Wait1ms(void) {
     long int i;
@@ -66,24 +61,3 @@ void LCD_line1(char *message) {
     LCD_message(message);
 }
 
-int main (void) {
-    int x, y, colour;
-    char *message1, *message2;
-
-    colour = 0;
-    for (y=0; y<120; y++) {
-        for (x=0; x<160; x++) {
-            VGA |= (y << 24) | (x << 16) | colour;
-            colour++;
-        }
-    }
-    message1 = "Alex";
-    message2 = "Hello World!";
-    LCD_line0(message1);
-    LCD_line1(message2);
-
-    while (1) {
-        LEDR = SWITCHES;
-        HEX = SWITCHES;
-    }
-}

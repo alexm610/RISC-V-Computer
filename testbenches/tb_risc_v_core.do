@@ -217,8 +217,22 @@ add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/out
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/shamt
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/HW/ALU/dummy_output
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/ALU/overflow
+add wave -noupdate -divider -height 40 UART_CONTROLLER
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/IOSelect
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/Clk
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/Reset_L
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/Clock_50Mhz
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/RS232_RxData
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/UDS_L
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/WE_L
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/AS_L
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/Address
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/DataIn
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/RS232_TxData
+add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/ACIA_IRQ
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/DataOut
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {684 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1276 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 383
 configure wave -valuecolwidth 219
@@ -234,4 +248,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {34 ps}
+WaveRestoreZoom {0 ps} {17408 ps}

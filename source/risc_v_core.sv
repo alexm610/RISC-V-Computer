@@ -40,31 +40,7 @@ module risc_v_core (
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
     assign LEDR[9]          = done;
-    /*
-    clock25_0002 CLOCK_25_MHz (
-        .refclk(CLOCK_50),
-        .rst(Reset_L),
-        .outclk_0(CLOCK_25),
-        .locked()
-    );
-	 */
-    /*
-    OnChipM68xxIO RS232_MODULE (
-        .IOSelect(IO_Select),
-        .Clk(CLOCK_25),
-        .Reset_L(Reset_L),
-        .Clock_50Mhz(CLOCK_50),
-        .RS232_RxData(GPIO_0[35]),
-        .UDS_L(),
-        .WE_L(WE_L),
-        .AS_L(AS_L),
-        .Address(address),
-        .DataIn(data_out[7:0]),
-        .RS232_TxData(GPIO_1[35]),
-        .ACIA_IRQ(),
-        .DataOut(data_out_RS232)
-    );
-    */
+
     cpu PROCESSOR (
         .Clock(CLOCK_50),
         .Reset_L(KEY[0]),
@@ -79,10 +55,12 @@ module risc_v_core (
         .Conduit(done),
         .Reset_Out(Reset_L));
 
-    address_decoder AD      (.Address(address),
-                            .RAM_Select_H(RAM_Select),
-                            .IO_Select_H(IO_Select),
-                            .Graphics_Select_H(Graphics_Select));
+    address_decoder AD (
+        .Address(address),
+        .RAM_Select_H(RAM_Select),
+        .IO_Select_H(IO_Select),
+        .Graphics_Select_H(Graphics_Select)
+    );
 
     data_bus_multiplexer DATABUS_MULTIPLEXER (
         .Select_SRAM(RAM_Select),
@@ -92,66 +70,75 @@ module risc_v_core (
         .DataOut_CPU(data_in)
     );
 
-    ram INSTRUCTION_MEM     (.clock(CLOCK_50),
-                            //.address(program_counter >> 2),
-                            .address(address>>2),
-                            .byteena(4'b1111),
-                            .wren(test_write),
-                            .data(dummy_instr_writedata),
-                            .q(instruction));
+    ram INSTRUCTION_MEM (
+        .clock(CLOCK_50),
+        .address(address>>2),
+        .byteena(4'b1111),
+        .wren(test_write),
+        .data(dummy_instr_writedata),
+        .q(instruction)
+    );
 
-    SRAM_Block SRAM         (.Clock(CLOCK_50),
-                            .AS_L(AS_L),
-                            .WE_L(WE_L),
-                            .RAM_Select_H(RAM_Select),
-                            .Address(address),
-                            .Byte_Enable(byte_enable),
-                            .Data_In(data_out),
-                            .Data_Out(data_out_SRAM));
+    SRAM_Block SRAM (.Clock(CLOCK_50),
+        .AS_L(AS_L),
+        .WE_L(WE_L),
+        .RAM_Select_H(RAM_Select),
+        .Address(address),
+        .Byte_Enable(byte_enable),
+        .Data_In(data_out),
+        .Data_Out(data_out_SRAM)
+    );
 
-	IO_Handler IO   		(.Clock(CLOCK_50),
-                            .Reset_L(Reset_L),
-							.LEDR_output(LEDR[8:0]),
-							.SW_input(SW),
-                            .HEX5_output(HEX5),
-                            .HEX4_output(HEX4),
-                            .HEX3_output(HEX3),
-                            .HEX2_output(HEX2),
-                            .HEX1_output(HEX1),
-                            .HEX0_output(HEX0),
-							.AS_L(AS_L),
-							.WE_L(WE_L),
-							.IO_Select(IO_Select),
-							.Address(address),
-							.IO_data_in(data_out),
-							.IO_data_out(data_out_IO),
-                            .RS_pin(GPIO_1[0]),
-                            .E_pin(GPIO_1[1]),
-                            .RW_pin(GPIO_1[2]),
-                            .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]})
+	IO_Handler IO (.Clock(CLOCK_50),
+        .Reset_L(Reset_L),
+        .byte_enable(byte_enable),
+		.LEDR_output(LEDR[8:0]),
+		.SW_input(SW),
+        .HEX5_output(HEX5),
+        .HEX4_output(HEX4),
+        .HEX3_output(HEX3),
+        .HEX2_output(HEX2),
+        .HEX1_output(HEX1),
+        .HEX0_output(HEX0),
+		.AS_L(AS_L),
+		.WE_L(WE_L),
+		.IO_Select(IO_Select),
+		.Address(address),
+		.IO_data_in(data_out),
+		.IO_data_out(data_out_IO),
+        .RS_pin(GPIO_1[0]),
+        .E_pin(GPIO_1[1]),
+        .RW_pin(GPIO_1[2]),
+        .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]}),
+        .UART_Tx(GPIO_1[35]),
+        .UART_Rx(GPIO_0[35])
     );
            
-    vga_control VGA_CONTROL (.clk(CLOCK_50),
-                            .rst_n(Reset_L),
-                            .data_in(data_out),
-                            .ready(vga_ready), // output to arbiter/cpu
-                            .VGA_Select(Graphics_Select),
-                            .start(1'b0), // input from arbiter (the write signal)
-                            .vga_x(fill_x),
-                            .vga_y(fill_y),
-                            .vga_colour(into_vga_colour),
-                            .vga_plot(fill_plot));  
+    vga_control VGA_CONTROL (
+        .clk(CLOCK_50),
+        .rst_n(Reset_L),
+        .data_in(data_out),
+        .ready(vga_ready), // output to arbiter/cpu
+        .VGA_Select(Graphics_Select),
+        .start(1'b0), // input from arbiter (the write signal)
+        .vga_x(fill_x),
+        .vga_y(fill_y),
+        .vga_colour(into_vga_colour),
+        .vga_plot(fill_plot)
+    );  
 
-    vga_adapter             #(.RESOLUTION("160x120")) VGA_0 (.clock(CLOCK_25),
-                            .resetn(Reset_L),
-                            .colour(into_vga_colour), // from controller
-                            .x(fill_x), // from controller I need to make 
-                            .y(fill_y), // from controller 
-                            .plot(fill_plot),  // from controller 
-                            .VGA_R(VGA_R_10),
-                            .VGA_G(VGA_G_10),
-                            .VGA_B(VGA_B_10),
-                            .*);    
+    vga_adapter #(.RESOLUTION("160x120")) VGA_0 (
+        .clock(CLOCK_50),
+        .resetn(Reset_L),
+        .colour(into_vga_colour), // from controller
+        .x(fill_x), // from controller I need to make 
+        .y(fill_y), // from controller 
+        .plot(fill_plot),  // from controller 
+        .VGA_R(VGA_R_10),
+        .VGA_G(VGA_G_10),
+        .VGA_B(VGA_B_10),
+        .*
+    );    
 endmodule: risc_v_core
 
 module data_bus_multiplexer (
