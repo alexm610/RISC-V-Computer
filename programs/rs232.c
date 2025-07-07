@@ -6,7 +6,7 @@ void Init_RS232(void) {
 }
 
 int _putch(int c) {
-    while (((char)(RS232_Status) & (char)(0x02)) != (char)(0x02));
+    while (((RS232_Status) & (char)(0x02)) != (char)(0x02));
     RS232_TxData = ((char)(c) & (char)(0x7F));
     return c;
 }

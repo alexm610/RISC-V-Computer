@@ -47,13 +47,15 @@ add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Clock
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Reset_L
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/State
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/DTAck
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Address
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Instruction
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Current_Instruction
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Program_Counter
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_In
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/AS_L
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Byte_Enable
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/WE_L
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/DataBus_Out
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Address
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Conduit
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/Reset_Out
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/mem_or_reg
@@ -70,8 +72,6 @@ add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_B_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_U_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/imm_J_TYPE
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/datapath_in
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Program_Counter
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/Current_Instruction
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/reg_bank_write
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/alu_SRC
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/negative
@@ -97,7 +97,7 @@ add wave -noupdate /tb_risc_v_core/dut/IO/Reset_L
 add wave -noupdate /tb_risc_v_core/dut/IO/RS_pin
 add wave -noupdate /tb_risc_v_core/dut/IO/E_pin
 add wave -noupdate /tb_risc_v_core/dut/IO/RW_pin
-add wave -noupdate /tb_risc_v_core/dut/IO/LCD_DataOut
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/LCD_DataOut
 add wave -noupdate /tb_risc_v_core/dut/IO/LCD_WriteEnable
 add wave -noupdate /tb_risc_v_core/dut/IO/LCD_CommandOrDisplayData
 add wave -noupdate /tb_risc_v_core/dut/IO/SW_input
@@ -129,7 +129,7 @@ add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/Data_Out
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/Data_Out_bus
 add wave -noupdate -divider -height 40 SRAM_BLOCK_3
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/b2v_inst/address
-add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/b2v_inst/data
+add wave -noupdate -radix hexadecimal -childformat {{{/tb_risc_v_core/dut/SRAM/b2v_inst/data[7]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[6]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[5]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[4]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[3]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[2]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[1]} -radix hexadecimal} {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[0]} -radix hexadecimal}} -subitemconfig {{/tb_risc_v_core/dut/SRAM/b2v_inst/data[7]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[6]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[5]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[4]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[3]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[2]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[1]} {-height 15 -radix hexadecimal} {/tb_risc_v_core/dut/SRAM/b2v_inst/data[0]} {-height 15 -radix hexadecimal}} /tb_risc_v_core/dut/SRAM/b2v_inst/data
 add wave -noupdate /tb_risc_v_core/dut/SRAM/b2v_inst/wren
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SRAM/b2v_inst/q
 add wave -noupdate -divider -height 40 SRAM_BLOCK_2
@@ -232,7 +232,7 @@ add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/RS2
 add wave -noupdate /tb_risc_v_core/dut/IO/UART_CONTROLLER/ACIA_IRQ
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/IO/UART_CONTROLLER/DataOut
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1276 ps} 0}
+WaveRestoreCursors {{Cursor 1} {2778 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 383
 configure wave -valuecolwidth 219
@@ -248,4 +248,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {17408 ps}
+WaveRestoreZoom {2727 ps} {2783 ps}

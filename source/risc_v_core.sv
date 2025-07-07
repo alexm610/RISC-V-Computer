@@ -34,7 +34,7 @@ module risc_v_core (
     logic [9:0] VGA_R_10, VGA_G_10, VGA_B_10;
     logic VGA_BLANK, VGA_SYNC;
     logic [2:0] into_vga_colour;
-    logic RAM_Select, IO_Select, Graphics_Select;
+    logic RAM_Select, IO_Select, Graphics_Select, ROM_Select;
 
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
@@ -57,6 +57,7 @@ module risc_v_core (
 
     address_decoder AD (
         .Address(address),
+        .ROM_Select_H(ROM_Select),
         .RAM_Select_H(RAM_Select),
         .IO_Select_H(IO_Select),
         .Graphics_Select_H(Graphics_Select)
@@ -65,8 +66,10 @@ module risc_v_core (
     data_bus_multiplexer DATABUS_MULTIPLEXER (
         .Select_SRAM(RAM_Select),
         .Select_IO(IO_Select),
+        .Select_ROM(ROM_Select),
         .DataIn_SRAM(data_out_SRAM),
         .DataIn_IO(data_out_IO),
+        .DataIn_ROM(instruction),
         .DataOut_CPU(data_in)
     );
 
@@ -83,7 +86,7 @@ module risc_v_core (
         .AS_L(AS_L),
         .WE_L(WE_L),
         .RAM_Select_H(RAM_Select),
-        .Address(address),
+        .Address(address>>2),
         .Byte_Enable(byte_enable),
         .Data_In(data_out),
         .Data_Out(data_out_SRAM)
@@ -144,8 +147,10 @@ endmodule: risc_v_core
 module data_bus_multiplexer (
     input logic         Select_SRAM,
     input logic         Select_IO,
+    input logic         Select_ROM,
     input logic [31:0]  DataIn_SRAM,
     input logic [31:0]  DataIn_IO,
+    input logic [31:0]  DataIn_ROM,
     output logic [31:0] DataOut_CPU
 );
 
@@ -158,6 +163,10 @@ module data_bus_multiplexer (
 
         if ((Select_SRAM == 0) && (Select_IO == 1)) begin
             DataOut_CPU <= DataIn_IO;
+        end
+
+        if (Select_ROM == 1) begin
+            DataOut_CPU <= DataIn_ROM;
         end
     end
 endmodule: data_bus_multiplexer

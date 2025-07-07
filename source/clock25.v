@@ -8,15 +8,14 @@
 module clock25 (
 		input  wire  refclk,   //  refclk.clk
 		input  wire  rst,      //   reset.reset
-		output wire  outclk_0, // outclk0.clk
-		output wire  locked    //  locked.export
+		output wire  outclk_0  // outclk0.clk
 	);
 
 	clock25_0002 clock25_inst (
 		.refclk   (refclk),   //  refclk.clk
 		.rst      (rst),      //   reset.reset
 		.outclk_0 (outclk_0), // outclk0.clk
-		.locked   (locked)    //  locked.export
+		.locked   ()          // (terminated)
 	);
 
 endmodule
@@ -59,7 +58,7 @@ endmodule
 // Retrieval info: 	<generic name="gui_feedback_clock" value="Global Clock" />
 // Retrieval info: 	<generic name="gui_fractional_cout" value="32" />
 // Retrieval info: 	<generic name="gui_dsm_out_sel" value="1st_order" />
-// Retrieval info: 	<generic name="gui_use_locked" value="true" />
+// Retrieval info: 	<generic name="gui_use_locked" value="false" />
 // Retrieval info: 	<generic name="gui_en_adv_params" value="false" />
 // Retrieval info: 	<generic name="gui_number_of_clocks" value="1" />
 // Retrieval info: 	<generic name="gui_multiply_factor" value="1" />

@@ -34,7 +34,7 @@ module tb_risc_v_core();
         SW = 10'b0110101011; #2;
         
         j = 0;
-        for (i = 0; i < 1024; i = i + 4) begin
+        for (i = 0; i < 4096; i = i + 4) begin
             force dut.WE_L = 0;
             force dut.AS_L = 0;
             force dut.RAM_Select = 1;
@@ -71,8 +71,9 @@ module tb_risc_v_core();
         KEY[0] = 0; #2;
         KEY[0] = 1; #10;
 
-        //#200;
-        @ (posedge LEDR[9]);
+        wait (dut.address == 32'h00000218);
+        
+        //@ (posedge LEDR[9]);
         #4;
 
         if (!error) begin

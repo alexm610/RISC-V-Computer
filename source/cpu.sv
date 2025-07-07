@@ -50,15 +50,6 @@ module cpu (
         .rs2(rs2_output)
     );
 
-    //ram PROGRAM_COUNTER (
-    //    .clock(Clock),
-    //    .address(Program_Counter >> 2),
-    //    .byteena(4'b1111),
-    //    .wren(save_pc),
-    //    .data(Instruction),
-    //    .q()
-    //);
-
     assign datapath_in          = mem_or_reg ? DataBus_In : datapath_out;
     assign rs1                  = Current_Instruction[19:15];
     assign rs2                  = Current_Instruction[24:20];
@@ -78,29 +69,32 @@ module cpu (
         Byte_Enable <= 4'b0000; // disable Byte_Enable by default
 
         if (funct3 == 3'h0) begin
-            case (Address[1:0]) 
+            /*case (Address[1:0]) 
                 2'b00: Byte_Enable <= 4'b0001; // we are writing a byte at no offset
                 2'b01: Byte_Enable <= 4'b0010; // we are writing a byte at offset = 1
                 2'b10: Byte_Enable <= 4'b0100; // writing a byte at offset = 2
                 2'b11: Byte_Enable <= 4'b1000; // writing a byte at offset = 3
-            endcase 
+            endcase*/
+            Byte_Enable <= 4'b0001; 
         end 
 
         if (funct3 == 3'h1) begin
-            case (Address[1:0]) 
+            /*case (Address[1:0]) 
                 2'b00: Byte_Enable <= 4'b0011; // writing a half-word at offset = 0
                 2'b01: Byte_Enable <= 4'b0110; // writing a half-word at offset = 1
                 2'b10: Byte_Enable <= 4'b1100; // writing a half-word at offset = 2
                 default: Byte_Enable <= 4'b0000; // we cannot write a half word at offset = 3, as this is misaligned
-            endcase 
+            endcase*/
+            Byte_Enable <= 4'b0011; 
         end
 
         if (funct3 == 3'h2) begin
-            Byte_Enable <= 4'b0000; // disable Byte_Enable, unless condition below is met
+            /*Byte_Enable <= 4'b0000; // disable Byte_Enable, unless condition below is met
 
             if (Address[1:0] == 2'b00) begin
                 Byte_Enable <= 4'b1111;
-            end
+            end*/
+            Byte_Enable <= 4'b1111;
         end
     end
 
@@ -125,33 +119,33 @@ module cpu (
 
     always @(posedge Clock, negedge Reset_L) begin
         if (Reset_L == 0) begin
-            State               <= INITIALIZE;
-            Program_Counter     <= 32'h00000000;
-            AS_L                <= 1;
-            WE_L                <= 1;
-            mem_or_reg          <= 0;
-            alu_OP              <= 4'h0;
-            alu_SRC             <= 1;
-            Conduit             <= 0;
-            jump_link           <= 0;
-            imm                 <= 32'h00000000;
-            reg_bank_write      <= 0;
-            load_upper_imm      <= 0;
-            Conduit             <= 0;
-            Program_Counter_Increment <= 2'b00;
-            Reset_Out           <= 0;
-            instruction_fetch   <= 1;
+            State                       <= INITIALIZE;
+            Program_Counter             <= 32'h00000000;
+            AS_L                        <= 1;
+            WE_L                        <= 1;
+            mem_or_reg                  <= 0;
+            alu_OP                      <= 4'h0;
+            alu_SRC                     <= 1;
+            Conduit                     <= 0;
+            jump_link                   <= 0;
+            imm                         <= 32'h00000000;
+            reg_bank_write              <= 0;
+            load_upper_imm              <= 0;
+            Conduit                     <= 0;
+            Program_Counter_Increment   <= 2'b00;
+            Reset_Out                   <= 0;
+            instruction_fetch           <= 1;
         end else begin
             case (State) 
                 INITIALIZE: begin
-                    State       <= START;
+                    State               <= START;
                     Current_Instruction <= Instruction;
-                    Reset_Out <= 1;
+                    Reset_Out           <= 1;
                     instruction_fetch   <= 1;
-                    save_pc <= 1;
+                    save_pc             <= 1;
                 end
                 START: begin
-                    save_pc <= 0;
+                    save_pc             <= 0;
                     case (opcode)
                         `R_TYPE: begin
                             State       <= WRITE_BACK;

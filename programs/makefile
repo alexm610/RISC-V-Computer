@@ -12,7 +12,7 @@ HEXDUMPFLAGS = -v -e '"%08x\n"'
 OBJS = instructions.elf
 BINS = instructions.bin
 SRECS = instructions.srec
-MIFS = instructions.mif
+MIFS = instructions.mif 
 SRCS = instructions.c rs232.c lcd_display.c vga_stripes.c  
 HDRS = instructions.h
 

@@ -49,10 +49,10 @@ BEGIN
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
    Process(Clk, StartETimer)
-			variable timer : integer range 0 to 8 ;							-- variable with sufficient range to count clock pulses
+			variable timer : integer range 0 to 20 ;							-- variable with sufficient range to count clock pulses
 	BEGIN
 			if(StartETimer = '1') then											-- if we get the signal from another process to start the timer
-				timer  := 8 ;															-- Preload timer with a margin of safety count of 8
+				timer  := 16 ;															-- Preload timer with a margin of safety count of 8
 			elsif (rising_edge(Clk) and (timer /= 0)) then				-- otherwise, provided timer has not already counted down to 0, on the next rising edge of the clock		
 				timer := timer - 1 ;												-- subtract 1 from the timer value
 			end if;
