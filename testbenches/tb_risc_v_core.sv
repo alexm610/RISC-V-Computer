@@ -37,7 +37,7 @@ module tb_risc_v_core();
         for (i = 0; i < 4096; i = i + 4) begin
             force dut.WE_L = 0;
             force dut.AS_L = 0;
-            force dut.RAM_Select = 1;
+            force dut.ROM_Select = 1;
             force dut.address = i[9:0];
             force dut.data_out = 32'h0;
             #2;
@@ -46,7 +46,7 @@ module tb_risc_v_core();
         dut.WE_L = 1;
         release dut.WE_L;
         release dut.AS_L;
-        release dut.RAM_Select;
+        
         release dut.address;
         release dut.data_out;
         #2;
@@ -56,6 +56,7 @@ module tb_risc_v_core();
         for (i = 0; i < 1024; i = i + 4) begin
             dut.test_write = 1;
             //force dut.program_counter = i;
+            force dut.ROM_Select = 1;
             force dut.address = i;
             force dut.dummy_instr_writedata = mem_file_1[j];
             
@@ -67,11 +68,12 @@ module tb_risc_v_core();
         //release dut.program_counter;
         release dut.address;
         release dut.dummy_instr_writedata;
+        release dut.ROM_Select;
         KEY[0] = 1; #2;
         KEY[0] = 0; #2;
         KEY[0] = 1; #10;
 
-        wait (dut.address == 32'h00000218);
+        wait (dut.address == 32'h00000208);
         
         //@ (posedge LEDR[9]);
         #4;

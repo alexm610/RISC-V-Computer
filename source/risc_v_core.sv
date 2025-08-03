@@ -73,23 +73,24 @@ module risc_v_core (
         .DataOut_CPU(data_in)
     );
 
-    ram INSTRUCTION_MEM (
-        .clock(CLOCK_50),
-        .address(address>>2),
-        .byteena(4'b1111),
-        .wren(test_write),
-        .data(dummy_instr_writedata),
-        .q(instruction)
+    OnChipROM16KWords INSTRUCTION_MEMORY (
+        .Clock(CLOCK_50),
+        .RomSelect_H(ROM_Select),
+        .Write_Enable(test_write),
+        .Address(address>>2),
+        .DataIn(dummy_instr_writedata),
+        .DataOut(instruction)
     );
 
-    SRAM_Block SRAM (.Clock(CLOCK_50),
-        .AS_L(AS_L),
+    OnChipRam256kbyte SRAM_MEMORY (
+        .Clock(CLOCK_50),
+        .RamSelect_H(RAM_Select),
         .WE_L(WE_L),
-        .RAM_Select_H(RAM_Select),
+        .AS_L(AS_L),
         .Address(address>>2),
-        .Byte_Enable(byte_enable),
-        .Data_In(data_out),
-        .Data_Out(data_out_SRAM)
+        .ByteEnable(byte_enable),
+        .DataIn(data_out),
+        .DataOut(data_out_SRAM)
     );
 
 	IO_Handler IO (.Clock(CLOCK_50),

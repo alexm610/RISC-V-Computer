@@ -1,0 +1,31 @@
+
+
+C:/Users/alexm/math/RISC-V-Computer/source/lpm_bustri0.vhd
+
+Jul 26 04PM:24:14>: Megafunction LPM_BUSTRI is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+C:/Users/alexm/math/RISC-V-Computer/source/lpm_bustri0.vhd
+
+Jul 26 04PM:24:15>: Megafunction LPM_BUSTRI is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+C:/Users/alexm/math/RISC-V-Computer/source/lpm_bustri0.vhd
+
+Jul 26 04PM:24:16>: Megafunction LPM_BUSTRI is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+C:/Users/alexm/math/RISC-V-Computer/source/lpm_bustri0.vhd
+
+Jul 26 04PM:24:19>: Megafunction LPM_BUSTRI is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+C:/Users/alexm/math/RISC-V-Computer/source/lpm_bustri0.vhd
+
+Jul 26 04PM:25:48>: Megafunction LPM_BUSTRI is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+C:/Users/alexm/math/RISC-V-Computer/source/lpm_bustri0.vhd
+
+Jul 26 04PM:25:53>: Megafunction LPM_BUSTRI is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted

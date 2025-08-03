@@ -63,91 +63,50 @@ module cpu (
     assign imm_J_TYPE           = {Current_Instruction[31], Current_Instruction[19:12], Current_Instruction[20], Current_Instruction[30:21], 1'b0};
     assign imm_U_TYPE           = Current_Instruction[31:12];
     assign Address              = instruction_fetch ? Program_Counter : datapath_out;
-    //assign DataBus_Out          = rs2_output;
-    
-    always @(*) begin
-        case (Byte_Enable) 
-            4'b0001: DataBus_Out <= rs2_output;
-            4'b0010: DataBus_Out <= rs2_output << 32'd8;
-            4'b0100: DataBus_Out <= rs2_output << 32'd16;
-            4'b1000: DataBus_Out <= rs2_output << 32'd24;
-            4'b0011: DataBus_Out <= rs2_output;
-            4'b1100: DataBus_Out <= rs2_output << 32'd16;
-            4'b1111: DataBus_Out <= rs2_output;
-            default: DataBus_Out <= 32'h00000000;
-        endcase
-    end
+    assign DataBus_Out          = rs2_output;
     
     always @(*) begin
         Byte_Enable <= 4'b0000; // disable Byte_Enable by default
 
         if (funct3 == 3'h0) begin
-            case (Address[1:0]) 
+            /*case (Address[1:0]) 
                 2'b00: Byte_Enable <= 4'b0001; // we are writing a byte at no offset
                 2'b01: Byte_Enable <= 4'b0010; // we are writing a byte at offset = 1
                 2'b10: Byte_Enable <= 4'b0100; // writing a byte at offset = 2
                 2'b11: Byte_Enable <= 4'b1000; // writing a byte at offset = 3
-            endcase
+            endcase*/
+            Byte_Enable <= 4'b0001; 
         end 
 
         if (funct3 == 3'h1) begin
-            case (Address[1:0]) 
+            /*case (Address[1:0]) 
                 2'b00: Byte_Enable <= 4'b0011; // writing a half-word at offset = 0
+                2'b01: Byte_Enable <= 4'b0110; // writing a half-word at offset = 1
                 2'b10: Byte_Enable <= 4'b1100; // writing a half-word at offset = 2
-                default: Byte_Enable <= 4'b0000; // we cannot write a half word at offset = 3 or offset = 1, as this is misaligned. Half words must be aligned at byte multiples of 2
-            endcase 
+                default: Byte_Enable <= 4'b0000; // we cannot write a half word at offset = 3, as this is misaligned
+            endcase*/
+            Byte_Enable <= 4'b0011; 
         end
 
         if (funct3 == 3'h2) begin
-            Byte_Enable <= 4'b0000; // disable Byte_Enable, unless condition below is met
+            /*Byte_Enable <= 4'b0000; // disable Byte_Enable, unless condition below is met
 
             if (Address[1:0] == 2'b00) begin
                 Byte_Enable <= 4'b1111;
-            end
+            end*/
+            Byte_Enable <= 4'b1111;
         end
     end
 
      always @(*) begin
         if (mem_or_reg == 1) begin
-            case (funct3)
-                3'h0: begin
-                    case (Address[1:0])
-                        2'b00: writedata <= {{24{datapath_in[7]}}, datapath_in[7:0]};
-                        2'b01: writedata <= {{24{datapath_in[15]}}, datapath_in[15:8]};
-                        2'b10: writedata <= {{24{datapath_in[23]}}, datapath_in[23:16]};
-                        2'b11: writedata <= {{24{datapath_in[31]}}, datapath_in[31:24]};
-                    endcase
-                end
-                3'h1: begin
-                    case (Address[1:0])
-                        2'b00: writedata <= {{16{datapath_in[15]}}, datapath_in[15:0]};
-                        2'b10: writedata <= {{16{datapath_in[31]}}, datapath_in[31:16]};
-                        default: writedata <= 32'h00000000;
-                    endcase
-                end
-                3'h2: begin
-                    if (Address[1:0] == 2'b00) begin
-                        writedata <= datapath_in;
-                    end else begin
-                        writedata <= 32'h00000000;
-                    end
-                end
-                3'h4: begin
-                    case (Address[1:0])
-                        2'b00: writedata <= {{24{1'b0}}, datapath_in[7:0]};
-                        2'b01: writedata <= {{24{1'b0}}, datapath_in[15:8]};
-                        2'b10: writedata <= {{24{1'b0}}, datapath_in[23:16]};
-                        2'b11: writedata <= {{24{1'b0}}, datapath_in[31:24]};
-                    endcase
-                end
-                3'h5: begin
-                    case (Address[1:0])
-                        2'b00: writedata <= {{16{1'b0}}, datapath_in[15:0]};
-                        2'b10: writedata <= {{16{1'b0}}, datapath_in[31:16]};
-                        default: writedata <= 32'h00000000;
-                    endcase
-                end
-                default: writedata <= 32'h00000000;
+            case (funct3) 
+                3'h0: writedata <= {{24{datapath_in[7]}}, datapath_in[7:0]};
+                3'h1: writedata <= {{16{datapath_in[15]}}, datapath_in[15:0]};
+                3'h2: writedata <= datapath_in;
+                3'h4: writedata <= {{24{1'b0}}, datapath_in[7:0]};
+                3'h5: writedata <= {{16{1'b0}}, datapath_in[15:0]};
+                default: writedata <= 32'd0;
             endcase
         end else if (jump_link == 1) begin
             writedata <= Program_Counter + 32'h4;
