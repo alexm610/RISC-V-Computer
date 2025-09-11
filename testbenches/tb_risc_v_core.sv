@@ -73,7 +73,7 @@ module tb_risc_v_core();
         KEY[0] = 0; #2;
         KEY[0] = 1; #10;
 
-        wait (dut.address == 32'h00000208);
+        wait (dut.address == 32'h00000114);
         
         //@ (posedge LEDR[9]);
         #4;

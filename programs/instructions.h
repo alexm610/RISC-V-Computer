@@ -4,16 +4,15 @@
 #define HEX                     *(volatile unsigned long *)(0x00400008)
 #define LCD_Command_Register    *(volatile unsigned long *)(0x0040000C)
 #define LCD_Data_Register       *(volatile unsigned long *)(0x00400010)
-#define RS232_Control           *(volatile unsigned long *)(0x00400040)
-#define RS232_Status            *(volatile unsigned long *)(0x00400040)
-#define RS232_TxData            *(volatile unsigned long *)(0x00400042)
-#define RS232_RxData            *(volatile unsigned long *)(0x00400042)
-#define RS232_Baud              *(volatile unsigned long *)(0x00400044)
+#define RS232_Status            *(volatile unsigned long *)(0x05000014)
+#define RS232_Data              *(volatile unsigned long *)(0x05000010)
+
 
 void print_stripes(void);
 
-void Init_RS232(void);
-int _putch(int);
+void uart_putch(char);
+char uart_getch(void);
+void uart_puts(char *);
 
 void Wait1ms(void);
 void Wait3ms(void);

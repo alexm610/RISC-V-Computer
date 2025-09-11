@@ -4,7 +4,9 @@ module address_decoder (
 		output logic ROM_Select_H,
         output logic RAM_Select_H,
         output logic IO_Select_H,
-		output logic Graphics_Select_H
+		output logic Graphics_Select_H,
+		output logic Keyboard_Select_H,
+		output logic UART_Select_H
 );
 
 	always @(*) begin
@@ -12,6 +14,8 @@ module address_decoder (
 		RAM_Select_H		<= 0;
 		IO_Select_H			<= 0;
 		Graphics_Select_H	<= 0;
+		Keyboard_Select_H   <= 0;
+		UART_Select_H		<= 0;
 
 		if ((Address >= 32'h00000000) && (Address <= 32'h00007FFF)) begin
 			ROM_Select_H		<= 1;
@@ -28,5 +32,13 @@ module address_decoder (
 		if ((Address >= 32'h08000000) && (Address <= 32'h0BFFFFFF)) begin
 			RAM_Select_H 		<= 1;
 		end
+
+		if ((Address >= 32'h05000000) && (Address <= 32'h0500000F)) begin
+			Keyboard_Select_H 	<= 1;
+		end
+
+		if ((Address >= 32'h05000010) && (Address < 32'h0500001F)) begin
+			UART_Select_H 		<= 1;
+		end 
 	end
 endmodule: address_decoder

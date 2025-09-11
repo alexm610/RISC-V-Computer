@@ -1,0 +1,21 @@
+# system info ps2_controller on 2025.08.05.14:12:36
+system_info:
+name,value
+DEVICE,5CSEMA5F31C6
+DEVICE_FAMILY,Cyclone V
+GENERATION_ID,1754428355
+#
+#
+# Files generated for ps2_controller on 2025.08.05.14:12:36
+files:
+filepath,kind,attributes,module,is_top
+simulation/ps2_controller.v,VERILOG,,ps2_controller,true
+simulation/submodules/altera_up_ps2.v,VERILOG,,ps2_controller_ps2_0,false
+simulation/submodules/altera_up_ps2_command_out.v,VERILOG,,ps2_controller_ps2_0,false
+simulation/submodules/altera_up_ps2_data_in.v,VERILOG,,ps2_controller_ps2_0,false
+simulation/submodules/ps2_controller_ps2_0.v,VERILOG,,ps2_controller_ps2_0,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+ps2_controller.ps2_0,ps2_controller_ps2_0

@@ -1,0 +1,67 @@
+Info: Starting: Create simulation model
+Info: qsys-generate C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller.qsys --simulation=VERILOG --allow-mixed-language-simulation --output-directory=C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller\simulation --family="Cyclone V" --part=5CSEMA5F31C6
+Progress: Loading source/ps2_controller.qsys
+Progress: Reading input file
+Progress: Adding ps2_0 [altera_up_avalon_ps2 18.0]
+Progress: Parameterizing module ps2_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: ps2_controller: Generating ps2_controller "ps2_controller" for SIM_VERILOG
+Info: ps2_0: Starting Generation of PS2 Controller
+Error: ps2_0: The input clock frequency must be known at generation time.
+Info: ps2_0: "ps2_controller" instantiated altera_up_avalon_ps2 "ps2_0"
+Info: ps2_controller: Done "ps2_controller" with 2 modules, 5 files
+Error: qsys-generate failed with exit code 1: 1 Error, 0 Warnings
+Info: Finished: Create simulation model
+Info: Starting: Create Modelsim Project.
+Info: sim-script-gen --spd=C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller\ps2_controller.spd --output-directory=C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ --use-relative-paths=true
+Info: Doing: ip-make-simscript --spd=C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller\ps2_controller.spd --output-directory=C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ --use-relative-paths=true
+Info: Generating the following file(s) for MODELSIM simulator in C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ directory:
+Info: 	mentor/msim_setup.tcl
+Info: Generating the following file(s) for VCS simulator in C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ directory:
+Info: 	synopsys/vcs/vcs_setup.sh
+Info: Generating the following file(s) for VCSMX simulator in C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ directory:
+Info: 	synopsys/vcsmx/synopsys_sim.setup
+Info: 	synopsys/vcsmx/vcsmx_setup.sh
+Info: Generating the following file(s) for NCSIM simulator in C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ directory:
+Info: 	cadence/cds.lib
+Info: 	cadence/hdl.var
+Info: 	cadence/ncsim_setup.sh
+Info: 	1 .cds.lib files in cadence/cds_libs/ directory
+Info: Generating the following file(s) for RIVIERA simulator in C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/ directory:
+Info: 	aldec/rivierapro_setup.tcl
+Info: For information on how to simulate your IP, see the explanatory comments in the simulator-specific subdirectories under C:/Users/alexm/math/RISC-V-Computer/source/ps2_controller/simulation/.
+Info: Regenerate these scripts whenever you make any change to any Quartus-generated IP in your project.
+Info: Finished: Create Modelsim Project.
+Info: Starting: Create block symbol file (.bsf)
+Info: qsys-generate C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller.qsys --block-symbol-file --output-directory=C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller --family="Cyclone V" --part=5CSEMA5F31C6
+Progress: Loading source/ps2_controller.qsys
+Progress: Reading input file
+Progress: Adding ps2_0 [altera_up_avalon_ps2 18.0]
+Progress: Parameterizing module ps2_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: qsys-generate succeeded.
+Info: Finished: Create block symbol file (.bsf)
+Info: 
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller.qsys --synthesis=VERILOG --output-directory=C:\Users\alexm\math\RISC-V-Computer\source\ps2_controller\synthesis --family="Cyclone V" --part=5CSEMA5F31C6
+Progress: Loading source/ps2_controller.qsys
+Progress: Reading input file
+Progress: Adding ps2_0 [altera_up_avalon_ps2 18.0]
+Progress: Parameterizing module ps2_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: ps2_controller: Generating ps2_controller "ps2_controller" for QUARTUS_SYNTH
+Info: ps2_0: Starting Generation of PS2 Controller
+Error: ps2_0: The input clock frequency must be known at generation time.
+Info: ps2_0: "ps2_controller" instantiated altera_up_avalon_ps2 "ps2_0"
+Info: ps2_controller: Done "ps2_controller" with 2 modules, 5 files
+Error: qsys-generate failed with exit code 1: 1 Error, 0 Warnings
+Info: Finished: Create HDL design files for synthesis

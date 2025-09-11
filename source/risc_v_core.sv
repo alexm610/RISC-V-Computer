@@ -17,9 +17,11 @@ module risc_v_core (
     output logic VGA_VS, 
     output logic VGA_CLK, 
     output logic [9:0] LEDR
+    //inout logic PS2_CLK,
+    //inout logic PS2_DAT
 );
 
-    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L;
+    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select;
     logic [7:0] data_out_RS232;
     logic CLOCK_25;
     logic [3:0] byte_enable;
@@ -34,7 +36,8 @@ module risc_v_core (
     logic [9:0] VGA_R_10, VGA_G_10, VGA_B_10;
     logic VGA_BLANK, VGA_SYNC;
     logic [2:0] into_vga_colour;
-    logic RAM_Select, IO_Select, Graphics_Select, ROM_Select;
+    logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select;
+    logic [31:0] data_out_KEYBOARD;
 
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
@@ -60,16 +63,22 @@ module risc_v_core (
         .ROM_Select_H(ROM_Select),
         .RAM_Select_H(RAM_Select),
         .IO_Select_H(IO_Select),
-        .Graphics_Select_H(Graphics_Select)
+        .Graphics_Select_H(Graphics_Select),
+        .Keyboard_Select_H(Keyboard_Select),
+        .UART_Select_H(UART_Select)
     );
 
     data_bus_multiplexer DATABUS_MULTIPLEXER (
         .Select_SRAM(RAM_Select),
         .Select_IO(IO_Select),
         .Select_ROM(ROM_Select),
+        .Select_KEYBOARD(Keyboard_Select),
+        .Select_UART(UART_Select),
+        .DataIn_KEYBOARD(data_out_KEYBOARD),
         .DataIn_SRAM(data_out_SRAM),
         .DataIn_IO(data_out_IO),
         .DataIn_ROM(instruction),
+        .DataIn_UART(data_out_UART),
         .DataOut_CPU(data_in)
     );
 
@@ -113,9 +122,20 @@ module risc_v_core (
         .RS_pin(GPIO_1[0]),
         .E_pin(GPIO_1[1]),
         .RW_pin(GPIO_1[2]),
-        .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]}),
-        .UART_Tx(GPIO_1[35]),
-        .UART_Rx(GPIO_0[35])
+        .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]})
+    );
+
+    uart_controller UART_0 (
+        .clk(CLOCK_50),
+        .reset(~Reset_L),
+        .AS_L(AS_L),
+        .WE_L(WE_L),
+        .UART_SEL_H(UART_Select),
+        .addr(address>>2),
+        .wdata(data_out),
+        .rdata(data_out_UART),
+        .tx(GPIO_1[35]),
+        .rx(GPIO_0[35])
     );
            
     vga_control VGA_CONTROL (
@@ -142,13 +162,17 @@ module risc_v_core (
         .VGA_G(VGA_G_10),
         .VGA_B(VGA_B_10),
         .*
-    );    
+    );  
 endmodule: risc_v_core
 
 module data_bus_multiplexer (
     input logic         Select_SRAM,
     input logic         Select_IO,
     input logic         Select_ROM,
+    input logic         Select_KEYBOARD,
+    input logic         Select_UART,
+    input logic [31:0]  DataIn_UART,
+    input logic [31:0]  DataIn_KEYBOARD,
     input logic [31:0]  DataIn_SRAM,
     input logic [31:0]  DataIn_IO,
     input logic [31:0]  DataIn_ROM,
@@ -168,6 +192,10 @@ module data_bus_multiplexer (
 
         if (Select_ROM == 1) begin
             DataOut_CPU <= DataIn_ROM;
+        end
+
+        if (Select_KEYBOARD == 1) begin
+            DataOut_CPU <= DataIn_KEYBOARD;
         end
     end
 endmodule: data_bus_multiplexer

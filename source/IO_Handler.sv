@@ -1,7 +1,7 @@
 `include "defines.sv"
 
 module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] SW_input, input logic AS_L, input logic WE_L, input logic IO_Select, input logic [31:0] Address, input logic [31:0] IO_data_in, input logic [3:0] byte_enable,
-                    output logic [6:0] HEX0_output, output logic [6:0] HEX1_output, output logic [6:0] HEX2_output, output logic [6:0] HEX3_output, output logic [6:0] HEX4_output, output logic [6:0] HEX5_output, output logic [8:0] LEDR_output, output logic [31:0] IO_data_out, output logic UART_Rx, output logic UART_Tx,
+                    output logic [6:0] HEX0_output, output logic [6:0] HEX1_output, output logic [6:0] HEX2_output, output logic [6:0] HEX3_output, output logic [6:0] HEX4_output, output logic [6:0] HEX5_output, output logic [8:0] LEDR_output, output logic [31:0] IO_data_out, /*output logic UART_Rx, output logic UART_Tx,*/
     output logic RS_pin,
     output logic E_pin,
     output logic RW_pin,
@@ -14,14 +14,14 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
     reg [8:0]   LEDR_writedata;
     reg [31:0]  IO_writedata, UART_data_out;
     logic LCD_WriteEnable, LCD_CommandOrDisplayData;
-
+    /*
     OnChipM68xxIO UART_CONTROLLER (
         .IOSelect(IO_Select),
         .Clk(Clock),
         .Reset_L(Reset_L),
         .Clock_50Mhz(Clock),
         .RS232_RxData(UART_Rx),
-        .UDS_L(~byte_enable[0]),
+        .UDS_L(1'b0),
         .WE_L(WE_L),
         .AS_L(AS_L),
         .Address(Address),
@@ -29,7 +29,7 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
         .RS232_TxData(UART_Tx),
         .ACIA_IRQ(),
         .DataOut(UART_data_out)
-    );
+    );*/
 
     LCD_Controller LCD (
         .Clk(Clock),
@@ -117,31 +117,30 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
         ledr_enable         <= 0;
         LCD_WriteEnable     <= 0;
         LCD_CommandOrDisplayData <= 0;
-
-        if (Address[15:0] == 16'h0000) begin // we are reading from switches
-            if ((AS_L == 0) && (WE_L == 1)) begin
-                IO_writedata    <= SW_input;
-            end
-        end else if (Address[15:0] == 16'h0004) begin // we are writing to LEDs
-            if ((AS_L == 0) && (WE_L == 0)) begin
-                ledr_enable <= 1;
-            end
-        end else if (Address[15:0] == 16'h0008) begin // we are writing to HEX display
-            if ((AS_L == 0) && (WE_L == 0)) begin
-                hex_enable <= 1;
-            end
-        end else if (Address[15:0] == 16'h000C) begin
-            if ((AS_L == 0) && (WE_L == 0)) begin
-                LCD_WriteEnable <= 1;
-                LCD_CommandOrDisplayData <= 0;
-            end
-        end else if (Address[15:0] == 16'h0010) begin
-            if ((AS_L == 0) && (WE_L == 0)) begin
-                LCD_WriteEnable <= 1;
-                LCD_CommandOrDisplayData <= 1;
-            end
-        end else if ((Address[15:4] == 12'h004) && (byte_enable[0] == 1) && (AS_L == 0)) begin
-            IO_writedata        <= UART_data_out;
+        if (IO_Select == 1'b1) begin
+            if (Address[15:0] == 16'h0000) begin // we are reading from switches
+                if ((AS_L == 0) && (WE_L == 1)) begin
+                    IO_writedata    <= SW_input;
+                end
+            end else if (Address[15:0] == 16'h0004) begin // we are writing to LEDs
+                if ((AS_L == 0) && (WE_L == 0)) begin
+                    ledr_enable <= 1;
+                end
+            end else if (Address[15:0] == 16'h0008) begin // we are writing to HEX display
+                if ((AS_L == 0) && (WE_L == 0)) begin
+                    hex_enable <= 1;
+                end
+            end else if (Address[15:0] == 16'h000C) begin
+                if ((AS_L == 0) && (WE_L == 0)) begin
+                    LCD_WriteEnable <= 1;
+                    LCD_CommandOrDisplayData <= 0;
+                end
+            end else if (Address[15:0] == 16'h0010) begin
+                if ((AS_L == 0) && (WE_L == 0)) begin
+                    LCD_WriteEnable <= 1;
+                    LCD_CommandOrDisplayData <= 1;
+                end
+            end 
         end
     end
 endmodule: IO_Handler
