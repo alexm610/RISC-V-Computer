@@ -21,7 +21,7 @@ module risc_v_core (
     //inout logic PS2_DAT
 );
 
-    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select;
+    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select;
     logic [7:0] data_out_RS232;
     logic CLOCK_25;
     logic [3:0] byte_enable;
@@ -37,7 +37,7 @@ module risc_v_core (
     logic VGA_BLANK, VGA_SYNC;
     logic [2:0] into_vga_colour;
     logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select;
-    logic [31:0] data_out_KEYBOARD;
+    logic [31:0] data_out_KEYBOARD, data_out_EXP;
 
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
@@ -65,7 +65,8 @@ module risc_v_core (
         .IO_Select_H(IO_Select),
         .Graphics_Select_H(Graphics_Select),
         .Keyboard_Select_H(Keyboard_Select),
-        .UART_Select_H(UART_Select)
+        .UART_Select_H(UART_Select),
+        .ExpAccel_Select_H(Exponent_Accelerator_Select)
     );
 
     data_bus_multiplexer DATABUS_MULTIPLEXER (
@@ -74,11 +75,13 @@ module risc_v_core (
         .Select_ROM(ROM_Select),
         .Select_KEYBOARD(Keyboard_Select),
         .Select_UART(UART_Select),
+        .Select_EXP(Exponent_Accelerator_Select),
         .DataIn_KEYBOARD(data_out_KEYBOARD),
         .DataIn_SRAM(data_out_SRAM),
         .DataIn_IO(data_out_IO),
         .DataIn_ROM(instruction),
         .DataIn_UART(data_out_UART),
+        .DataIn_EXP(data_out_EXP),
         .DataOut_CPU(data_in)
     );
 
@@ -163,6 +166,17 @@ module risc_v_core (
         .VGA_B(VGA_B_10),
         .*
     );  
+
+    exponent_accelerator EXP_ACCELERATOR_0 (
+        .clk(CLOCK_50),
+        .reset_n(Reset_L),
+        .exp_select(Exponent_Accelerator_Select),
+        .WE_L(WE_L),
+        .AS_L(AS_L),
+        .addr(address[3:0]),
+        .writedata(data_out),
+        .readdata(data_out_EXP)
+    );  
 endmodule: risc_v_core
 
 module data_bus_multiplexer (
@@ -171,6 +185,8 @@ module data_bus_multiplexer (
     input logic         Select_ROM,
     input logic         Select_KEYBOARD,
     input logic         Select_UART,
+    input logic         Select_EXP,
+    input logic [31:0]  DataIn_EXP,
     input logic [31:0]  DataIn_UART,
     input logic [31:0]  DataIn_KEYBOARD,
     input logic [31:0]  DataIn_SRAM,
@@ -196,6 +212,10 @@ module data_bus_multiplexer (
 
         if (Select_KEYBOARD == 1) begin
             DataOut_CPU <= DataIn_KEYBOARD;
+        end
+
+        if (Select_EXP == 1) begin
+            DataOut_CPU     <= DataIn_EXP;
         end
     end
 endmodule: data_bus_multiplexer

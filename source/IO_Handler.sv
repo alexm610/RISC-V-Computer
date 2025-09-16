@@ -14,22 +14,6 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
     reg [8:0]   LEDR_writedata;
     reg [31:0]  IO_writedata, UART_data_out;
     logic LCD_WriteEnable, LCD_CommandOrDisplayData;
-    /*
-    OnChipM68xxIO UART_CONTROLLER (
-        .IOSelect(IO_Select),
-        .Clk(Clock),
-        .Reset_L(Reset_L),
-        .Clock_50Mhz(Clock),
-        .RS232_RxData(UART_Rx),
-        .UDS_L(1'b0),
-        .WE_L(WE_L),
-        .AS_L(AS_L),
-        .Address(Address),
-        .DataIn(IO_data_in[7:0]),
-        .RS232_TxData(UART_Tx),
-        .ACIA_IRQ(),
-        .DataOut(UART_data_out)
-    );*/
 
     LCD_Controller LCD (
         .Clk(Clock),
