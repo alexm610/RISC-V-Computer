@@ -4,6 +4,7 @@ module cpu (
     input logic         Clock,
     input logic         Reset_L,
     input logic         DTAck,
+    input logic         IRQ,
     input logic [31:0]  Instruction,
     input logic [31:0]  DataBus_In,
     output logic        AS_L,

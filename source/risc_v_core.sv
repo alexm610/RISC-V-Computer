@@ -21,7 +21,7 @@ module risc_v_core (
     //inout logic PS2_DAT
 );
 
-    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select;
+    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select, vga_ready;
     logic [7:0] data_out_RS232;
     logic CLOCK_25;
     logic [3:0] byte_enable;
@@ -36,8 +36,9 @@ module risc_v_core (
     logic [9:0] VGA_R_10, VGA_G_10, VGA_B_10;
     logic VGA_BLANK, VGA_SYNC;
     logic [2:0] into_vga_colour;
-    logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select;
+    logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select, IRQ_timer;
     logic [31:0] data_out_KEYBOARD, data_out_EXP;
+    logic [31:0] dataa_out_UART;
 
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
@@ -48,6 +49,7 @@ module risc_v_core (
         .Clock(CLOCK_50),
         .Reset_L(KEY[0]),
         .DTAck(1'b1),
+        .IRQ(IRQ_timer),
         .Instruction(instruction),
         .DataBus_In(data_in),
         .AS_L(AS_L),
@@ -125,7 +127,8 @@ module risc_v_core (
         .RS_pin(GPIO_1[0]),
         .E_pin(GPIO_1[1]),
         .RW_pin(GPIO_1[2]),
-        .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]})
+        .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]}),
+        .IRQ_timer0_L(IRQ_timer)
     );
 
     uart_controller UART_0 (

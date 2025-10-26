@@ -5,15 +5,29 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
     output logic RS_pin,
     output logic E_pin,
     output logic RW_pin,
-    output logic [7:0] LCD_DataOut                    
+    output logic [7:0] LCD_DataOut,
+    output logic IRQ_timer0_L                  
 );
 
     reg         hex_enable, ledr_enable, IO_data_out_enable;
     wire [6:0]  hex0_wire, hex1_wire, hex2_wire, hex3_wire, hex4_wire, hex5_wire;
     reg [6:0]   HEX0_writedata, HEX1_writedata, HEX2_writedata, HEX3_writedata, HEX4_writedata, HEX5_writedata;
     reg [8:0]   LEDR_writedata;
-    reg [31:0]  IO_writedata, UART_data_out;
+    reg [31:0]  IO_writedata, UART_data_out, timer0_writedata;
     logic LCD_WriteEnable, LCD_CommandOrDisplayData;
+    logic timer_0_control_enable, timer_0_data_enable;
+
+    timer TIMER_0 (
+        .clk(Clock),
+        .reset_n(Reset_L),
+        .WE_L(WE_L),
+        .AS_L(AS_L),
+        .data_reg_select(timer_0_data_enable),
+        .control_reg_select(timer_0_control_enable),
+        .data_in(IO_data_in),
+        .data_out(timer0_writedata),
+        .irq_out(IRQ_timer0_L)
+    );
 
     LCD_Controller LCD (
         .Clk(Clock),
@@ -101,6 +115,9 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
         ledr_enable         <= 0;
         LCD_WriteEnable     <= 0;
         LCD_CommandOrDisplayData <= 0;
+        timer_0_control_enable <= 0;
+        timer_0_data_enable     <= 0;
+
         if (IO_Select == 1'b1) begin
             if (Address[15:0] == 16'h0000) begin // we are reading from switches
                 if ((AS_L == 0) && (WE_L == 1)) begin
@@ -123,6 +140,18 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
                 if ((AS_L == 0) && (WE_L == 0)) begin
                     LCD_WriteEnable <= 1;
                     LCD_CommandOrDisplayData <= 1;
+                end
+            end else if (Address[15:0] == 16'h0100) begin // accessing timer 0 data register
+                if ((AS_L == 0) && (WE_L == 0)) begin  // writing to timer; ie., setting timer countdown value
+                    timer_0_data_enable <= 1;
+                end 
+            end else if (Address[15:0] == 16'h0104) begin // accessing timer 0 control register
+                if ((AS_L == 0)) begin 
+                    timer_0_control_enable <= 1;
+
+                    if (WE_L == 1) begin
+                        IO_writedata <= timer0_writedata; // if we happen to be reading, then set IO output data bus to the timer0 output data bus (the timer module should know to report back the contents of the control register)
+                    end
                 end
             end 
         end
