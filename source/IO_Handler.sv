@@ -142,11 +142,15 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
                     LCD_CommandOrDisplayData <= 1;
                 end
             end else if (Address[15:0] == 16'h0100) begin // accessing timer 0 data register
-                if ((AS_L == 0) && (WE_L == 0)) begin  // writing to timer; ie., setting timer countdown value
+                if (AS_L == 0) begin  // writing to timer; ie., setting timer countdown value
                     timer_0_data_enable <= 1;
+
+                    if (WE_L == 1) begin
+                        IO_writedata <= timer0_writedata;
+                    end
                 end 
             end else if (Address[15:0] == 16'h0104) begin // accessing timer 0 control register
-                if ((AS_L == 0)) begin 
+                if (AS_L == 0) begin 
                     timer_0_control_enable <= 1;
 
                     if (WE_L == 1) begin

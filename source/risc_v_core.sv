@@ -131,6 +131,7 @@ module risc_v_core (
         .IRQ_timer0_L(IRQ_timer)
     );
 
+    /*
     uart_controller UART_0 (
         .clk(CLOCK_50),
         .reset(~Reset_L),
@@ -143,7 +144,7 @@ module risc_v_core (
         .tx(GPIO_1[35]),
         .rx(GPIO_0[35])
     );
-           
+    */     
     vga_control VGA_CONTROL (
         .clk(CLOCK_50),
         .rst_n(Reset_L),
@@ -170,7 +171,7 @@ module risc_v_core (
         .*
     );  
 
-    exponent_accelerator EXP_ACCELERATOR_0 (
+    /*exponent_accelerator EXP_ACCELERATOR_0 (
         .clk(CLOCK_50),
         .reset_n(Reset_L),
         .exp_select(Exponent_Accelerator_Select),
@@ -179,7 +180,7 @@ module risc_v_core (
         .addr(address[3:0]),
         .writedata(data_out),
         .readdata(data_out_EXP)
-    );  
+    );*/  
 endmodule: risc_v_core
 
 module data_bus_multiplexer (

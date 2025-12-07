@@ -34,7 +34,7 @@ module timer (
                 end
             end else if ((WE_L == 1) && (AS_L == 0)) begin
                 if (data_reg_select == 1) begin
-                    data_out <= data_reg;
+                    data_out <= Timer;
                 end
 
                 if (control_reg_select == 1) begin

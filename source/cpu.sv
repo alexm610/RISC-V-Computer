@@ -64,7 +64,6 @@ module cpu (
     assign imm_J_TYPE           = {Current_Instruction[31], Current_Instruction[19:12], Current_Instruction[20], Current_Instruction[30:21], 1'b0};
     assign imm_U_TYPE           = Current_Instruction[31:12];
     assign Address              = instruction_fetch ? Program_Counter : datapath_out;
-    //assign DataBus_Out          = rs2_output;
     
     always @(*) begin
         case (Byte_Enable) 
