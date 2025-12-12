@@ -6,7 +6,7 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
     output logic E_pin,
     output logic RW_pin,
     output logic [7:0] LCD_DataOut,
-    output logic IRQ_timer0_L                  
+    output logic IRQ_timer0_H                  
 );
 
     reg         hex_enable, ledr_enable, IO_data_out_enable;
@@ -26,7 +26,7 @@ module IO_Handler   (input logic Clock, input logic Reset_L, input logic [9:0] S
         .control_reg_select(timer_0_control_enable),
         .data_in(IO_data_in),
         .data_out(timer0_writedata),
-        .irq_out(IRQ_timer0_L)
+        .irq_out(IRQ_timer0_H)
     );
 
     LCD_Controller LCD (

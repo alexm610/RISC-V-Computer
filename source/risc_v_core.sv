@@ -49,7 +49,7 @@ module risc_v_core (
         .Clock(CLOCK_50),
         .Reset_L(KEY[0]),
         .DTAck(1'b1),
-        .IRQ(IRQ_timer),
+        .IRQ_Timer_H(IRQ_timer),
         .Instruction(instruction),
         .DataBus_In(data_in),
         .AS_L(AS_L),
@@ -128,7 +128,7 @@ module risc_v_core (
         .E_pin(GPIO_1[1]),
         .RW_pin(GPIO_1[2]),
         .LCD_DataOut({GPIO_1[3], GPIO_1[4], GPIO_1[5], GPIO_1[6], GPIO_1[7], GPIO_1[8], GPIO_1[9], GPIO_1[10]}),
-        .IRQ_timer0_L(IRQ_timer)
+        .IRQ_timer0_H(IRQ_timer)
     );
 
     /*

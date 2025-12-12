@@ -4,7 +4,7 @@ module cpu (
     input logic         Clock,
     input logic         Reset_L,
     input logic         DTAck,
-    input logic         IRQ,
+    input logic         IRQ_Timer_H,
     input logic [31:0]  Instruction,
     input logic [31:0]  DataBus_In,
     output logic        AS_L,
@@ -17,21 +17,34 @@ module cpu (
 );
 
     // CPU signals
-    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1} State;
+    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1} State;
     logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch, save_pc;
+    logic           CSR_process;
+    logic           CSR_WE_L;
     logic [1:0]     Program_Counter_Increment;
     logic [2:0]     funct3;
     logic [6:0]     funct7, opcode;
     logic [11:0]    imm_I_TYPE, imm_S_TYPE, imm_B_TYPE;
+    logic [11:0]    CSR_address;
     logic [19:0]    imm_U_TYPE;
     logic [20:0]    imm_J_TYPE;
     logic [31:0]    datapath_in, Program_Counter, Current_Instruction;
-
+    logic [31:0]    CSR_read_data, CSR_write_data, CSR_read_data_temp;
+    logic [31:0]    imm_CSR_TYPE;
     // Data path signals
     logic           reg_bank_write, alu_SRC, negative, overflow, zero;
     logic [3:0]     alu_OP;
     logic [4:0]     rs1, rs2, rd0;
     logic [31:0]    writedata, datapath_out, imm, rs2_output;
+    logic MIE, MPIE, MSIE, MTIE, MEIE, MSIP, MTIP, MEIP;
+    logic [1:0] MPP, MTVEC_MODE;
+    logic [29:0] MTVEC_BASE;
+    logic [31:0] MEPC, MCAUSE;
+
+    logic [31:0] MSTATUS_temp;
+    logic IRQ_pending;
+    logic [31:0]    interrupt_ID;
+    logic [11:0]    pending_interrupt_mask;
 
     datapath HW (
         .clk(Clock),
@@ -51,6 +64,31 @@ module cpu (
         .rs2(rs2_output)
     );
 
+    csr CSR (
+        .clock(Clock),
+        .reset_L(Reset_L),
+        .WE_L(CSR_WE_L),
+        .address(CSR_address),
+        .write_data(CSR_write_data),
+        .read_data(CSR_read_data),
+        .irq_software(1'b0),
+        .irq_timer(IRQ_Timer_H),
+        .irq_external(1'b0),
+        .mstatus_MIE(MIE),
+        .mstatus_MPIE(MPIE),
+        .mstatus_MPP(MPP),
+        .mie_MSIE(MSIE),
+        .mie_MTIE(MTIE),
+        .mie_MEIE(MEIE),
+        .mip_MSIP(MSIP),
+        .mip_MTIP(MTIP),
+        .mip_MEIP(MEIP),
+        .mtvec_MODE(MTVEC_MODE),
+        .mtvec_BASE(MTVEC_BASE),
+        .mepc_REG(MEPC),
+        .mcause_REG(MCAUSE)
+    );
+
     assign datapath_in          = mem_or_reg ? DataBus_In : datapath_out;
     assign rs1                  = Current_Instruction[19:15];
     assign rs2                  = Current_Instruction[24:20];
@@ -64,6 +102,24 @@ module cpu (
     assign imm_J_TYPE           = {Current_Instruction[31], Current_Instruction[19:12], Current_Instruction[20], Current_Instruction[30:21], 1'b0};
     assign imm_U_TYPE           = Current_Instruction[31:12];
     assign Address              = instruction_fetch ? Program_Counter : datapath_out;
+    //assign CSR_address          = Current_Instruction[31:20];
+    assign imm_CSR_TYPE         = {{27{1'b0}}, rs1};
+    assign IRQ_pending          = ((MIE == 1'b1) && (((MSIE == 1) && (MSIP == 1)) || ((MTIE == 1) && (MTIP == 1)) || ((MEIE == 1) && (MEIP == 1)))) ? 1'b1 : 1'b0;
+    //assign interrupt_ID         = 32'h0;
+    assign pending_interrupt_mask   = {MEIP & MEIE, 3'h0, MTIE & MTIP, 3'h0, MSIE & MSIP, 3'h0};
+
+    always @(*) begin
+        if (pending_interrupt_mask[11]) begin
+            interrupt_ID = 32'd11; // MEIP
+        end else if (pending_interrupt_mask[7]) begin
+            interrupt_ID = 32'd7; // MTIP
+        end else if (pending_interrupt_mask[3]) begin
+            interrupt_ID = 32'd3; // MSIP
+        end else begin
+            interrupt_ID = 32'd0; // no interrupt
+        end 
+    end
+    
     
     always @(*) begin
         case (Byte_Enable) 
@@ -153,6 +209,8 @@ module cpu (
             writedata <= Program_Counter + 32'h4;
         end else if (load_upper_imm == 1) begin
             writedata <= imm;
+        end else if (CSR_process == 1) begin
+            writedata <= CSR_read_data_temp;
         end else begin  
             writedata <= datapath_in;
         end
@@ -176,6 +234,11 @@ module cpu (
             Program_Counter_Increment   <= 2'b00;
             Reset_Out                   <= 0;
             instruction_fetch           <= 1;
+            CSR_WE_L                    <= 1;
+            CSR_process                 <= 0;
+            CSR_read_data_temp          <= 32'h0;
+            CSR_write_data              <= 32'h0;
+            CSR_address                 <= Current_Instruction[31:20];
         end else begin
             case (State) 
                 INITIALIZE: begin
@@ -263,12 +326,134 @@ module cpu (
                             imm             <= (imm_U_TYPE << 12) + Program_Counter;
                             load_upper_imm  <= 1'b1; 
                         end 
+                        `CSR_TYPE: begin
+                            CSR_address          <= Current_Instruction[31:20];
+                            case (funct3) 
+                                `CSRRW: begin
+                                    State       <= CSRRW_WRITE_1;
+                                    CSR_process <= 1;
+                                    CSR_read_data_temp <= CSR_read_data; // save the initial value of whichever CSR we are copying from
+                                end
+                                `CSRRS: begin
+                                    State       <= CSRRS_WRITE_1;
+                                    CSR_process <= 1;
+                                    CSR_read_data_temp <= CSR_read_data;
+                                end
+                                `CSRRC: begin
+                                    State       <= CSRRC_WRITE_1;
+                                    CSR_process <= 1;
+                                    CSR_read_data_temp <= CSR_read_data;
+                                end
+                                `CSRRWI: begin
+                                    State       <= CSRRWI_1;
+                                    CSR_process <= 1;
+                                    // CSR_read_data_temp  <= CSR_read_data;
+                                    // CSR_write_data <= imm_CSR_TYPE;
+                                    // CSR_WE_L    <= 0;
+                                end
+                                `CSRRSI: begin
+                                    State       <= CSRRSI_1;
+                                    CSR_process <= 1;
+                                    // CSR_read_data_temp  <= CSR_read_data;
+                                    // CSR_write_data <= imm_CSR_TYPE | CSR_read_data;
+                                    // CSR_WE_L    <= 0;
+                                end
+                                `CSRRCI: begin
+                                    State           <= CSRRCI_1;
+                                    CSR_process     <= 1;
+                                    // CSR_read_data_temp  <= CSR_read_data;
+                                    // CSR_write_data  <= CSR_read_data & (~imm_CSR_TYPE);
+                                    // CSR_WE_L        <= 0;
+                                end
+                                `MRET: begin
+                                    if (Current_Instruction == 32'h30200073) begin
+                                        State               <= MRET_1;
+                                        CSR_write_data      <= {26'd0, 1'b1, 3'b000, MPIE, 3'b000};
+                                        //MSTATUS_temp[3]    <= MPIE;
+                                        //MSTATUS_temp[7]     <= 1'b1;
+                                        CSR_address <= 12'h300;
+                                        //CSR_write_data <= MSTATUS_temp;
+                                        CSR_WE_L    <= 1'b1; 
+                                    end
+                                end
+                            endcase
+                        end
                         7'b0000000: begin
                             Conduit <= 1'b1;
                             State <= START;
                         end
                         default: State  <= START;
                     endcase
+                end
+                CSRRCI_1: begin
+                    State <= CSR_WRITE_BACK;
+                    CSR_read_data_temp  <= CSR_read_data;
+                    CSR_write_data  <= CSR_read_data & (~imm_CSR_TYPE);
+                    CSR_WE_L        <= 0;
+                end
+                CSRRSI_1: begin
+                    State <= CSR_WRITE_BACK;
+                    CSR_read_data_temp  <= CSR_read_data;
+                    CSR_write_data <= imm_CSR_TYPE | CSR_read_data;
+                    CSR_WE_L    <= 0;
+                end
+                CSRRWI_1: begin
+                    State <= CSR_WRITE_BACK;
+                    CSR_read_data_temp  <= CSR_read_data;
+                    CSR_write_data <= imm_CSR_TYPE;
+                    CSR_WE_L    <= 0;
+                end
+                MRET_1: begin
+                    State <= MRET_2;
+                    CSR_WE_L <= 1'b0;
+
+                end
+                MRET_2: begin
+                    State <= INCREMENT_PC;
+
+                    CSR_WE_L <= 1'b1;
+                    Program_Counter <= MEPC;
+                end
+                CSRRC_WRITE_1: begin
+                    State       <= CSRRC_WRITE_2;
+                    imm         <= 32'h0;
+                    alu_SRC     <= 1'b0;
+                    alu_OP      <= {1'b0, `ADDSUB};
+                    CSR_read_data_temp <= CSR_read_data;
+                end
+                CSRRC_WRITE_2: begin
+                    State       <= CSR_WRITE_BACK;
+                    CSR_write_data <= CSR_read_data_temp & (~datapath_out);
+                    CSR_WE_L    <= 0;
+                end
+                CSRRS_WRITE_1: begin
+                    State       <= CSRRS_WRITE_2;
+                    imm         <= 32'h0;
+                    alu_SRC     <= 1'b0;
+                    alu_OP      <= {1'b0, `ADDSUB};
+                    CSR_read_data_temp <= CSR_read_data;
+                end
+                CSRRS_WRITE_2: begin
+                    State       <= CSR_WRITE_BACK;
+                    CSR_write_data  <= CSR_read_data_temp | datapath_out; 
+                    CSR_WE_L    <= 0;
+                end
+                CSRRW_WRITE_1: begin
+                    State       <= CSRRW_WRITE_2;
+                    imm         <= 32'h0; // we don't want anything added to whatever is in RS1, ie., RS1 + 0 => output of datapath, to be written back to CSR
+                    alu_SRC     <= 1'b0;
+                    alu_OP      <= {1'b0, `ADDSUB};
+                end
+                CSRRW_WRITE_2: begin
+                    State       <= CSR_WRITE_BACK;
+                    CSR_write_data  <= datapath_out;
+                    CSR_WE_L    <= 0;   // write the output of the datapath to CSR
+                end
+                CSR_WRITE_BACK: begin
+                    State       <= COMPLETE;
+                    Program_Counter_Increment <= 2'b00;
+                    reg_bank_write <= 1;    // writedata bus into datapath and rd0 should be set with CSR data and target destination register, respectively
+                    CSR_WE_L    <= 1;
                 end
                 WRITE_BACK: begin
                     State           <= COMPLETE; 
@@ -278,15 +463,6 @@ module cpu (
                     Program_Counter_Increment <= 2'b00;
                 end
                 COMPLETE: begin
-                    State <= INCREMENT_PC;
-                    // disable control signals in preparation for next instruction cycle
-                    reg_bank_write  <= 1'b0;
-                    mem_or_reg      <= 1'b0;
-                    WE_L            <= 1'b1;
-                    AS_L            <= 1'b1;
-                    load_upper_imm  <= 0;
-                    instruction_fetch <= 1;
-                    jump_link       <= 0;
                     if (Program_Counter_Increment == 2'b00) begin
                         // increment program counter by 4
                         Program_Counter <= Program_Counter + 32'h4;
@@ -297,10 +473,79 @@ module cpu (
                         // set program counter to output of data path
                         Program_Counter <= datapath_out;
                     end
+
+                    if (IRQ_pending == 0) begin
+                        State <= INCREMENT_PC;
+                        // disable control signals in preparation for next instruction cycle
+                        reg_bank_write  <= 1'b0;
+                        mem_or_reg      <= 1'b0;
+                        WE_L            <= 1'b1;
+                        AS_L            <= 1'b1;
+                        load_upper_imm  <= 0;
+                        instruction_fetch <= 1;
+                        jump_link       <= 0;
+                        CSR_process     <= 0;
+                        // if (Program_Counter_Increment == 2'b00) begin
+                        //     // increment program counter by 4
+                        //     Program_Counter <= Program_Counter + 32'h4;
+                        // end else if (Program_Counter_Increment == 2'b01) begin
+                        //     // increment program counter by immediate
+                        //     Program_Counter <= Program_Counter + imm;
+                        // end else if (Program_Counter_Increment == 2'b10) begin
+                        //     // set program counter to output of data path
+                        //     Program_Counter <= datapath_out;
+                        // end
+                    end else begin
+                        State               <= IRQ_1;
+                        instruction_fetch   <= 1;
+                        MSTATUS_temp        <= 32'h0;
+                        CSR_write_data      <= Program_Counter;
+                        CSR_address         <= 12'h341; 
+                        //CSR_WE_L            <= 1'b0;
+                    end
+                end
+                IRQ_1: begin
+                    State           <= IRQ_2;
+                    //MSTATUS_temp[3] <= 1'b0; // clear MIE bit
+                    //MSTATUS_temp[7] <= MIE;     // give MPIE the original value of MIE
+                    //CSR_address     <= 12'h300; // mstatus address
+                    CSR_WE_L                <= 1'b0; // write to MEPC
+                end
+                IRQ_2: begin
+                    State <= IRQ_3;
+                    CSR_write_data      <= {26'd0, MIE, 3'b000, 1'b0, 3'b000};
+                    CSR_address         <= 12'h300; // writing to MSTATUS
+                    CSR_WE_L            <= 1'b1;
+                end
+                IRQ_3: begin
+                    State <= IRQ_4;
+                    //CSR_address         <=12'h342;
+                    //CSR_write_data      <= {1'b1, {27{1'b0}}, interrupt_ID[3:0]};
+                    CSR_WE_L        <= 1'b0; // write to MSTATUS
+                end
+                IRQ_4: begin
+                    State <= IRQ_5;
+
+                    CSR_address     <= 12'h342; // writing to MCAUSE
+                    CSR_write_data  <= {1'b1, 27'b0, interrupt_ID[3:0]};
+                    CSR_WE_L    <= 1'b1;
+                end
+                IRQ_5: begin
+                    State <= INCREMENT_PC;
+                    CSR_WE_L            <= 1'b0;
+
+                    if (MTVEC_MODE[0] == 1'b0) begin
+                        // direct mode 
+                        Program_Counter <= {MTVEC_BASE, 2'b00};
+                    end else begin
+                        // vectored mode 
+                        Program_Counter <= {MTVEC_BASE, 2'b00} + (4 * interrupt_ID);
+                    end
                 end
                 INCREMENT_PC: begin
                     State   <= LATCH_INSTRUCTION;
                     // delay one clock cycle for new instruction to appear on output bus of SRAM
+                    CSR_WE_L <= 1'b1;
                 end
                 LATCH_INSTRUCTION: begin
                     State <= START;

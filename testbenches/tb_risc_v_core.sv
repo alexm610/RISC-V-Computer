@@ -15,7 +15,7 @@ module tb_risc_v_core();
     int counter = 0;
     int correct_answer = 0;
     logic error;
-    reg [31:0] mem_file_1 [0:255];
+    reg [31:0] mem_file_1 [0:1023];
 
     risc_v_core dut   (.*);
 
@@ -73,7 +73,7 @@ module tb_risc_v_core();
         KEY[0] = 0; #2;
         KEY[0] = 1; #10;
 
-        wait (dut.address == 32'h00000114);
+        wait (dut.address == 32'h01140000);
         
         //@ (posedge LEDR[9]);
         #4;

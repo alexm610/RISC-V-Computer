@@ -8,6 +8,18 @@
 `define J_TYPE_JAL      7'b1101111
 `define J_TYPE_JALR     7'b1100111
 `define LOAD_TYPE       7'b0000011
+`define CSR_TYPE        7'b1110011
+
+/* funct3 */
+`define CSRRW           3'b001
+`define CSRRS           3'b010
+`define CSRRC           3'b011
+`define CSRRWI          3'b101
+`define CSRRSI          3'b110
+`define CSRRCI          3'b111
+`define ECALL           3'b000
+`define EBREAK          3'b000
+`define MRET            3'b000
 
 /* ALUop */
 `define ADDSUB          3'b000
