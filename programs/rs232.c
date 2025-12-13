@@ -1,7 +1,5 @@
 #include "instructions.h"
-
-#define UART_TX_BUSY    0x02
-#define UART_RX_READY   0x01
+#include "rs232.h"
 
 // blocking
 void uart_putch(char c) {

@@ -1,16 +1,11 @@
-#include "instructions.h"
 #include <stdint.h>
+#include "instructions.h"
+#include "vga.h"
+#include "rs232.h"
+#include "lcd_display.h"
 
-volatile uint32_t timer_ticks = 0;
+extern volatile uint32_t timer_ticks;
 
-void __attribute__((interrupt)) timer_irq_handler(void) {
-    timer_ticks++;
-    Timer0_Control_Register = 0x3;
-}
-
-void __attribute__((interrupt)) default_irq_handler(void) {
-    ;;
-}
 int main(void) {
     char *message1 = "Hello Somya,";
 

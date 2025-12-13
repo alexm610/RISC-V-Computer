@@ -1,4 +1,5 @@
 #include "instructions.h"
+#include "lcd_display.h"
 
 void Wait1ms(void) {
     long int i;
