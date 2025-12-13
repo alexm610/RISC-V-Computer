@@ -62,8 +62,8 @@ module timer (
             // TIMER LOGIC (ONE SHOT)
             //-----------------------------------------
             else begin
-                timer_enable = control_reg[0];
-                irq_enable   = control_reg[1];
+                timer_enable <= control_reg[0];
+                irq_enable   <= control_reg[1];
 
                 if (timer_enable && irq_out == 0) begin
                     // Only count if timer hasn't expired yet
