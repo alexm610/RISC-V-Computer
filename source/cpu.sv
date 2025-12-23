@@ -5,6 +5,7 @@ module cpu (
     input logic         Reset_L,
     input logic         DTAck,
     input logic         IRQ_Timer_H,
+    input logic         IRQ_UART_H,
     input logic [31:0]  Instruction,
     input logic [31:0]  DataBus_In,
     output logic        AS_L,
@@ -73,7 +74,7 @@ module cpu (
         .read_data(CSR_read_data),
         .irq_software(1'b0),
         .irq_timer(IRQ_Timer_H),
-        .irq_external(1'b0),
+        .irq_external(IRQ_UART_H),
         .mstatus_MIE(MIE),
         .mstatus_MPIE(MPIE),
         .mstatus_MPP(MPP),
@@ -238,12 +239,13 @@ module cpu (
             CSR_process                 <= 0;
             CSR_read_data_temp          <= 32'h0;
             CSR_write_data              <= 32'h0;
-            CSR_address                 <= Current_Instruction[31:20];
+            CSR_address                 <= 12'h0;//Current_Instruction[31:20];
+            Current_Instruction         <= 32'h00000013; // NOP
         end else begin
             case (State) 
                 INITIALIZE: begin
-                    State               <= START;
-                    Current_Instruction <= Instruction;
+                    State               <= INCREMENT_PC;
+                    //Current_Instruction <= Instruction;
                     Reset_Out           <= 1;
                     instruction_fetch   <= 1;
                     save_pc             <= 1;
@@ -327,22 +329,28 @@ module cpu (
                             load_upper_imm  <= 1'b1; 
                         end 
                         `CSR_TYPE: begin
-                            CSR_address          <= Current_Instruction[31:20];
+                            //CSR_address          <= Current_Instruction[31:20];
                             case (funct3) 
                                 `CSRRW: begin
                                     State       <= CSRRW_WRITE_1;
                                     CSR_process <= 1;
                                     CSR_read_data_temp <= CSR_read_data; // save the initial value of whichever CSR we are copying from
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRS: begin
                                     State       <= CSRRS_WRITE_1;
                                     CSR_process <= 1;
                                     CSR_read_data_temp <= CSR_read_data;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRC: begin
                                     State       <= CSRRC_WRITE_1;
                                     CSR_process <= 1;
                                     CSR_read_data_temp <= CSR_read_data;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRWI: begin
                                     State       <= CSRRWI_1;
@@ -350,6 +358,8 @@ module cpu (
                                     // CSR_read_data_temp  <= CSR_read_data;
                                     // CSR_write_data <= imm_CSR_TYPE;
                                     // CSR_WE_L    <= 0;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRSI: begin
                                     State       <= CSRRSI_1;
@@ -357,6 +367,8 @@ module cpu (
                                     // CSR_read_data_temp  <= CSR_read_data;
                                     // CSR_write_data <= imm_CSR_TYPE | CSR_read_data;
                                     // CSR_WE_L    <= 0;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRCI: begin
                                     State           <= CSRRCI_1;
@@ -364,6 +376,8 @@ module cpu (
                                     // CSR_read_data_temp  <= CSR_read_data;
                                     // CSR_write_data  <= CSR_read_data & (~imm_CSR_TYPE);
                                     // CSR_WE_L        <= 0;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `MRET: begin
                                     if (Current_Instruction == 32'h30200073) begin

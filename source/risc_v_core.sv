@@ -38,7 +38,8 @@ module risc_v_core (
     logic [2:0] into_vga_colour;
     logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select, IRQ_timer;
     logic [31:0] data_out_KEYBOARD, data_out_EXP;
-    logic [31:0] dataa_out_UART;
+    logic [31:0] data_out_UART;
+    logic IRQ_uart;
 
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
@@ -50,6 +51,7 @@ module risc_v_core (
         .Reset_L(KEY[0]),
         .DTAck(1'b1),
         .IRQ_Timer_H(IRQ_timer),
+        .IRQ_UART_H(1'b0),
         .Instruction(instruction),
         .DataBus_In(data_in),
         .AS_L(AS_L),
@@ -132,19 +134,19 @@ module risc_v_core (
     );
 
     /*
-    uart_controller UART_0 (
-        .clk(CLOCK_50),
-        .reset(~Reset_L),
+    uart_mmio_8bit UART_0 (
+        .CLOCK_50MHz(CLOCK_50),
+        .RESET_L(Reset_L),
         .AS_L(AS_L),
         .WE_L(WE_L),
-        .UART_SEL_H(UART_Select),
-        .addr(address>>2),
-        .wdata(data_out),
-        .rdata(data_out_UART),
-        .tx(GPIO_1[35]),
-        .rx(GPIO_0[35])
+        .Address(address),
+        .DataIn(data_out),
+        .DataOut(data_out_UART),
+        .uart_rx(GPIO_0[35]),
+        .uart_tx(GPIO_1[35])
     );
-    */     
+    */
+
     vga_control VGA_CONTROL (
         .clk(CLOCK_50),
         .rst_n(Reset_L),
@@ -220,6 +222,10 @@ module data_bus_multiplexer (
 
         if (Select_EXP == 1) begin
             DataOut_CPU     <= DataIn_EXP;
+        end
+
+        if (Select_UART == 1) begin
+            DataOut_CPU     <= DataIn_UART;
         end
     end
 endmodule: data_bus_multiplexer

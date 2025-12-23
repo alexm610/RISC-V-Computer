@@ -29,12 +29,12 @@ Begin
 -- decoder for the Baud Rate generator at 0x00400044 on D15-D8 and UDS = 0
 
 		if(IOSelect = '1') then
-			if((Address(31 downto 4) = X"0040004") and UDS_L = '0' and AS_L = '0') then	
-			    if((Address(3 downto 0) = X"0") OR (Address(3 downto 0) = X"2")) then
+			if((Address(31 downto 4) = X"0500001") and UDS_L = '0' and AS_L = '0') then	
+			    if((Address(3 downto 0) = X"0") OR (Address(3 downto 0) = X"4")) then
 					ACIA1_Port_Enable <= '1' ;
 				end if ;
 				
-				if(Address(3 downto 0) = X"4") then
+				if(Address(3 downto 0) = X"8") then
 					ACIA1_Baud_Enable <= '1' ;
 				end if ;
 			end if ;			

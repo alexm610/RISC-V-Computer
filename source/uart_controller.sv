@@ -1,164 +1,308 @@
-// uart_controller.sv
-module uart_controller #(
-    parameter CLK_FREQ = 50_000_000,  // System clock frequency in Hz
-    parameter BAUD_RATE = 115200      // UART baud rate
+// uart_mmio_8bit.sv
+// MMIO UART (8-N-1), polled, 8-bit CPU bus: Address/AS_L/WE_L/DataIn/DataOut
+
+module uart_mmio_8bit #(
+    parameter logic [31:0] BASE_ADDR = 32'h1000_0000,
+    parameter int unsigned CLK_HZ    = 50_000_000,
+    parameter int unsigned BAUD      = 115_200
 ) (
-    input  logic        clk,
-    input  logic        reset,
+    input  logic        CLOCK_50MHz,
+    input  logic        RESET_L,
 
-    // Bus interface
-    input  logic        AS_L,         // Address strobe (active low)
-    input  logic        WE_L,         // Write enable (active low)
-    input  logic        UART_SEL_H,   // Chip select (active high)
-    input  logic [1:0]  addr,         // 0 = DATA, 1 = STATUS
-    input  logic [31:0] wdata,
-    output logic [31:0] rdata,
+    input  logic        AS_L,          // active-low address strobe
+    input  logic        WE_L,          // active-low write enable (0=write, 1=read)
+    input  logic [31:0] Address,       // byte address
+    input  logic [7:0]  DataIn,        // write data
+    output logic [7:0]  DataOut,       // read data (combinational)
 
-    // UART pins
-    output logic        tx,
-    input  logic        rx
+    input  logic        uart_rx,
+    output logic        uart_tx
 );
 
-    // ----------------------------------------------------------------
-    // Bus decode
-    // ----------------------------------------------------------------
-    logic write_en, read_en;
-    assign write_en = UART_SEL_H && !AS_L && !WE_L;
-    assign read_en  = UART_SEL_H && !AS_L &&  WE_L;
+    logic clk, reset_n;
+    assign clk     = CLOCK_50MHz;
+    assign reset_n = RESET_L;
 
-    // ----------------------------------------------------------------
-    // Baud generator
-    // ----------------------------------------------------------------
-    localparam int CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
-    logic [$clog2(CLKS_PER_BIT)-1:0] baud_cnt;
-    logic baud_tick;
+    // -----------------------------
+    // Address decode (16-byte window)
+    // -----------------------------
+    // Peripheral responds at BASE_ADDR .. BASE_ADDR+0xF
+    logic       bus_sel, bus_wr, bus_rd;
+    logic [3:0] off;
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            baud_cnt  <= 0;
-            baud_tick <= 0;
+    assign bus_sel = (~AS_L) && (Address[31:4] == BASE_ADDR[31:4]);
+    assign bus_wr  = bus_sel && (~WE_L);
+    assign bus_rd  = bus_sel && ( WE_L);
+    assign off     = Address[3:0];
+
+    localparam logic [3:0] REG_DATA   = 4'h0;
+    localparam logic [3:0] REG_STATUS = 4'h1;
+    localparam logic [3:0] REG_BAUD_L = 4'h2;
+    localparam logic [3:0] REG_BAUD_H = 4'h3;
+    localparam logic [3:0] REG_CTRL   = 4'h4;
+
+    // -----------------------------
+    // Default baud divisor
+    // -----------------------------
+    function automatic int unsigned calc_div(input int unsigned clk_hz, input int unsigned baud);
+        int unsigned q;
+        begin
+            q = (baud == 0) ? 0 : (clk_hz / baud);
+            calc_div = (q == 0) ? 0 : (q - 1);
+        end
+    endfunction
+
+    localparam int unsigned BAUDDIV_RESET = calc_div(CLK_HZ, BAUD);
+
+    // -----------------------------
+    // Registers / status
+    // -----------------------------
+    logic        tx_en, rx_en, loopback;
+    logic [15:0] bauddiv; // clocks_per_bit_minus_1
+
+    logic [7:0]  rx_data;
+    logic        rx_valid;
+    logic        rx_overrun_sticky;
+    logic        rx_frameerr_sticky;
+
+    // -----------------------------
+    // UART RX synchronizer
+    // -----------------------------
+    logic rx_ff1, rx_ff2;
+    always_ff @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            rx_ff1 <= 1'b1;
+            rx_ff2 <= 1'b1;
         end else begin
-            if (baud_cnt == CLKS_PER_BIT-1) begin
-                baud_cnt  <= 0;
-                baud_tick <= 1;
-            end else begin
-                baud_cnt  <= baud_cnt + 1;
-                baud_tick <= 0;
-            end
+            rx_ff1 <= uart_rx;
+            rx_ff2 <= rx_ff1;
         end
     end
 
-    // ----------------------------------------------------------------
-    // TX logic (blocking-friendly: assert busy immediately when CPU writes)
-    // ----------------------------------------------------------------
-    logic [10:0] tx_shift;   // {stop2, stop1, data[7:0], start}
-    logic [3:0]  tx_bit_cnt;
+    logic rx_in;
+    assign rx_in = loopback ? uart_tx : rx_ff2;
+
+    // -----------------------------
+    // TX engine (8N1)
+    // -----------------------------
     logic        tx_busy;
+    logic [3:0]  tx_bit_idx;   // 0..9
+    logic [9:0]  tx_shift;     // bit0=start, bits1..8=data, bit9=stop
+    logic [15:0] tx_cnt;       // countdown within a bit
 
-    assign tx = tx_shift[0];
+    // -----------------------------
+    // RX engine (8N1, mid-bit sample)
+    // -----------------------------
+    typedef enum logic [1:0] {RX_IDLE, RX_START, RX_DATA, RX_STOP} rx_state_t;
+    rx_state_t   rx_state;
+    logic [2:0]  rx_bit_idx;   // 0..7
+    logic [7:0]  rx_shift;
+    logic [15:0] rx_cnt;
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            tx_shift   <= 11'h7FF; // line idle = high
-            tx_bit_cnt <= 4'd0;
-            tx_busy    <= 1'b0;
-        end else begin
-            // If CPU issues a write to DATA and transmitter is idle, accept it
-            if (write_en && (addr == 2'd0) && !tx_busy) begin
-                // Frame: start(0), data[7:0], stop(1), stop(1)
-                tx_shift   <= {2'b11, wdata[7:0], 1'b0};
-                tx_bit_cnt <= 4'd0;
-                tx_busy    <= 1'b1; // IMMEDIATELY mark busy so CPU polling will see it next read
-            end
-            // Otherwise if transmitting, shift at baud rate
-            else if (tx_busy && baud_tick) begin
-                tx_shift   <= {1'b1, tx_shift[10:1]}; // shift right, fill with 1
-                tx_bit_cnt <= tx_bit_cnt + 4'd1;
-                if (tx_bit_cnt == 4'd10)
-                    tx_busy <= 1'b0; // finished
-            end
+    function automatic [15:0] half_div(input [15:0] div);
+        // div=(ticks_per_bit-1). half bit ~= (ticks_per_bit/2)-1
+        logic [15:0] ticks;
+        logic [15:0] half_ticks;
+        begin
+            ticks = div + 16'd1;
+            half_ticks = ticks >> 1;
+            if (half_ticks == 16'd0) half_div = 16'd0;
+            else half_div = half_ticks - 16'd1;
         end
-    end
+    endfunction
 
-    // ----------------------------------------------------------------
-    // RX logic (8-N-2)
-    // ----------------------------------------------------------------
-    logic rx_meta, rx_sync;
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            rx_meta <= 1'b1;
-            rx_sync <= 1'b1;
-        end else begin
-            rx_meta <= rx;
-            rx_sync <= rx_meta;
-        end
-    end
+    // -----------------------------
+    // Combinational read mux
+    // -----------------------------
+    always_comb begin
+        DataOut = 8'h00;
 
-    logic [3:0]  rx_bit_index;
-    logic [7:0]  rx_data_reg;
-    logic [$clog2(CLKS_PER_BIT)-1:0] rx_clk_cnt;
-    logic        rx_busy;
-    logic        rx_ready;
+        if (bus_sel && WE_L) begin
+            unique case (off)
+                REG_DATA:   DataOut = rx_data;
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            rx_busy      <= 1'b0;
-            rx_ready     <= 1'b0;
-            rx_bit_index <= 4'd0;
-            rx_clk_cnt   <= 0;
-            rx_data_reg  <= 8'd0;
-        end else begin
-            if (!rx_busy) begin
-                if (rx_sync == 1'b0) begin // start bit detected
-                    rx_busy      <= 1'b1;
-                    rx_bit_index <= 4'd0;
-                    rx_clk_cnt   <= CLKS_PER_BIT / 2; // sample mid start bit
+                REG_STATUS: begin
+                    DataOut        = 8'h00;
+                    DataOut[0]     = ~tx_busy;            // TX_READY
+                    DataOut[1]     = rx_valid;            // RX_VALID
+                    DataOut[2]     = rx_overrun_sticky;   // OVERRUN (sticky)
+                    DataOut[3]     = rx_frameerr_sticky;  // FRAME_ERR (sticky)
                 end
-            end else begin
-                if (rx_clk_cnt == CLKS_PER_BIT-1) begin
-                    rx_clk_cnt <= 0;
-                    rx_bit_index <= rx_bit_index + 4'd1;
-                    case (rx_bit_index)
-                        4'd0: ; // start
-                        4'd1: rx_data_reg[0] <= rx_sync;
-                        4'd2: rx_data_reg[1] <= rx_sync;
-                        4'd3: rx_data_reg[2] <= rx_sync;
-                        4'd4: rx_data_reg[3] <= rx_sync;
-                        4'd5: rx_data_reg[4] <= rx_sync;
-                        4'd6: rx_data_reg[5] <= rx_sync;
-                        4'd7: rx_data_reg[6] <= rx_sync;
-                        4'd8: rx_data_reg[7] <= rx_sync;
-                        4'd9: ; // stop1
-                        4'd10: begin
-                            rx_ready <= 1'b1;
-                            rx_busy  <= 1'b0;
-                        end
-                    endcase
-                end else begin
-                    rx_clk_cnt <= rx_clk_cnt + 1'b1;
+
+                REG_BAUD_L: DataOut = bauddiv[7:0];
+                REG_BAUD_H: DataOut = bauddiv[15:8];
+
+                REG_CTRL: begin
+                    DataOut        = 8'h00;
+                    DataOut[0]     = tx_en;
+                    DataOut[1]     = rx_en;
+                    DataOut[2]     = loopback;
                 end
-            end
 
-            // clear RX ready when CPU reads DATA reg
-            if (read_en && (addr == 2'd0))
-                rx_ready <= 1'b0;
-        end
-    end
-
-    // ----------------------------------------------------------------
-    // MMIO readback: DATA @ addr==0, STATUS @ addr==1
-    // STATUS bits: bit1 = TX_BUSY, bit0 = RX_READY (matches your C)
-    // ----------------------------------------------------------------
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) rdata <= 32'd0;
-        else if (read_en) begin
-            unique case (addr)
-                2'd0: rdata <= {24'd0, rx_data_reg};
-                2'd1: rdata <= {30'd0, tx_busy, rx_ready}; // bit1=tx_busy, bit0=rx_ready
-                default: rdata <= 32'd0;
+                default:    DataOut = 8'h00;
             endcase
+        end
+    end
+
+    // -----------------------------
+    // Sequential logic
+    // -----------------------------
+    always_ff @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            tx_en     <= 1'b1;
+            rx_en     <= 1'b1;
+            loopback  <= 1'b0;
+            bauddiv   <= BAUDDIV_RESET[15:0];
+
+            rx_data            <= 8'h00;
+            rx_valid           <= 1'b0;
+            rx_overrun_sticky  <= 1'b0;
+            rx_frameerr_sticky <= 1'b0;
+
+            uart_tx    <= 1'b1;
+            tx_busy    <= 1'b0;
+            tx_bit_idx <= 4'd0;
+            tx_shift   <= 10'h3FF;
+            tx_cnt     <= 16'd0;
+
+            rx_state   <= RX_IDLE;
+            rx_bit_idx <= 3'd0;
+            rx_shift   <= 8'h00;
+            rx_cnt     <= 16'd0;
         end else begin
-            rdata <= rdata; // hold last
+            // ---- Read side-effect: reading DATA clears RX_VALID
+            if (bus_rd && (off == REG_DATA)) begin
+                rx_valid <= 1'b0;
+            end
+
+            // ---- Writes
+            if (bus_wr) begin
+                unique case (off)
+                    REG_DATA: begin
+                        // Start TX only if enabled and idle
+                        if (tx_en && !tx_busy) begin
+                            tx_shift   <= {1'b1, DataIn, 1'b0}; // stop,data,start
+                            tx_bit_idx <= 4'd0;
+                            tx_busy    <= 1'b1;
+                            uart_tx    <= 1'b0;                 // start bit
+                            tx_cnt     <= bauddiv;
+                        end
+                    end
+
+                    REG_STATUS: begin
+                        // W1C sticky bits
+                        if (DataIn[2]) rx_overrun_sticky  <= 1'b0;
+                        if (DataIn[3]) rx_frameerr_sticky <= 1'b0;
+                    end
+
+                    REG_BAUD_L: bauddiv[7:0]  <= DataIn;
+                    REG_BAUD_H: bauddiv[15:8] <= DataIn;
+
+                    REG_CTRL: begin
+                        tx_en    <= DataIn[0];
+                        rx_en    <= DataIn[1];
+                        loopback <= DataIn[2];
+
+                        if (DataIn[3]) rx_valid <= 1'b0; // CLR_RX
+
+                        if (DataIn[4]) begin             // CLR_ERR
+                            rx_overrun_sticky  <= 1'b0;
+                            rx_frameerr_sticky <= 1'b0;
+                        end
+                    end
+
+                    default: begin end
+                endcase
+            end
+
+            // ---- If TX disabled, force idle
+            if (!tx_en) begin
+                tx_busy <= 1'b0;
+                uart_tx <= 1'b1;
+            end
+
+            // ---- TX engine
+            if (tx_en && tx_busy) begin
+                if (tx_cnt != 16'd0) begin
+                    tx_cnt <= tx_cnt - 16'd1;
+                end else begin
+                    // end of current bit time
+                    if (tx_bit_idx == 4'd9) begin
+                        // stop bit time finished
+                        tx_busy <= 1'b0;
+                        uart_tx <= 1'b1;
+                    end else begin
+                        tx_bit_idx <= tx_bit_idx + 4'd1;
+                        tx_cnt     <= bauddiv;
+
+                        // shift to next bit; new bit0 is old bit1
+                        tx_shift <= {1'b1, tx_shift[9:1]};
+                        uart_tx  <= tx_shift[1];
+                    end
+                end
+            end
+
+            // ---- RX engine
+            if (!rx_en) begin
+                rx_state <= RX_IDLE;
+                rx_cnt   <= 16'd0;
+            end else begin
+                unique case (rx_state)
+                    RX_IDLE: begin
+                        if (rx_in == 1'b0) begin
+                            rx_state <= RX_START;
+                            rx_cnt   <= half_div(bauddiv);
+                        end
+                    end
+
+                    RX_START: begin
+                        if (rx_cnt != 16'd0) begin
+                            rx_cnt <= rx_cnt - 16'd1;
+                        end else begin
+                            // sample middle of start bit
+                            if (rx_in == 1'b0) begin
+                                rx_state   <= RX_DATA;
+                                rx_bit_idx <= 3'd0;
+                                rx_cnt     <= bauddiv;
+                            end else begin
+                                rx_state <= RX_IDLE; // glitch
+                            end
+                        end
+                    end
+
+                    RX_DATA: begin
+                        if (rx_cnt != 16'd0) begin
+                            rx_cnt <= rx_cnt - 16'd1;
+                        end else begin
+                            rx_shift[rx_bit_idx] <= rx_in;
+                            rx_cnt <= bauddiv;
+
+                            if (rx_bit_idx == 3'd7) rx_state <= RX_STOP;
+                            else rx_bit_idx <= rx_bit_idx + 3'd1;
+                        end
+                    end
+
+                    RX_STOP: begin
+                        if (rx_cnt != 16'd0) begin
+                            rx_cnt <= rx_cnt - 16'd1;
+                        end else begin
+                            if (rx_in != 1'b1) rx_frameerr_sticky <= 1'b1;
+
+                            // 1-byte buffer: preserve old byte, drop new if not read
+                            if (rx_valid) begin
+                                rx_overrun_sticky <= 1'b1;
+                            end else begin
+                                rx_data  <= rx_shift;
+                                rx_valid <= 1'b1;
+                            end
+
+                            rx_state <= RX_IDLE;
+                        end
+                    end
+
+                    default: rx_state <= RX_IDLE;
+                endcase
+            end
         end
     end
 

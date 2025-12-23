@@ -2,6 +2,7 @@
 .global _start
 .extern timer_irq_handler
 .extern default_irq_handler
+.extern uart_irq_handler
 
 # ------------------------
 # Start of program
@@ -21,12 +22,8 @@ _start:
     csrrs x0, mstatus, t0
 
     # Enable external interrupts in MIE (MEIE = 1 << 11)
-    li t0, (1 << 7)
-    # csrrs x0, mie, t0
-    # csrrsi x0, mie, 11   # external
-    csrrs x0, mie, t0     # timer
-    # csrrsi x0, mie, 3    # software
-
+    li t0, (1 << 7) 
+    csrrs x0, mie, t0    
 
     # Call main
     call main
@@ -49,4 +46,4 @@ __vector_table:
     j default_irq_handler      # IRQ 4
     j default_irq_handler      # IRQ 5
     j default_irq_handler      # IRQ 6
-    j timer_irq_handler        # IRQ 7
+    j default_irq_handler        # IRQ 7
