@@ -15,8 +15,11 @@ module timer (
     logic [31:0] reload_value;   // load value
     logic [31:0] Timer;          // countdown
 
+    // COMBINATIONAL enables (NOT flops)
     logic timer_enable;
     logic irq_enable;
+    assign timer_enable = control_reg[0];
+    assign irq_enable   = control_reg[1];
 
     always_ff @(posedge clk or negedge reset_n) begin
         if (!reset_n) begin
@@ -28,9 +31,9 @@ module timer (
 
         end else begin
 
-            //-----------------------------------------
-            // CPU writes (ACK + reload)
-            //-----------------------------------------
+            // -------------------------
+            // CPU writes
+            // -------------------------
             if (AS_L == 0 && WE_L == 0) begin
 
                 if (data_reg_select) begin
@@ -43,14 +46,14 @@ module timer (
                     // CPU acknowledgement
                     irq_out <= 1'b0;
 
-                    // Reload only NOW
+                    // Reload on control write (your intended behavior)
                     Timer <= reload_value;
                 end
             end
 
-            //-----------------------------------------
+            // -------------------------
             // CPU reads
-            //-----------------------------------------
+            // -------------------------
             else if (AS_L == 0 && WE_L == 1) begin
                 if (data_reg_select)
                     data_out <= Timer;
@@ -58,24 +61,17 @@ module timer (
                     data_out <= {30'b0, control_reg};
             end
 
-            //-----------------------------------------
-            // TIMER LOGIC (ONE SHOT)
-            //-----------------------------------------
+            // -------------------------
+            // Timer logic (one-shot)
+            // -------------------------
             else begin
-                timer_enable <= control_reg[0];
-                irq_enable   <= control_reg[1];
-
-                if (timer_enable && irq_out == 0) begin
-                    // Only count if timer hasn't expired yet
+                if (timer_enable && (irq_out == 1'b0)) begin
                     if (Timer != 0) begin
                         Timer <= Timer - 1;
                     end else begin
-                        // Timer reaches 0: assert IRQ and STOP
                         if (irq_enable)
                             irq_out <= 1'b1;
-
-                        // NO AUTO-RELOAD HERE
-                        // Timer stays at 0 until CPU ACK
+                        // Timer stays at 0 until CPU ACK (control write)
                     end
                 end
             end

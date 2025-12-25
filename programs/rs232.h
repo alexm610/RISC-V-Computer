@@ -1,43 +1,41 @@
+#pragma once
 #include <stdint.h>
 #include <stdbool.h>
-// Base address must match uart_mmio_8bit BASE_ADDR parameter.
+
 #ifndef UART0_BASE
-#define UART0_BASE 0x10000000u
+#define UART0_BASE 0x10000000u   // MUST match your address_decoder
 #endif
 
-// Register offsets
-#define UART_REG_DATA    0x00u
-#define UART_REG_STATUS  0x01u
-#define UART_REG_BAUD_L  0x02u
-#define UART_REG_BAUD_H  0x03u
-#define UART_REG_CTRL    0x04u
+// Word-spaced register offsets
+#define RS232_DATA_OFF    0x00u   // R: RX byte in [7:0], W: TX byte in [7:0]
+#define RS232_STATUS_OFF  0x04u   // R: status
+#define RS232_CTRL_OFF    0x08u   // W: control (enable/clear)
 
-// STATUS bits
-#define UART_STATUS_TX_READY   (1u << 0)
-#define UART_STATUS_RX_VALID   (1u << 1)
-#define UART_STATUS_OVERRUN    (1u << 2)  // sticky
-#define UART_STATUS_FRAME_ERR  (1u << 3)  // sticky
+// STATUS bits (match your UART RTL)
+#define RS232_RX_READY    (1u << 1)   // RX_VALID
+#define RS232_TX_READY    (1u << 0)   // TX_READY
 
-// CTRL bits
-#define UART_CTRL_TX_EN        (1u << 0)
-#define UART_CTRL_RX_EN        (1u << 1)
-#define UART_CTRL_LOOPBACK     (1u << 2)
-#define UART_CTRL_CLR_RX       (1u << 3)  // self-clearing command
-#define UART_CTRL_CLR_ERR      (1u << 4)  // self-clearing command
+// CTRL bits (match your UART RTL)
+#define RS232_CTRL_TX_EN    (1u << 0)
+#define RS232_CTRL_RX_EN    (1u << 1)
+#define RS232_CTRL_LOOPBACK (1u << 2)
+#define RS232_CTRL_CLR_RX   (1u << 3)
+#define RS232_CTRL_CLR_ERR  (1u << 4)
 
+// Memory-mapped registers
+#define RS232_RxData   (*(volatile uint32_t *)(UART0_BASE + RS232_DATA_OFF))
+#define RS232_TxData   (*(volatile uint32_t *)(UART0_BASE + RS232_DATA_OFF))
+#define RS232_Status   (*(volatile uint32_t *)(UART0_BASE + RS232_STATUS_OFF))
+#define RS232_Control  (*(volatile uint32_t *)(UART0_BASE + RS232_CTRL_OFF))
 
-// 8-bit MMIO access helpers
-static inline void mmio_write8(uint32_t addr, uint8_t value);
-static inline uint8_t mmio_read8(uint32_t addr);
-static inline void uart_write_reg(uint32_t base, uint32_t off, uint8_t v);
-static inline uint8_t uart_read_reg(uint32_t base, uint32_t off);
-static inline uint16_t uart_calc_divisor(uint32_t clk_hz, uint32_t baud);
-static inline void uart_init(uint32_t base, uint32_t clk_hz, uint32_t baud);
-static inline uint8_t uart_status(uint32_t base);
-static inline void uart_putc(uint32_t base, uint8_t c);
-static inline bool uart_putc_nb(uint32_t base, uint8_t c);
-static inline uint8_t uart_getc(uint32_t base);
-static inline bool uart_getc_nb(uint32_t base, uint8_t *out);
-static inline void uart_clear_errors(uint32_t base);
-static inline void uart_puts(uint32_t base, const char *s);
-static inline void uart_puts_crlf(uint32_t base, const char *s);
+// Optional echo flag like your old code
+extern volatile uint32_t Echo;
+
+void rs232_init(void);
+
+// Your requested API
+int _putch(int c);
+int _getch(void);
+
+// Useful helper so main doesn’t block (prevents “HEX only updates on keypress”)
+int rs232_getch_nb(void);   // returns -1 if no char available

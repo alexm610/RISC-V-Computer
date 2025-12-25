@@ -60,7 +60,7 @@ module csr (
         endcase
     end
 
-    always @(posedge clock) begin
+    always @(posedge clock or negedge reset_L) begin
         if (reset_L == 0) begin
             mstatus <= 32'h0;
             mie     <= 32'h0;
@@ -76,6 +76,7 @@ module csr (
                 12'h341: mepc       <= write_data;
                 12'h342: mcause     <= write_data;
                 //12'h344: mip        <= write_data;
+                default: ;
             endcase
         end
     end

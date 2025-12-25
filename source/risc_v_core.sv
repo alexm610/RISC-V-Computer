@@ -133,8 +133,7 @@ module risc_v_core (
         .IRQ_timer0_H(IRQ_timer)
     );
 
-    /*
-    uart_mmio_8bit UART_0 (
+    uart_mmio_32bit UART_0 (
         .CLOCK_50MHz(CLOCK_50),
         .RESET_L(Reset_L),
         .AS_L(AS_L),
@@ -145,8 +144,7 @@ module risc_v_core (
         .uart_rx(GPIO_0[35]),
         .uart_tx(GPIO_1[35])
     );
-    */
-
+    
     vga_control VGA_CONTROL (
         .clk(CLOCK_50),
         .rst_n(Reset_L),

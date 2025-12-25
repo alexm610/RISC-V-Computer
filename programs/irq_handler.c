@@ -5,6 +5,7 @@
 volatile uint32_t timer_ticks = 0;
 
 void __attribute__((interrupt)) timer_irq_handler(void) {
+    Timer0_Control_Register = 0x0;
     timer_ticks++;
     Timer0_Control_Register = 0x3;
 }

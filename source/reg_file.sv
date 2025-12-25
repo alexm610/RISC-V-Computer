@@ -61,7 +61,7 @@ module register (clock, reset, in, enable, out);
     input logic [k-1:0] in;
     output logic signed [k-1:0] out;
 
-    always @(posedge clock) begin
+    always @(posedge clock or negedge reset) begin
         if (!reset) begin
             out = {k{1'b0}};
         end else begin
