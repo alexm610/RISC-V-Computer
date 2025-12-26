@@ -5,6 +5,7 @@ module cpu (
     input logic         Reset_L,
     input logic         DTAck,
     input logic         IRQ_Timer_H,
+    input logic         IRQ_UART_H,
     input logic [31:0]  Instruction,
     input logic [31:0]  DataBus_In,
     output logic        AS_L,
@@ -17,7 +18,7 @@ module cpu (
 );
 
     // CPU signals
-    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1} State;
+    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1, IRQ_0, IRQ_2_STALL, IRQ_4_STALL} State;
     logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch, save_pc;
     logic           CSR_process;
     logic           CSR_WE_L;
@@ -73,7 +74,7 @@ module cpu (
         .read_data(CSR_read_data),
         .irq_software(1'b0),
         .irq_timer(IRQ_Timer_H),
-        .irq_external(1'b0),
+        .irq_external(IRQ_UART_H),
         .mstatus_MIE(MIE),
         .mstatus_MPIE(MPIE),
         .mstatus_MPP(MPP),
@@ -238,12 +239,13 @@ module cpu (
             CSR_process                 <= 0;
             CSR_read_data_temp          <= 32'h0;
             CSR_write_data              <= 32'h0;
-            CSR_address                 <= Current_Instruction[31:20];
+            CSR_address                 <= 12'h0;//Current_Instruction[31:20];
+            Current_Instruction         <= 32'h00000013; // NOP
         end else begin
             case (State) 
                 INITIALIZE: begin
-                    State               <= START;
-                    Current_Instruction <= Instruction;
+                    State               <= INCREMENT_PC;
+                    //Current_Instruction <= Instruction;
                     Reset_Out           <= 1;
                     instruction_fetch   <= 1;
                     save_pc             <= 1;
@@ -327,22 +329,28 @@ module cpu (
                             load_upper_imm  <= 1'b1; 
                         end 
                         `CSR_TYPE: begin
-                            CSR_address          <= Current_Instruction[31:20];
+                            //CSR_address          <= Current_Instruction[31:20];
                             case (funct3) 
                                 `CSRRW: begin
                                     State       <= CSRRW_WRITE_1;
                                     CSR_process <= 1;
                                     CSR_read_data_temp <= CSR_read_data; // save the initial value of whichever CSR we are copying from
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRS: begin
                                     State       <= CSRRS_WRITE_1;
                                     CSR_process <= 1;
                                     CSR_read_data_temp <= CSR_read_data;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRC: begin
                                     State       <= CSRRC_WRITE_1;
                                     CSR_process <= 1;
                                     CSR_read_data_temp <= CSR_read_data;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRWI: begin
                                     State       <= CSRRWI_1;
@@ -350,6 +358,8 @@ module cpu (
                                     // CSR_read_data_temp  <= CSR_read_data;
                                     // CSR_write_data <= imm_CSR_TYPE;
                                     // CSR_WE_L    <= 0;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRSI: begin
                                     State       <= CSRRSI_1;
@@ -357,6 +367,8 @@ module cpu (
                                     // CSR_read_data_temp  <= CSR_read_data;
                                     // CSR_write_data <= imm_CSR_TYPE | CSR_read_data;
                                     // CSR_WE_L    <= 0;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `CSRRCI: begin
                                     State           <= CSRRCI_1;
@@ -364,6 +376,8 @@ module cpu (
                                     // CSR_read_data_temp  <= CSR_read_data;
                                     // CSR_write_data  <= CSR_read_data & (~imm_CSR_TYPE);
                                     // CSR_WE_L        <= 0;
+                            CSR_address          <= Current_Instruction[31:20];
+
                                 end
                                 `MRET: begin
                                     if (Current_Instruction == 32'h30200073) begin
@@ -496,13 +510,19 @@ module cpu (
                         //     Program_Counter <= datapath_out;
                         // end
                     end else begin
-                        State               <= IRQ_1;
+                        State               <= IRQ_0;
                         instruction_fetch   <= 1;
                         MSTATUS_temp        <= 32'h0;
-                        CSR_write_data      <= Program_Counter;
+                        //CSR_write_data      <= Program_Counter;
                         CSR_address         <= 12'h341; 
                         //CSR_WE_L            <= 1'b0;
                     end
+                end
+                IRQ_0: begin
+                    State <= IRQ_1; 
+
+                    // Program counter is updated at start of this clock cycle, latch it now, otherwise we write it early. 
+                    CSR_write_data <= Program_Counter;
                 end
                 IRQ_1: begin
                     State           <= IRQ_2;
@@ -512,10 +532,15 @@ module cpu (
                     CSR_WE_L                <= 1'b0; // write to MEPC
                 end
                 IRQ_2: begin
-                    State <= IRQ_3;
+                    State <= IRQ_2_STALL;
                     CSR_write_data      <= {26'd0, MIE, 3'b000, 1'b0, 3'b000};
                     CSR_address         <= 12'h300; // writing to MSTATUS
                     CSR_WE_L            <= 1'b1;
+                end
+                IRQ_2_STALL: begin
+                    State <= IRQ_3;
+
+                    // stall here for data and address buses into CSR to update
                 end
                 IRQ_3: begin
                     State <= IRQ_4;
@@ -524,11 +549,16 @@ module cpu (
                     CSR_WE_L        <= 1'b0; // write to MSTATUS
                 end
                 IRQ_4: begin
-                    State <= IRQ_5;
+                    State <= IRQ_4_STALL;
 
                     CSR_address     <= 12'h342; // writing to MCAUSE
                     CSR_write_data  <= {1'b1, 27'b0, interrupt_ID[3:0]};
                     CSR_WE_L    <= 1'b1;
+                end
+                IRQ_4_STALL: begin
+                    State <= IRQ_5;
+
+                    // stall here for data and address buses to update
                 end
                 IRQ_5: begin
                     State <= INCREMENT_PC;

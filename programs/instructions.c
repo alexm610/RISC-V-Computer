@@ -14,6 +14,7 @@ int main(void) {
     LCD_line1("I love you!");
 
     timer_ticks = 0;
+    Timer0_Control_Register = 0x0;
     Timer0_Data_Register = 0x02FAF080;
     Timer0_Control_Register = 0x00000003;
 

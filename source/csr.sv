@@ -60,7 +60,7 @@ module csr (
         endcase
     end
 
-    always @(posedge clock) begin
+    always @(posedge clock or negedge reset_L) begin
         if (reset_L == 0) begin
             mstatus <= 32'h0;
             mie     <= 32'h0;
