@@ -7,3 +7,4 @@
 *.mif
 *.srec
 *.hex
+*.o
