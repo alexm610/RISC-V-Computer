@@ -12,30 +12,33 @@ module timer (
 );
 
     logic [1:0]  control_reg;    // [0]=enable, [1]=irq enable
-    logic [31:0] reload_value;   // load value
-    logic [31:0] Timer;          // countdown
+    logic [31:0] reload_value;
+    logic [31:0] Timer;
 
-    // COMBINATIONAL enables (NOT flops)
-    logic timer_enable;
-    logic irq_enable;
-    assign timer_enable = control_reg[0];
-    assign irq_enable   = control_reg[1];
+    wire bus_wr = (AS_L == 1'b0) && (WE_L == 1'b0);
+    wire bus_rd = (AS_L == 1'b0) && (WE_L == 1'b1);
+
+    wire timer_enable = control_reg[0];
+    wire irq_enable   = control_reg[1];
+
+    // COMBINATIONAL readback (safer for simple MMIO)
+    always_comb begin
+        if (control_reg_select)      data_out = {30'b0, control_reg};
+        else if (data_reg_select)    data_out = Timer;
+        else                         data_out = 32'h0;
+    end
 
     always_ff @(posedge clk or negedge reset_n) begin
         if (!reset_n) begin
-            control_reg   <= 2'b00;
-            reload_value  <= 32'h0;
-            Timer         <= 32'h0;
-            data_out      <= 32'h0;
-            irq_out       <= 1'b0;
-
+            control_reg  <= 2'b00;
+            reload_value <= 32'h0;
+            Timer        <= 32'h0;
+            irq_out      <= 1'b0;
         end else begin
-
             // -------------------------
             // CPU writes
             // -------------------------
-            if (AS_L == 0 && WE_L == 0) begin
-
+            if (bus_wr) begin
                 if (data_reg_select) begin
                     reload_value <= data_in;
                 end
@@ -43,38 +46,27 @@ module timer (
                 if (control_reg_select) begin
                     control_reg <= data_in[1:0];
 
-                    // CPU acknowledgement
+                    // ACK any pending IRQ on control write
                     irq_out <= 1'b0;
 
-                    // Reload on control write (your intended behavior)
+                    // reload whenever control is written
                     Timer <= reload_value;
                 end
             end
 
             // -------------------------
-            // CPU reads
-            // -------------------------
-            else if (AS_L == 0 && WE_L == 1) begin
-                if (data_reg_select)
-                    data_out <= Timer;
-                else if (control_reg_select)
-                    data_out <= {30'b0, control_reg};
-            end
-
-            // -------------------------
             // Timer logic (one-shot)
             // -------------------------
-            else begin
+            if (!bus_wr && !bus_rd) begin
                 if (timer_enable && (irq_out == 1'b0)) begin
-                    if (Timer != 0) begin
-                        Timer <= Timer - 1;
+                    if (Timer != 32'd0) begin
+                        Timer <= Timer - 32'd1;
                     end else begin
-                        if (irq_enable)
-                            irq_out <= 1'b1;
-                        // Timer stays at 0 until CPU ACK (control write)
+                        if (irq_enable) irq_out <= 1'b1;
                     end
                 end
             end
         end
     end
+
 endmodule

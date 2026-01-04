@@ -1,19 +1,21 @@
-// uart_mmio_32bit.sv
-// Word-spaced MMIO UART (8-N-1), polled
-// BASE + 0x00 DATA, +0x04 STATUS, +0x08 CTRL, +0x0C BAUDDIV (RO)
+// uart_mmio_32bit_8N2.sv
+// Word-spaced MMIO UART (8-N-2), polled
+// BASE + 0x00 DATA, +0x04 STATUS, +0x08 CTRL
 //
-// Hardcoded: 50 MHz clock, 115200 baud -> BAUDDIV = (50_000_000/115200)-1 = 433
+// Hardcoded:
+//   CLK = 50 MHz
+//   BAUD = 115200
+//   BAUDDIV = (50_000_000 / 115200) - 1 = 433
+//   BASE_ADDR = 0x1000_0000
 
-module uart_mmio_32bit #(
-    parameter logic [31:0] BASE_ADDR = 32'h1000_0000
-) (
+module uart_mmio_32bit_8N2 (
     input  logic         CLOCK_50MHz,
     input  logic         RESET_L,
 
     input  logic         AS_L,          // active-low address strobe
     input  logic         WE_L,          // active-low write enable (0=write, 1=read)
     input  logic [31:0]  Address,       // byte address
-    input  logic [31:0]  DataIn,        // 32-bit bus; UART uses low byte where relevant
+    input  logic [31:0]  DataIn,        // 32-bit bus; UART uses low byte
     output logic [31:0]  DataOut,       // 32-bit read data
 
     input  logic         uart_rx,
@@ -24,34 +26,42 @@ module uart_mmio_32bit #(
     assign clk     = CLOCK_50MHz;
     assign reset_n = RESET_L;
 
-    // Hardcoded baud divisor for 50MHz -> 115200
-    localparam logic [15:0] BAUDDIV = 16'd433; // ticks_per_bit_minus_1
+    // -----------------------------
+    // Hardcoded base + baud divisor
+    // -----------------------------
+    localparam logic [31:0] BASE_ADDR = 32'h1000_0000;
+    localparam logic [15:0] BAUDDIV   = 16'd433; // ticks_per_bit_minus_1 @ 50MHz, 115200
 
-    // Word-spaced register select: 0x0,0x4,0x8,0xC
-    // Use Address[3:2] within a 16-byte window
-    logic        bus_sel, bus_wr, bus_rd;
-    logic [1:0]  woff;
+    // Word-spaced: 0x0,0x4,0x8
+    logic       bus_sel, bus_wr, bus_rd;
+    logic [1:0] woff;
 
     assign bus_sel = (~AS_L) && (Address[31:4] == BASE_ADDR[31:4]);
     assign bus_wr  = bus_sel && (~WE_L);
     assign bus_rd  = bus_sel && ( WE_L);
     assign woff    = Address[3:2];
 
-    localparam logic [1:0] REG_DATA    = 2'd0; // +0x00
-    localparam logic [1:0] REG_STATUS  = 2'd1; // +0x04
-    localparam logic [1:0] REG_CTRL    = 2'd2; // +0x08
-    localparam logic [1:0] REG_BAUDDIV = 2'd3; // +0x0C (RO)
+    localparam logic [1:0] REG_DATA   = 2'd0; // +0x00
+    localparam logic [1:0] REG_STATUS = 2'd1; // +0x04
+    localparam logic [1:0] REG_CTRL   = 2'd2; // +0x08
 
-    // CTRL bits
+    // -----------------------------
+    // CTRL bits (optional)
+    // -----------------------------
+    // [0]=TX_EN, [1]=RX_EN, [2]=LOOPBACK, [3]=CLR_RX (self), [4]=CLR_ERR (self)
     logic tx_en, rx_en, loopback;
 
-    // RX status
+    // -----------------------------
+    // RX status/buffer
+    // -----------------------------
     logic [7:0] rx_data;
     logic       rx_valid;
     logic       rx_overrun_sticky;
     logic       rx_frameerr_sticky;
 
+    // -----------------------------
     // RX sync
+    // -----------------------------
     logic rx_ff1, rx_ff2;
     always_ff @(posedge clk or negedge reset_n) begin
         if (!reset_n) begin
@@ -66,16 +76,20 @@ module uart_mmio_32bit #(
     logic rx_in;
     assign rx_in = loopback ? uart_tx : rx_ff2;
 
-    // TX engine (8N1)
+    // -----------------------------
+    // TX engine (8-N-2): 1 start + 8 data + 2 stop = 11 bits
+    // -----------------------------
     logic        tx_busy;
-    logic [3:0]  tx_bit_idx;   // 0..9
-    logic [9:0]  tx_shift;     // bit0=start, bits1..8=data, bit9=stop
+    logic [3:0]  tx_bit_idx;     // 0..10
+    logic [10:0] tx_shift;       // [0]=start, [1..8]=data, [9]=stop1, [10]=stop2
     logic [15:0] tx_cnt;
 
-    // RX engine (8N1, mid-bit sample)
-    typedef enum logic [1:0] {RX_IDLE, RX_START, RX_DATA, RX_STOP} rx_state_t;
+    // -----------------------------
+    // RX engine (8-N-2)
+    // -----------------------------
+    typedef enum logic [2:0] {RX_IDLE, RX_START, RX_DATA, RX_STOP1, RX_STOP2} rx_state_t;
     rx_state_t   rx_state;
-    logic [2:0]  rx_bit_idx;
+    logic [2:0]  rx_bit_idx;     // 0..7
     logic [7:0]  rx_shift;
     logic [15:0] rx_cnt;
 
@@ -90,13 +104,17 @@ module uart_mmio_32bit #(
         end
     endfunction
 
-    // --------------- Read mux ---------------
+    // -----------------------------
+    // Read mux
+    // -----------------------------
     always_comb begin
         DataOut = 32'h0;
 
         if (bus_sel && WE_L) begin
             unique case (woff)
-                REG_DATA:   DataOut = {24'h0, rx_data};
+                REG_DATA: begin
+                    DataOut = {24'h0, rx_data};
+                end
 
                 REG_STATUS: begin
                     DataOut[0] = ~tx_busy;           // TX_READY
@@ -111,16 +129,14 @@ module uart_mmio_32bit #(
                     DataOut[2] = loopback;
                 end
 
-                REG_BAUDDIV: begin
-                    DataOut = {16'h0, BAUDDIV};
-                end
-
                 default: DataOut = 32'h0;
             endcase
         end
     end
 
-    // --------------- Sequential ---------------
+    // -----------------------------
+    // Sequential
+    // -----------------------------
     always_ff @(posedge clk or negedge reset_n) begin
         if (!reset_n) begin
             tx_en     <= 1'b1;
@@ -135,7 +151,7 @@ module uart_mmio_32bit #(
             uart_tx    <= 1'b1;
             tx_busy    <= 1'b0;
             tx_bit_idx <= 4'd0;
-            tx_shift   <= 10'h3FF;
+            tx_shift   <= 11'h7FF;
             tx_cnt     <= 16'd0;
 
             rx_state   <= RX_IDLE;
@@ -152,8 +168,10 @@ module uart_mmio_32bit #(
             if (bus_wr) begin
                 unique case (woff)
                     REG_DATA: begin
+                        // TX start if enabled and idle
                         if (tx_en && !tx_busy) begin
-                            tx_shift   <= {1'b1, DataIn[7:0], 1'b0}; // stop,data,start
+                            // 8-N-2 frame: start(0), data[7:0], stop1(1), stop2(1)
+                            tx_shift   <= {2'b11, DataIn[7:0], 1'b0};
                             tx_bit_idx <= 4'd0;
                             tx_busy    <= 1'b1;
                             uart_tx    <= 1'b0;     // start bit
@@ -189,25 +207,26 @@ module uart_mmio_32bit #(
                 uart_tx <= 1'b1;
             end
 
-            // TX engine
+            // ---- TX engine (11 bits total: idx 0..10)
             if (tx_en && tx_busy) begin
                 if (tx_cnt != 16'd0) begin
                     tx_cnt <= tx_cnt - 16'd1;
                 end else begin
-                    if (tx_bit_idx == 4'd9) begin
+                    if (tx_bit_idx == 4'd10) begin
                         tx_busy <= 1'b0;
                         uart_tx <= 1'b1;
                     end else begin
                         tx_bit_idx <= tx_bit_idx + 4'd1;
                         tx_cnt     <= BAUDDIV;
 
-                        tx_shift <= {1'b1, tx_shift[9:1]};
+                        // shift toward LSB; keep stuffing '1' at MSB for stop/idles
+                        tx_shift <= {1'b1, tx_shift[10:1]};
                         uart_tx  <= tx_shift[1];
                     end
                 end
             end
 
-            // RX engine
+            // ---- RX engine (8-N-2)
             if (!rx_en) begin
                 rx_state <= RX_IDLE;
                 rx_cnt   <= 16'd0;
@@ -216,19 +235,20 @@ module uart_mmio_32bit #(
                     RX_IDLE: begin
                         if (rx_in == 1'b0) begin
                             rx_state <= RX_START;
-                            rx_cnt   <= half_div(BAUDDIV);
+                            rx_cnt   <= half_div(BAUDDIV); // mid start-bit
                         end
                     end
 
                     RX_START: begin
                         if (rx_cnt != 16'd0) rx_cnt <= rx_cnt - 16'd1;
                         else begin
+                            // sample middle of start bit
                             if (rx_in == 1'b0) begin
                                 rx_state   <= RX_DATA;
                                 rx_bit_idx <= 3'd0;
                                 rx_cnt     <= BAUDDIV;
                             end else begin
-                                rx_state <= RX_IDLE;
+                                rx_state <= RX_IDLE; // glitch
                             end
                         end
                     end
@@ -239,16 +259,26 @@ module uart_mmio_32bit #(
                             rx_shift[rx_bit_idx] <= rx_in;
                             rx_cnt <= BAUDDIV;
 
-                            if (rx_bit_idx == 3'd7) rx_state <= RX_STOP;
+                            if (rx_bit_idx == 3'd7) rx_state <= RX_STOP1;
                             else rx_bit_idx <= rx_bit_idx + 3'd1;
                         end
                     end
 
-                    RX_STOP: begin
+                    RX_STOP1: begin
+                        if (rx_cnt != 16'd0) rx_cnt <= rx_cnt - 16'd1;
+                        else begin
+                            if (rx_in != 1'b1) rx_frameerr_sticky <= 1'b1;
+                            rx_state <= RX_STOP2;
+                            rx_cnt   <= BAUDDIV;
+                        end
+                    end
+
+                    RX_STOP2: begin
                         if (rx_cnt != 16'd0) rx_cnt <= rx_cnt - 16'd1;
                         else begin
                             if (rx_in != 1'b1) rx_frameerr_sticky <= 1'b1;
 
+                            // 1-byte buffer
                             if (rx_valid) rx_overrun_sticky <= 1'b1;
                             else begin
                                 rx_data  <= rx_shift;
@@ -258,6 +288,8 @@ module uart_mmio_32bit #(
                             rx_state <= RX_IDLE;
                         end
                     end
+
+                    default: rx_state <= RX_IDLE;
                 endcase
             end
         end

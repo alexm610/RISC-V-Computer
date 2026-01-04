@@ -18,7 +18,7 @@ module cpu (
 );
 
     // CPU signals
-    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1, IRQ_0} State;
+    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1, IRQ_0, IRQ_2_STALL, IRQ_4_STALL} State;
     logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch, save_pc;
     logic           CSR_process;
     logic           CSR_WE_L;
@@ -382,7 +382,7 @@ module cpu (
                                 `MRET: begin
                                     if (Current_Instruction == 32'h30200073) begin
                                         State               <= MRET_1;
-                                        CSR_write_data      <= {26'd0, 1'b1, 3'b000, MPIE, 3'b000};
+                                        CSR_write_data      <= {19'd0, 2'b11, 3'd0, 1'b1, 3'b000, MPIE, 3'b000};
                                         //MSTATUS_temp[3]    <= MPIE;
                                         //MSTATUS_temp[7]     <= 1'b1;
                                         CSR_address <= 12'h300;
@@ -516,6 +516,9 @@ module cpu (
                         //CSR_write_data      <= Program_Counter;
                         CSR_address         <= 12'h341; 
                         //CSR_WE_L            <= 1'b0;
+                        WE_L            <= 1'b1;
+                        AS_L            <= 1'b1;
+                        mem_or_reg <= 1'b0;
                     end
                 end
                 IRQ_0: begin
@@ -532,10 +535,15 @@ module cpu (
                     CSR_WE_L                <= 1'b0; // write to MEPC
                 end
                 IRQ_2: begin
-                    State <= IRQ_3;
-                    CSR_write_data      <= {26'd0, MIE, 3'b000, 1'b0, 3'b000};
+                    State <= IRQ_2_STALL;
+                    CSR_write_data      <= {24'd0, MIE, 3'b000, 1'b0, 3'b000};
                     CSR_address         <= 12'h300; // writing to MSTATUS
                     CSR_WE_L            <= 1'b1;
+                end
+                IRQ_2_STALL: begin
+                    State <= IRQ_3;
+
+                    // stall here for data and address buses into CSR to update
                 end
                 IRQ_3: begin
                     State <= IRQ_4;
@@ -544,11 +552,16 @@ module cpu (
                     CSR_WE_L        <= 1'b0; // write to MSTATUS
                 end
                 IRQ_4: begin
-                    State <= IRQ_5;
+                    State <= IRQ_4_STALL;
 
                     CSR_address     <= 12'h342; // writing to MCAUSE
                     CSR_write_data  <= {1'b1, 27'b0, interrupt_ID[3:0]};
                     CSR_WE_L    <= 1'b1;
+                end
+                IRQ_4_STALL: begin
+                    State <= IRQ_5;
+
+                    // stall here for data and address buses to update
                 end
                 IRQ_5: begin
                     State <= INCREMENT_PC;

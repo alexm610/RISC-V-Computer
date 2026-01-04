@@ -12,10 +12,12 @@ SRECFLAGS1 = -Output -Memory_Initialization_File 32
 SRECFLAGS2 = -Output_Block_Size 4 -DISable Execution_Start_Address
 SRECFLAGS3 = -byte-swap 4
 HEXDUMPFLAGS = -v -e '"%08x\n"'
-
-SRCS = instructions.c rs232.c lcd_display.c vga.c irq_handler.c kstdio.c
-ASMS = start.s
-OBJS = $(SRCS:.c=.o) $(ASMS:.s=.o)
+OBJS = instructions.elf
+BINS = instructions.bin
+SRECS = instructions.srec
+MIFS = instructions.mif 
+SRCS = instructions.c uart.c lcd_display.c vga.c irq_handler.c
+HDRS = instructions.h vga.h uart.h lcd_display.h irq_handler.h
 
 all: instructions.mif
 

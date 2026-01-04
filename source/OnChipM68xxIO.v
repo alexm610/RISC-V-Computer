@@ -14,7 +14,7 @@
 
 // PROGRAM		"Quartus Prime"
 // VERSION		"Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
-// CREATED		"Mon Jun 16 11:32:14 2025"
+// CREATED		"Sat Jan 03 16:56:42 2026"
 
 module OnChipM68xxIO(
 	IOSelect,
@@ -81,7 +81,7 @@ ACIA_6850	b2v_inst16(
 	.Reset_H(SYNTHESIZED_WIRE_1),
 	.CS_H(SYNTHESIZED_WIRE_2),
 	.Write_L(WE_L),
-	.RS(Address[1]),
+	.RS(Address[2]),
 	.RxClock(SYNTHESIZED_WIRE_7),
 	.TxClock(SYNTHESIZED_WIRE_7),
 	.RxData(RS232_RxData),
