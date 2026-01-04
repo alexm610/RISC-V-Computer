@@ -74,7 +74,7 @@ module cpu (
         .read_data(CSR_read_data),
         .irq_software(1'b0),
         .irq_timer(IRQ_Timer_H),
-        .irq_external(1'b0),
+        .irq_external(IRQ_UART_H),
         .mstatus_MIE(MIE),
         .mstatus_MPIE(MPIE),
         .mstatus_MPP(MPP),

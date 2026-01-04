@@ -50,6 +50,7 @@ module risc_v_core (
         .Reset_L(KEY[0]),
         .DTAck(1'b1),
         .IRQ_Timer_H(IRQ_timer),
+        .IRQ_UART_H(1'b0),
         .Instruction(instruction),
         .DataBus_In(data_in),
         .AS_L(AS_L),
@@ -239,6 +240,10 @@ module data_bus_multiplexer (
 
         if (Select_UART == 1) begin
             DataOut_CPU     = DataIn_UART;
+        end
+
+        if (Select_UART == 1) begin
+            DataOut_CPU     <= DataIn_UART;
         end
     end
 endmodule: data_bus_multiplexer

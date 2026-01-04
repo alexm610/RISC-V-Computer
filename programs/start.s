@@ -1,34 +1,55 @@
 .section .text
 .global _start
+.extern main
 .extern timer_irq_handler
 .extern default_irq_handler
 
-# ------------------------
-# Start of program
-# ------------------------
 _start:
-    # Initialize stack pointer
+    # Init SP
     la sp, _stack_top
+    la gp, __global_pointer$
 
-    # Set mtvec for vectored mode (base address | 0x1)
+    # ------------------------
+    # Copy .data from ROM to RAM
+    # ------------------------
+    la t0, _data_lma
+    la t1, _data_start
+    la t2, _data_end
+1:
+    beq t1, t2, 2f
+    lw t3, 0(t0)
+    sw t3, 0(t1)
+    addi t0, t0, 4
+    addi t1, t1, 4
+    j 1b
+2:
+    # ------------------------
+    # Zero .bss
+    # ------------------------
+    la t1, _bss_start
+    la t2, _bss_end
+3:
+    beq t1, t2, 4f
+    sw zero, 0(t1)
+    addi t1, t1, 4
+    j 3b
+4:
+    # ------------------------
+    # Trap vector base (vectored)
+    # ------------------------
     la t0, __vector_table
-    li t1, 1               # vector mode
+    li t1, 1
     or t0, t0, t1
-    csrrw x0, mtvec, t0 
+    csrw mtvec, t0
 
     # Enable global machine interrupts (MIE in mstatus)
     li t0, 8
-    csrrs x0, mstatus, t0
+    # csrs mstatus, t0
 
-    # Enable external interrupts in MIE (MEIE = 1 << 11)
+    # Enable timer interrupts in mie (MTIE = 1 << 7)
     li t0, (1 << 7)
-    # csrrs x0, mie, t0
-    # csrrsi x0, mie, 11   # external
-    csrrs x0, mie, t0     # timer
-    # csrrsi x0, mie, 3    # software
+    # csrs mie, t0
 
-
-    # Call main
     call main
     j .
 
@@ -37,16 +58,16 @@ __vector_table:
     j default_irq_handler      # IRQ 0
     j default_irq_handler      # IRQ 1
     j default_irq_handler      # IRQ 2
-    j default_irq_handler     # IRQ 3
+    j default_irq_handler      # IRQ 3
     j default_irq_handler      # IRQ 4
     j default_irq_handler      # IRQ 5
     j default_irq_handler      # IRQ 6
     j timer_irq_handler        # IRQ 7
-    j default_irq_handler      # IRQ 0
-    j default_irq_handler      # IRQ 1
-    j default_irq_handler      # IRQ 2
-    j default_irq_handler     # IRQ 3
-    j default_irq_handler      # IRQ 4
-    j default_irq_handler      # IRQ 5
-    j default_irq_handler      # IRQ 6
-    j timer_irq_handler        # IRQ 7
+    j default_irq_handler      # IRQ 8
+    j default_irq_handler      # IRQ 9
+    j default_irq_handler      # IRQ 10
+    j default_irq_handler      # IRQ 11
+    j default_irq_handler      # IRQ 12
+    j default_irq_handler      # IRQ 13
+    j default_irq_handler      # IRQ 14
+    j default_irq_handler      # IRQ 15

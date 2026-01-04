@@ -76,6 +76,7 @@ module csr (
                 12'h341: mepc       <= write_data;
                 12'h342: mcause     <= write_data;
                 //12'h344: mip        <= write_data;
+                default: ;
             endcase
         end
     end
