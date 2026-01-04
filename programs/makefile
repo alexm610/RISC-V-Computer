@@ -13,8 +13,8 @@ OBJS = instructions.elf
 BINS = instructions.bin
 SRECS = instructions.srec
 MIFS = instructions.mif 
-SRCS = instructions.c rs232.c lcd_display.c vga.c irq_handler.c
-HDRS = instructions.h vga.h rs232.h lcd_display.h irq_handler.h
+SRCS = instructions.c uart.c lcd_display.c vga.c irq_handler.c
+HDRS = instructions.h vga.h uart.h lcd_display.h irq_handler.h
 
 all: instructions.mif
 

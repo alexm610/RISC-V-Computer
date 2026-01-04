@@ -2,8 +2,8 @@ module risc_v_core (
     input logic CLOCK_50, 
     input logic [3:0] KEY, 
     input logic [9:0] SW,
-    input logic [35:0] GPIO_0,
-    output logic [35:0] GPIO_1,
+    inout logic [35:0] GPIO_0,
+    inout logic [35:0] GPIO_1,
     output logic [6:0] HEX0, 
     output logic [6:0] HEX1, 
     output logic [6:0] HEX2,
@@ -38,7 +38,7 @@ module risc_v_core (
     logic [2:0] into_vga_colour;
     logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select, IRQ_timer;
     logic [31:0] data_out_KEYBOARD, data_out_EXP;
-    logic [31:0] dataa_out_UART;
+    logic [31:0] data_out_UART;
 
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
@@ -108,7 +108,7 @@ module risc_v_core (
     );
 
 	IO_Handler IO (.Clock(CLOCK_50),
-        .Reset_L(Reset_L),
+        .Reset_L(KEY[0]),
         .byte_enable(byte_enable),
 		.LEDR_output(LEDR[8:0]),
 		.SW_input(SW),
@@ -131,23 +131,38 @@ module risc_v_core (
         .IRQ_timer0_H(IRQ_timer)
     );
 
-    /*
-    uart_controller UART_0 (
-        .clk(CLOCK_50),
-        .reset(~Reset_L),
+    /*uart_mmio_32bit_8N2 UART_0 (
+        .CLOCK_50MHz(CLOCK_50),
+        .RESET_L(KEY[0]),
         .AS_L(AS_L),
         .WE_L(WE_L),
-        .UART_SEL_H(UART_Select),
-        .addr(address>>2),
-        .wdata(data_out),
-        .rdata(data_out_UART),
-        .tx(GPIO_1[35]),
-        .rx(GPIO_0[35])
+        //.UART_SEL_H(UART_Select),
+        .Address(address),
+        .DataIn(data_out),
+        .DataOut(data_out_UART),
+        .uart_tx(GPIO_1[35]),
+        .uart_rx(GPIO_1[34])
+    );*/
+
+    OnChipM68xxIO UART_0 (
+	    .IOSelect(UART_Select),
+	    .Clk(CLOCK_50),
+	    .Reset_L(KEY[0]),
+	    .Clock_50Mhz(CLOCK_50),
+	    .RS232_RxData(GPIO_1[34]),
+	    .UDS_L(1'b0),
+	    .WE_L(WE_L),
+	    .AS_L(AS_L),
+	    .Address(address),
+	    .DataIn(data_out),
+	    .RS232_TxData(GPIO_1[35]),
+	    .ACIA_IRQ(),
+	    .DataOut(data_out_UART)
     );
-    */     
+       
     vga_control VGA_CONTROL (
         .clk(CLOCK_50),
-        .rst_n(Reset_L),
+        .rst_n(KEY[0]),
         .data_in(data_out),
         .ready(vga_ready), // output to arbiter/cpu
         .VGA_Select(Graphics_Select),
@@ -160,7 +175,7 @@ module risc_v_core (
 
     vga_adapter #(.RESOLUTION("160x120")) VGA_0 (
         .clock(CLOCK_50),
-        .resetn(Reset_L),
+        .resetn(KEY[0]),
         .colour(into_vga_colour), // from controller
         .x(fill_x), // from controller I need to make 
         .y(fill_y), // from controller 
@@ -200,26 +215,30 @@ module data_bus_multiplexer (
 );
 
     always @(*) begin
-        DataOut_CPU <= 32'h00000000;
+        DataOut_CPU = 32'h00000000;
 
         if ((Select_SRAM == 1) && (Select_IO == 0)) begin
-            DataOut_CPU <= DataIn_SRAM;
-        end 
+            DataOut_CPU = DataIn_SRAM;
+        end else 
 
         if ((Select_SRAM == 0) && (Select_IO == 1)) begin
-            DataOut_CPU <= DataIn_IO;
-        end
+            DataOut_CPU = DataIn_IO;
+        end else 
 
         if (Select_ROM == 1) begin
-            DataOut_CPU <= DataIn_ROM;
-        end
+            DataOut_CPU = DataIn_ROM;
+        end else 
 
         if (Select_KEYBOARD == 1) begin
-            DataOut_CPU <= DataIn_KEYBOARD;
-        end
+            DataOut_CPU = DataIn_KEYBOARD;
+        end else
 
         if (Select_EXP == 1) begin
-            DataOut_CPU     <= DataIn_EXP;
+            DataOut_CPU     = DataIn_EXP;
+        end else
+
+        if (Select_UART == 1) begin
+            DataOut_CPU     = DataIn_UART;
         end
     end
 endmodule: data_bus_multiplexer

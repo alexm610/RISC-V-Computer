@@ -74,7 +74,7 @@ module cpu (
         .read_data(CSR_read_data),
         .irq_software(1'b0),
         .irq_timer(IRQ_Timer_H),
-        .irq_external(IRQ_UART_H),
+        .irq_external(1'b0),
         .mstatus_MIE(MIE),
         .mstatus_MPIE(MPIE),
         .mstatus_MPP(MPP),
@@ -382,7 +382,7 @@ module cpu (
                                 `MRET: begin
                                     if (Current_Instruction == 32'h30200073) begin
                                         State               <= MRET_1;
-                                        CSR_write_data      <= {26'd0, 1'b1, 3'b000, MPIE, 3'b000};
+                                        CSR_write_data      <= {19'd0, 2'b11, 3'd0, 1'b1, 3'b000, MPIE, 3'b000};
                                         //MSTATUS_temp[3]    <= MPIE;
                                         //MSTATUS_temp[7]     <= 1'b1;
                                         CSR_address <= 12'h300;
@@ -516,6 +516,9 @@ module cpu (
                         //CSR_write_data      <= Program_Counter;
                         CSR_address         <= 12'h341; 
                         //CSR_WE_L            <= 1'b0;
+                        WE_L            <= 1'b1;
+                        AS_L            <= 1'b1;
+                        mem_or_reg <= 1'b0;
                     end
                 end
                 IRQ_0: begin
@@ -533,7 +536,7 @@ module cpu (
                 end
                 IRQ_2: begin
                     State <= IRQ_2_STALL;
-                    CSR_write_data      <= {26'd0, MIE, 3'b000, 1'b0, 3'b000};
+                    CSR_write_data      <= {24'd0, MIE, 3'b000, 1'b0, 3'b000};
                     CSR_address         <= 12'h300; // writing to MSTATUS
                     CSR_WE_L            <= 1'b1;
                 end

@@ -43,7 +43,7 @@ module address_decoder (
 			Keyboard_Select_H 	<= 1;
 		end
 
-		if ((Address >= 32'h05000010) && (Address <= 32'h0500001F)) begin
+		if ((Address >= 32'h10000000) && (Address <= 32'h1000000F)) begin
 			UART_Select_H 		<= 1;
 		end 
 	end
