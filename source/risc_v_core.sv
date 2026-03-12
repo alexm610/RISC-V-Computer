@@ -16,9 +16,20 @@ module risc_v_core (
     output logic VGA_HS, 
     output logic VGA_VS, 
     output logic VGA_CLK, 
-    output logic [9:0] LEDR
+    output logic [9:0] LEDR,
     //inout logic PS2_CLK,
-    //inout logic PS2_DAT
+    //inout logic PS2_DAT,
+    output logic        DRAM_CLK,
+    output logic        DRAM_CKE,
+    output logic        DRAM_CS_N,
+    output logic        DRAM_RAS_N,
+    output logic        DRAM_CAS_N,
+    output logic        DRAM_WE_N,
+    output logic [12:0] DRAM_ADDR,
+    output logic [1:0]  DRAM_BA,
+    inout  wire  [15:0] DRAM_DQ,
+    output logic        DRAM_UDQM,
+    output logic        DRAM_LDQM
 );
 
     logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select, vga_ready;
@@ -39,7 +50,9 @@ module risc_v_core (
     logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select, IRQ_timer;
     logic [31:0] data_out_KEYBOARD, data_out_EXP;
     logic [31:0] data_out_UART;
+    logic sdram_dtack_h, sdram_reset_out;
 
+    assign DRAM_CLK         = ~CLOCK_50;
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
@@ -47,8 +60,8 @@ module risc_v_core (
 
     cpu PROCESSOR (
         .Clock(CLOCK_50),
-        .Reset_L(KEY[0]),
-        .DTAck(1'b1),
+        .Reset_L(sdram_reset_out),
+        .DTAck(RAM_Select ? sdram_dtack_h : 1'b1),
         .IRQ_Timer_H(IRQ_timer),
         .IRQ_UART_H(1'b0),
         .Instruction(instruction),
@@ -59,7 +72,8 @@ module risc_v_core (
         .DataBus_Out(data_out),
         .Address(address),
         .Conduit(done),
-        .Reset_Out(Reset_L));
+        .Reset_Out(Reset_L)
+    );
 
     address_decoder AD (
         .Address(address),
@@ -97,19 +111,32 @@ module risc_v_core (
         .DataOut(instruction)
     );
 
-    OnChipRam256kbyte SRAM_MEMORY (
-        .Clock(CLOCK_50),
-        .RamSelect_H(RAM_Select),
-        .WE_L(WE_L),
-        .AS_L(AS_L),
-        .Address(address>>2),
-        .ByteEnable(byte_enable),
-        .DataIn(data_out),
-        .DataOut(data_out_SRAM)
+    SDRAM_wrapper SDRAM_MEMORY (
+        .Clock       (CLOCK_50),
+        .Reset_L     (KEY[0]),
+        .RamSelect_H (RAM_Select),
+        .WE_L        (WE_L),
+        .AS_L        (AS_L),
+        .Address     (address),          // NOTE: no >>2 here — wrapper takes byte addr
+        .ByteEnable  (byte_enable),
+        .DataIn      (data_out),
+        .DataOut     (data_out_SRAM),
+        .DTAck_H     (sdram_dtack_h),
+        .ResetOut_L  (sdram_reset_out),
+        .SDRAM_CKE   (DRAM_CKE),        // add DRAM_* to your top-level port list
+        .SDRAM_CS_N  (DRAM_CS_N),
+        .SDRAM_RAS_N (DRAM_RAS_N),
+        .SDRAM_CAS_N (DRAM_CAS_N),
+        .SDRAM_WE_N  (DRAM_WE_N),
+        .SDRAM_ADDR  (DRAM_ADDR),
+        .SDRAM_BA    (DRAM_BA),
+        .SDRAM_DQ    (DRAM_DQ),
+        .SDRAM_UDQM  (DRAM_UDQM),
+        .SDRAM_LDQM  (DRAM_LDQM)
     );
 
 	IO_Handler IO (.Clock(CLOCK_50),
-        .Reset_L(KEY[0]),
+        .Reset_L(Reset_L),
         .byte_enable(byte_enable),
 		.LEDR_output(LEDR[8:0]),
 		.SW_input(SW),
@@ -135,7 +162,7 @@ module risc_v_core (
     OnChipM68xxIO UART_0 (
 	    .IOSelect(UART_Select),
 	    .Clk(CLOCK_50),
-	    .Reset_L(KEY[0]),
+	    .Reset_L(Reset_L),
 	    .Clock_50Mhz(CLOCK_50),
 	    .RS232_RxData(GPIO_1[34]),
 	    .UDS_L(1'b0),
@@ -150,7 +177,7 @@ module risc_v_core (
        
     vga_control VGA_CONTROL (
         .clk(CLOCK_50),
-        .rst_n(KEY[0]),
+        .rst_n(Reset_L),
         .data_in(data_out),
         .ready(vga_ready), // output to arbiter/cpu
         .VGA_Select(Graphics_Select),
@@ -163,7 +190,7 @@ module risc_v_core (
 
     vga_adapter #(.RESOLUTION("160x120")) VGA_0 (
         .clock(CLOCK_50),
-        .resetn(KEY[0]),
+        .resetn(Reset_L),
         .colour(into_vga_colour), // from controller
         .x(fill_x), // from controller I need to make 
         .y(fill_y), // from controller 

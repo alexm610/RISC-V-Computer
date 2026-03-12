@@ -25,13 +25,6 @@ int main(void) {
     Timer0_Data_Register = 0x02FAF080;
     Timer0_Control_Register = 0x00000003;
 
-    _puts("Enter your name: ");
-    FlushKeyboard();
-    _gets(buf, 32);              // blocks until user presses Enter
-    _puts("Hello, ");
-    _puts(buf);
-    _puts("!\n");
-
     print_stripes();
     while (1) {
         HEX = timer_ticks;
