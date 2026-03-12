@@ -3,7 +3,7 @@
 #include "vga.h"
 #include "lcd_display.h"
 #include "uart.h"
-extern volatile uint32_t timer_ticks;
+extern volatile unsigned int timer_ticks;
 
 int main(void) {
     char *message1 = "Hello dearest,";
@@ -36,9 +36,9 @@ Init_RS232();
     while (1) {
         HEX = timer_ticks;
 
-        LEDR = RS232_Status;
+        LEDR = SWITCHES;
         
 
-        c = _getch();
-}
+        
+    }
 }
