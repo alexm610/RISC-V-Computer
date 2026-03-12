@@ -132,19 +132,6 @@ module risc_v_core (
         .IRQ_timer0_H(IRQ_timer)
     );
 
-    /*uart_mmio_32bit_8N2 UART_0 (
-        .CLOCK_50MHz(CLOCK_50),
-        .RESET_L(KEY[0]),
-        .AS_L(AS_L),
-        .WE_L(WE_L),
-        //.UART_SEL_H(UART_Select),
-        .Address(address),
-        .DataIn(data_out),
-        .DataOut(data_out_UART),
-        .uart_tx(GPIO_1[35]),
-        .uart_rx(GPIO_1[34])
-    );*/
-
     OnChipM68xxIO UART_0 (
 	    .IOSelect(UART_Select),
 	    .Clk(CLOCK_50),

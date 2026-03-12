@@ -9,3 +9,5 @@ int kbhit(void);
 int _putch(int);
 int _getch(void);
 void FlushKeyboard(void);
+void _puts(const char *s);
+void _gets(char *buf, int max_len);

@@ -73,3 +73,40 @@ void FlushKeyboard(void)
             return ;
      }
 }
+
+void _puts(const char *s)
+{
+    while (*s != '\0') {
+        if (*s == '\n') {
+            _putch('\r');   // send CR before LF for proper terminal newline
+            _putch('\n');
+            s++;
+        } else {
+            _putch(*s++);
+        }
+    }
+}
+
+void _gets(char *buf, int max_len)
+{
+    int i = 0;
+    FlushKeyboard();        // discard any stale input before we start
+
+    while (1) {
+        char c = _getch();
+        if (c == '\r') {
+            _puts("\n");
+            buf[i] = '\0';
+            return;
+        } else if (c == 0x08 || c == 0x7F) {
+            if (i > 0) {
+                i--;
+                _putch(0x08);
+                _putch(' ');
+                _putch(0x08);
+            }
+        } else if (i < max_len - 1) {
+            buf[i++] = c;
+        }
+    }
+}
