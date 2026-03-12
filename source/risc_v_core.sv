@@ -241,9 +241,5 @@ module data_bus_multiplexer (
         if (Select_UART == 1) begin
             DataOut_CPU     = DataIn_UART;
         end
-
-        if (Select_UART == 1) begin
-            DataOut_CPU     <= DataIn_UART;
-        end
     end
 endmodule: data_bus_multiplexer

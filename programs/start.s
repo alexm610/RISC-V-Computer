@@ -7,7 +7,11 @@
 _start:
     # Init SP
     la sp, _stack_top
+
+    .option push
+    .option norelax
     la gp, __global_pointer$
+    .option pop
 
     # ------------------------
     # Copy .data from ROM to RAM
@@ -44,11 +48,11 @@ _start:
 
     # Enable global machine interrupts (MIE in mstatus)
     li t0, 8
-    # csrs mstatus, t0
+    csrs mstatus, t0
 
     # Enable timer interrupts in mie (MTIE = 1 << 7)
     li t0, (1 << 7)
-    # csrs mie, t0
+    csrs mie, t0
 
     call main
     j .
