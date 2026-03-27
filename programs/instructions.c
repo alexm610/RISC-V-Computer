@@ -21,20 +21,15 @@ int main(void) {
     LCD_line1(message2);
 
     timer_ticks = 0;
-    Timer0_Control_Register = 0x0;
-    Timer0_Data_Register = 0x02FAF080;
-    Timer0_Control_Register = 0x00000003;
+    //Timer0_Control_Register = 0x0;
+    //Timer0_Data_Register = 0x02FAF080;
+    //Timer0_Control_Register = 0x00000003;
 
     print_stripes();
     while (1) {
         HEX = timer_ticks;
         LEDR = SWITCHES;
 
-        if (kbhit()) {
-            char c = _getch();
-            if (c == '\r') {
-                _puts("\nYou pressed enter!\n");
-            }
-        }
+        
     }
 }

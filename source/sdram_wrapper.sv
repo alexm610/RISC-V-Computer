@@ -82,7 +82,7 @@ module SDRAM_wrapper (
     logic        ctrl_we_n;     // WE_L into controller
     logic        ctrl_as_n;     // AS_L into controller
     logic        ctrl_dtack_n;  // Dtack_L from controller (active-low)
-    logic        ctrl_rst_out;  // ResetOut_L from controller
+
     logic [4:0]  ctrl_state;    // DramState (debug only)
 
     // ── Read-data capture registers ──────────────────────────────────────────
@@ -128,7 +128,9 @@ module SDRAM_wrapper (
 
                 DONE:
                     // DTAck_H was pulsed this clock (see comb block); return to IDLE.
-                    state <= IDLE;
+                    if (AS_L) begin
+                        state <= IDLE;
+                    end 
 
                 default:
                     state <= IDLE;

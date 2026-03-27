@@ -8,8 +8,19 @@ module tb_risc_v_core();
     logic [2:0] VGA_COLOUR;
     logic VGA_PLOT, VGA_HS, VGA_VS, VGA_CLK;
     logic [9:0] SW, LEDR;
-    logic [35:0] GPIO_0, GPIO_1;
-    
+    wire [35:0] GPIO_0, GPIO_1;
+    logic        DRAM_CLK;
+    logic        DRAM_CKE;
+    logic        DRAM_CS_N;
+    logic        DRAM_RAS_N;
+    logic        DRAM_CAS_N;
+    logic        DRAM_WE_N;
+    logic [12:0] DRAM_ADDR;
+    logic [1:0]  DRAM_BA;
+    wire  [15:0] DRAM_DQ;
+    logic        DRAM_UDQM;
+    logic        DRAM_LDQM;
+
     reg [31:0] i;
     reg [31:0] j;
     int counter = 0;
@@ -18,6 +29,11 @@ module tb_risc_v_core();
     reg [31:0] mem_file_1 [0:1023];
 
     risc_v_core dut   (.*);
+
+    initial begin
+        $dumpfile("waveform.vcd"); // Name of the output file
+        $dumpvars(0, tb_risc_v_core); // 0 means dump ALL signals in this module and below
+    end
 
     initial forever begin
         CLOCK_50 = 1; #1;
@@ -53,7 +69,7 @@ module tb_risc_v_core();
         //KEY[0] = 0;
         $readmemh("instructions.txt", mem_file_1);
         j = 0;
-        for (i = 0; i < 1024; i = i + 4) begin
+        for (i = 0; i < 4096; i = i + 4) begin
             dut.test_write = 1;
             //force dut.program_counter = i;
             force dut.ROM_Select = 1;
@@ -61,7 +77,9 @@ module tb_risc_v_core();
             force dut.dummy_instr_writedata = mem_file_1[j];
             
             #2;
+            dut.test_write = 0;
             j = j + 1;
+            #2;
         end
         dut.test_write = 0;
         #2;
@@ -73,10 +91,10 @@ module tb_risc_v_core();
         KEY[0] = 0; #2;
         KEY[0] = 1; #10;
 
-        wait (dut.address == 32'h01140000);
+        //wait (dut.address == 32'h01140000);
         
         //@ (posedge LEDR[9]);
-        #4;
+        #5000;
 
         if (!error) begin
             $display("No errors thrown!");

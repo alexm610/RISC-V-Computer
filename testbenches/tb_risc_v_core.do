@@ -144,14 +144,6 @@ add wave -noupdate /tb_risc_v_core/dut/INSTRUCTION_MEMORY/Write_Enable
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEMORY/Address
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEMORY/DataIn
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/INSTRUCTION_MEMORY/DataOut
-add wave -noupdate -divider -height 40 SRAM
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/RamSelect_H
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/WE_L
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/AS_L
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/Address
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/ByteEnable
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/DataIn
-add wave -noupdate /tb_risc_v_core/dut/SRAM_MEMORY/DataOut
 add wave -noupdate -divider -height 40 DATAPATH
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/write_rb
 add wave -noupdate /tb_risc_v_core/dut/PROCESSOR/HW/alu_source
@@ -266,8 +258,55 @@ add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/CSR/mtvec
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/CSR/mepc
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/CSR/mcause
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/PROCESSOR/CSR/mip
+add wave -noupdate -divider -height 40 SDRAM
+add wave -noupdate /tb_risc_v_core/dut/DRAM_CLK
+add wave -noupdate /tb_risc_v_core/dut/DRAM_CKE
+add wave -noupdate /tb_risc_v_core/dut/DRAM_CS_N
+add wave -noupdate /tb_risc_v_core/dut/DRAM_RAS_N
+add wave -noupdate /tb_risc_v_core/dut/DRAM_CAS_N
+add wave -noupdate /tb_risc_v_core/dut/DRAM_WE_N
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/DRAM_ADDR
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/DRAM_BA
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/DRAM_DQ
+add wave -noupdate /tb_risc_v_core/dut/DRAM_UDQM
+add wave -noupdate /tb_risc_v_core/dut/DRAM_LDQM
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/Clock
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/Reset_L
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/RamSelect_H
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/WE_L
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/AS_L
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/Address
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ByteEnable
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/DataIn
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/DataOut
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/DTAck_H
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ResetOut_L
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_CKE
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_CS_N
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_RAS_N
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_CAS_N
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_WE_N
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_ADDR
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_BA
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_DQ
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_UDQM
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/SDRAM_LDQM
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/state
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_addr
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_din
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_dout
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_uds_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_lds_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_sel_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_we_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_as_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_dtack_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_rst_out
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_state
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/rdata_hi
+add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/rdata_lo
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {10266 ps} 0}
+WaveRestoreCursors {{Cursor 1} {10244 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 383
 configure wave -valuecolwidth 219
@@ -283,4 +322,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {13861 ps} {13947 ps}
+WaveRestoreZoom {10125 ps} {10611 ps}

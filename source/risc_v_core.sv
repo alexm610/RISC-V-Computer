@@ -34,7 +34,6 @@ module risc_v_core (
 
     logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select, vga_ready;
     logic [7:0] data_out_RS232;
-    logic CLOCK_25;
     logic [3:0] byte_enable;
     logic [3:0] fabric_write, fabric_read;
     logic [31:0] program_counter;//, address;
@@ -51,16 +50,26 @@ module risc_v_core (
     logic [31:0] data_out_KEYBOARD, data_out_EXP;
     logic [31:0] data_out_UART;
     logic sdram_dtack_h, sdram_reset_out;
+    logic CLOCK_25, clk_div;
 
-    assign DRAM_CLK         = ~CLOCK_50;
+    assign DRAM_CLK         = CLOCK_50;
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
     assign LEDR[9]          = done;
+    assign CLOCK_25         = clk_div;
+
+    always_ff @(posedge CLOCK_50) begin
+        if (~KEY[0]) begin
+            clk_div <= 1'b0;
+        end else begin
+            clk_div <= ~clk_div;
+        end
+    end
 
     cpu PROCESSOR (
-        .Clock(CLOCK_50),
-        .Reset_L(sdram_reset_out),
+        .Clock(CLOCK_25),
+        .Reset_L(KEY[0] & sdram_reset_out),
         .DTAck(RAM_Select ? sdram_dtack_h : 1'b1),
         .IRQ_Timer_H(IRQ_timer),
         .IRQ_UART_H(1'b0),
@@ -103,7 +112,7 @@ module risc_v_core (
     );
 
     OnChipROM16KWords INSTRUCTION_MEMORY (
-        .Clock(CLOCK_50),
+        .Clock(CLOCK_25),
         .RomSelect_H(ROM_Select),
         .Write_Enable(test_write),
         .Address(address>>2),
@@ -112,7 +121,7 @@ module risc_v_core (
     );
 
     SDRAM_wrapper SDRAM_MEMORY (
-        .Clock       (CLOCK_50),
+        .Clock       (~CLOCK_50),
         .Reset_L     (KEY[0]),
         .RamSelect_H (RAM_Select),
         .WE_L        (WE_L),
@@ -135,7 +144,8 @@ module risc_v_core (
         .SDRAM_LDQM  (DRAM_LDQM)
     );
 
-	IO_Handler IO (.Clock(CLOCK_50),
+	IO_Handler IO (
+        .Clock(CLOCK_25),
         .Reset_L(Reset_L),
         .byte_enable(byte_enable),
 		.LEDR_output(LEDR[8:0]),
@@ -161,7 +171,7 @@ module risc_v_core (
 
     OnChipM68xxIO UART_0 (
 	    .IOSelect(UART_Select),
-	    .Clk(CLOCK_50),
+	    .Clk(CLOCK_25),
 	    .Reset_L(Reset_L),
 	    .Clock_50Mhz(CLOCK_50),
 	    .RS232_RxData(GPIO_1[34]),
@@ -176,7 +186,7 @@ module risc_v_core (
     );
        
     vga_control VGA_CONTROL (
-        .clk(CLOCK_50),
+        .clk(CLOCK_25),
         .rst_n(Reset_L),
         .data_in(data_out),
         .ready(vga_ready), // output to arbiter/cpu

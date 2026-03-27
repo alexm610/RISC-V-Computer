@@ -19,7 +19,7 @@ module address_decoder (
 		UART_Select_H		<= 0;
 		ExpAccel_Select_H	<= 0;
 
-		if ((Address >= 32'h00000000) && (Address <= 32'h00007FFF)) begin
+		if ((Address >= 32'h00000000) && (Address <= 32'h00003FFF)) begin
 			ROM_Select_H		<= 1;
 		end
 
