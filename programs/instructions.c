@@ -21,15 +21,27 @@ int main(void) {
     LCD_line1(message2);
 
     timer_ticks = 0;
-    //Timer0_Control_Register = 0x0;
-    //Timer0_Data_Register = 0x02FAF080;
-    //Timer0_Control_Register = 0x00000003;
+    Timer0_Control_Register = 0x0;
+    Timer0_Data_Register = 0x017D7840;
+    Timer0_Control_Register = 0x00000003;
+
+    _puts("Enter your name: ");
+    FlushKeyboard();
+    _gets(buf, 32);              // blocks until user presses Enter
+    _puts("Hello, ");
+    _puts(buf);
+    _puts("!\n");
 
     print_stripes();
     while (1) {
         HEX = timer_ticks;
         LEDR = SWITCHES;
 
-        
+        if (kbhit()) {
+            char c = _getch();
+            if (c == '\r') {
+                _puts("\nYou pressed enter!\n");
+            }
+        }
     }
 }

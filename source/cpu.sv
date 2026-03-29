@@ -110,7 +110,7 @@ module cpu (
     assign IRQ_pending          = ((MIE == 1'b1) && (((MSIE == 1) && (MSIP == 1)) || ((MTIE == 1) && (MTIP == 1)) || ((MEIE == 1) && (MEIP == 1)))) ? 1'b1 : 1'b0;
     //assign interrupt_ID         = 32'h0;
     assign pending_interrupt_mask   = {MEIP & MEIE, 3'h0, MTIE & MTIP, 3'h0, MSIE & MSIP, 3'h0};
-    assign conduit = dtack_timeout[23];
+    //assign conduit = dtack_timeout[23];
 
     always @(*) begin
         if (pending_interrupt_mask[11]) begin
@@ -228,7 +228,7 @@ module cpu (
             mem_or_reg                  <= 0;
             alu_OP                      <= 4'h0;
             alu_SRC                     <= 1;
-            //Conduit                     <= 0;
+            Conduit                     <= 0;
             jump_link                   <= 0;
             imm                         <= 32'h00000000;
             reg_bank_write              <= 0;
@@ -394,7 +394,7 @@ module cpu (
                             endcase
                         end
                         7'b0000000: begin
-                            //Conduit <= 1'b1;
+                            Conduit <= 1'b1;
                             State <= START;
                         end
                         default: State  <= START;
@@ -600,7 +600,7 @@ module cpu (
                         Program_Counter_Increment <= 2'b00;
                     end else begin 
                         dtack_timeout <= dtack_timeout + 1;
-                        State <= (dtack_timeout == 24'hFFFFFF) ? INITIALIZE : ACCESS_MEMORY_2;
+                        State <= ACCESS_MEMORY_2;
                     end 
                 end
                 WRITE_MEMORY_1: begin
@@ -612,11 +612,11 @@ module cpu (
                     if (DTAck) begin
                         dtack_timeout <= 0;
                         State <= COMPLETE;
-                        reg_bank_write <= 1'b1; // only write when data is valid
+                        //reg_bank_write <= 1'b1; // only write when data is valid
                         Program_Counter_Increment <= 2'b00;
                     end else begin 
                         dtack_timeout <= dtack_timeout + 1;
-                        State <= (dtack_timeout == 24'hFFFFFF) ? INITIALIZE : WRITE_MEMORY_2;
+                        State <= WRITE_MEMORY_2;
                     end 
                 end
                 BRANCH_EQ: begin

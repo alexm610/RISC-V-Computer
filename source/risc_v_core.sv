@@ -50,25 +50,24 @@ module risc_v_core (
     logic [31:0] data_out_KEYBOARD, data_out_EXP;
     logic [31:0] data_out_UART;
     logic sdram_dtack_h, sdram_reset_out;
-    logic CLOCK_25, clk_div;
+    logic clk_25, clk_50, clk_50_180;
 
-    assign DRAM_CLK         = CLOCK_50;
+    assign DRAM_CLK         = clk_50;
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
     assign LEDR[9]          = done;
-    assign CLOCK_25         = clk_div;
 
-    always_ff @(posedge CLOCK_50) begin
-        if (~KEY[0]) begin
-            clk_div <= 1'b0;
-        end else begin
-            clk_div <= ~clk_div;
-        end
-    end
+    pll_alex_0002 PLL_ALEX (
+        .refclk(CLOCK_50),
+        .rst(~KEY[0]),
+        .outclk_0(clk_25),
+        .outclk_1(clk_50),
+        .outclk_2(clk_50_180)
+    );
 
     cpu PROCESSOR (
-        .Clock(CLOCK_25),
+        .Clock(clk_25),
         .Reset_L(KEY[0] & sdram_reset_out),
         .DTAck(RAM_Select ? sdram_dtack_h : 1'b1),
         .IRQ_Timer_H(IRQ_timer),
@@ -112,7 +111,7 @@ module risc_v_core (
     );
 
     OnChipROM16KWords INSTRUCTION_MEMORY (
-        .Clock(CLOCK_25),
+        .Clock(clk_25),
         .RomSelect_H(ROM_Select),
         .Write_Enable(test_write),
         .Address(address>>2),
@@ -121,7 +120,7 @@ module risc_v_core (
     );
 
     SDRAM_wrapper SDRAM_MEMORY (
-        .Clock       (~CLOCK_50),
+        .Clock       (clk_50_180),
         .Reset_L     (KEY[0]),
         .RamSelect_H (RAM_Select),
         .WE_L        (WE_L),
@@ -145,7 +144,7 @@ module risc_v_core (
     );
 
 	IO_Handler IO (
-        .Clock(CLOCK_25),
+        .Clock(clk_25),
         .Reset_L(Reset_L),
         .byte_enable(byte_enable),
 		.LEDR_output(LEDR[8:0]),
@@ -171,9 +170,9 @@ module risc_v_core (
 
     OnChipM68xxIO UART_0 (
 	    .IOSelect(UART_Select),
-	    .Clk(CLOCK_25),
+	    .Clk(clk_25),
 	    .Reset_L(Reset_L),
-	    .Clock_50Mhz(CLOCK_50),
+	    .Clock_50Mhz(clk_50),
 	    .RS232_RxData(GPIO_1[34]),
 	    .UDS_L(1'b0),
 	    .WE_L(WE_L),
@@ -186,7 +185,7 @@ module risc_v_core (
     );
        
     vga_control VGA_CONTROL (
-        .clk(CLOCK_25),
+        .clk(clk_25),
         .rst_n(Reset_L),
         .data_in(data_out),
         .ready(vga_ready), // output to arbiter/cpu

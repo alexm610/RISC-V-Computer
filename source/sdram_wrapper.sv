@@ -156,33 +156,42 @@ module SDRAM_wrapper (
         SDRAM_LDQM = 1'b0;
         
         case (state)
-
             HI_PHASE: begin
-                // First 16-bit cycle — upper half of the 32-bit word.
-                ctrl_addr  = Address;           // controller extracts row/bank/col internally
-                ctrl_din   = DataIn[31:16];     // upper 16 bits of CPU write data
-                ctrl_uds_n = ~ByteEnable[3];    // D31..D24 enable
-                ctrl_lds_n = ~ByteEnable[2];    // D23..D16 enable
-                ctrl_sel_n = 1'b0;              // assert DRAM select
-                ctrl_we_n  = WE_L;             // pass write-enable straight through
-                ctrl_as_n  = 1'b0;              // assert address strobe
-                SDRAM_UDQM = WE_L ? 1'b0 : ~ByteEnable[3];  // D31..D24
-                SDRAM_LDQM = WE_L ? 1'b0 : ~ByteEnable[2];  // D23..D16
-            end
-
-            LO_PHASE: begin
-                // Second 16-bit cycle — lower half of the 32-bit word.
-                // Adding 2 to the byte address moves the column address up by 1
-                // (controller uses Address[10:1] as the column index).
-                ctrl_addr  = Address + 32'd2;   // next 16-bit location
-                ctrl_din   = DataIn[15:0];      // lower 16 bits of CPU write data
-                ctrl_uds_n = ~ByteEnable[1];    // D15..D8 enable
-                ctrl_lds_n = ~ByteEnable[0];    // D7..D0 enable
+                ctrl_addr  = Address;
+                ctrl_din   = DataIn[31:16];
                 ctrl_sel_n = 1'b0;
                 ctrl_we_n  = WE_L;
                 ctrl_as_n  = 1'b0;
-                SDRAM_UDQM = WE_L ? 1'b0 : ~ByteEnable[1];  // D15..D8
-                SDRAM_LDQM = WE_L ? 1'b0 : ~ByteEnable[0];  // D7..D0
+                if (!WE_L && ByteEnable[3:2] == 2'b00) begin
+                    ctrl_uds_n = 1'b0;   // force asserted to prevent controller stall
+                    ctrl_lds_n = 1'b0;
+                    SDRAM_UDQM = 1'b1;   // DQM masks both bytes — nothing written to SDRAM
+                    SDRAM_LDQM = 1'b1;
+                end else begin
+                    ctrl_uds_n = ~ByteEnable[3];
+                    ctrl_lds_n = ~ByteEnable[2];
+                    SDRAM_UDQM = WE_L ? 1'b0 : ~ByteEnable[3];
+                    SDRAM_LDQM = WE_L ? 1'b0 : ~ByteEnable[2];
+                end
+            end
+
+            LO_PHASE: begin
+                ctrl_addr  = Address + 32'd2;
+                ctrl_din   = DataIn[15:0];
+                ctrl_sel_n = 1'b0;
+                ctrl_we_n  = WE_L;
+                ctrl_as_n  = 1'b0;
+                if (!WE_L && ByteEnable[1:0] == 2'b00) begin
+                    ctrl_uds_n = 1'b0;   // force asserted to prevent controller stall
+                    ctrl_lds_n = 1'b0;
+                    SDRAM_UDQM = 1'b1;   // DQM masks both bytes — nothing written
+                    SDRAM_LDQM = 1'b1;
+                end else begin
+                    ctrl_uds_n = ~ByteEnable[1];
+                    ctrl_lds_n = ~ByteEnable[0];
+                    SDRAM_UDQM = WE_L ? 1'b0 : ~ByteEnable[1];
+                    SDRAM_LDQM = WE_L ? 1'b0 : ~ByteEnable[0];
+                end
             end
 
             DONE: begin

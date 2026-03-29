@@ -30,7 +30,7 @@ module M68kDramController_Verilog (
 			output reg SDram_WE_L,								// active low Write enable for dram chip
 			output reg unsigned [12:0] SDram_Addr,			// 13 bit address bus dram chip	
 			output reg unsigned [1:0] SDram_BA,				// 2 bit bank address
-			inout  reg unsigned [15:0] SDram_DQ,			// 16 bit bi-directional data lines to dram chip
+			inout  wire [15:0] SDram_DQ,			// 16 bit bi-directional data lines to dram chip
 			
 			output reg Dtack_L,									// Dtack back to CPU at end of bus cycle
 			output reg ResetOut_L,								// reset out to the CPU
@@ -38,7 +38,7 @@ module M68kDramController_Verilog (
 			// Use only if you want to simulate dram controller state (e.g. for debugging)
 			output reg [4:0] DramState
 		); 	
-		
+		reg [15:0] SDram_DQ_reg;
 		// WIRES and REGs
 		
 		reg  	[4:0] Command;										// 5 bit signal containing Dram_CKE_H, SDram_CS_L, SDram_RAS_L, SDram_CAS_L, SDram_WE_L
@@ -131,7 +131,7 @@ module M68kDramController_Verilog (
 		
 		
 		// TODO - Add your own states as per your own design
-		
+		assign SDram_DQ = FPGAWritingtoSDram_H ? SDram_DQ_reg : 16'bz;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General Timer for timing and counting things: Loadable and counts down on each clock then produced a TimerDone signal and stops counting
@@ -211,11 +211,7 @@ module M68kDramController_Verilog (
 			// of course during a write, the dram WE signal will need to be driven low and it will respond by tri-stating its outputs lines so you can drive data in to it
 			// remember the Dram chip has bi-directional data lines, when you read from it, it turns them on, when you write to it, it turns them off (tri-states them)
 
-			if(FPGAWritingtoSDram_H == 1) 	begin		// if CPU is doing a write, we need to turn on the FPGA data out lines to the SDRam and present Dram with CPU data 
-				SDram_DQ	<= SDramWriteData ;
-			end else begin
-				SDram_DQ	<= 16'bZZZZZZZZZZZZZZZZ;			// otherwise tri-state the FPGA data output lines to the SDRAM for anything other than writing to it
-			end
+			SDram_DQ_reg <= SDramWriteData;
 			DramState <= CurrentState ;					// output current state - useful for debugging so you can see you state machine changing states etc
 		end
 	end	
@@ -427,12 +423,13 @@ module M68kDramController_Verilog (
 
 		else if (CurrentState == read_SDRAM_wait) begin
 			CPUReset_L					<= 1; 									// Keep CPU reset inactive
-			CPU_Dtack_L					<= 0;									// Issue DTAck back to 68000 once we are waiting for CAS latency
 			Command						<= NOP;									// Issue NOP command to SDRAM
 			DramDataLatch_H				<= 1;									// Latch data from SDRAM to data-out bus towards 68000
 			if (TimerDone_H == 1) begin
+				CPU_Dtack_L					<= 0;									// Issue DTAck back to 68000 once we are waiting for CAS latency
 				NextState				<= terminate_bus_cycle;					// CAS latency complete, transition to bus cycle termination state
 			end else begin
+				CPU_Dtack_L 			<= 1;
 				NextState				<= read_SDRAM_wait;						// CAS latency uncomplete, remain in current state
 			end
 		end

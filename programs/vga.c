@@ -1,7 +1,6 @@
 #include "instructions.h"
 #include "vga.h"
 
-
 void print_stripes(void) {
     int x, y, colour;
 
