@@ -64,7 +64,7 @@ module risc_v_core (
         .outclk_0(clk_25),
         .outclk_1(clk_50),
         .outclk_2(clk_50_180)
-    );
+  );  
 
     cpu PROCESSOR (
         .Clock(clk_50),
