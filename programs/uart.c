@@ -45,21 +45,6 @@ int _putch( int c)
 **  call _getch() also
 *********************************************************************************************************/
 
-int _getch( void )
-{
-    int c ;
-    while(((RS232_Status) & (char)(0x01)) != (char)(0x01))    // wait for Rx bit in 6850 serial comms chip status register to be '1'
-        ;
-
-    c = (RS232_RxData & (char)(0x7f));                   // read received character, mask off top bit and return as 7 bit ASCII character
-
-    // shall we echo the character? Echo is set to TRUE at reset, but for speed we don't want to echo when downloading code with the 'L' debugger command
-    if(1)
-        _putch(c);
-
-    return c ;
-}
-
 // flush the input stream for any unread characters
 
 void FlushKeyboard(void)
@@ -87,14 +72,22 @@ void _puts(const char *s)
     }
 }
 
+int _getch(void)
+{
+    int c;
+    while (((RS232_Status) & (char)(0x01)) != (char)(0x01))
+        ;
+    c = (RS232_RxData & 0x7f);
+    return c;   // no echo here — let the caller decide
+}
+
 void _gets(char *buf, int max_len)
 {
     int i = 0;
-    FlushKeyboard();        // discard any stale input before we start
-
+    FlushKeyboard();
     while (1) {
         char c = _getch();
-        if (c == '\r') {
+        if (c == '\r' || c == '\n') {
             _puts("\n");
             buf[i] = '\0';
             return;
@@ -107,6 +100,7 @@ void _gets(char *buf, int max_len)
             }
         } else if (i < max_len - 1) {
             buf[i++] = c;
+            _putch(c);   // echo here, after storing
         }
     }
 }

@@ -47,6 +47,8 @@ module cpu (
     logic [31:0]    interrupt_ID;
     logic [11:0]    pending_interrupt_mask;
 
+    logic [23:0] dtack_timeout; 
+
     datapath HW (
         .clk(Clock),
         .rst_n(Reset_L),
@@ -108,6 +110,7 @@ module cpu (
     assign IRQ_pending          = ((MIE == 1'b1) && (((MSIE == 1) && (MSIP == 1)) || ((MTIE == 1) && (MTIP == 1)) || ((MEIE == 1) && (MEIP == 1)))) ? 1'b1 : 1'b0;
     //assign interrupt_ID         = 32'h0;
     assign pending_interrupt_mask   = {MEIP & MEIE, 3'h0, MTIE & MTIP, 3'h0, MSIE & MSIP, 3'h0};
+    //assign conduit = dtack_timeout[23];
 
     always @(*) begin
         if (pending_interrupt_mask[11]) begin
@@ -120,7 +123,6 @@ module cpu (
             interrupt_ID = 32'd0; // no interrupt
         end 
     end
-    
     
     always @(*) begin
         case (Byte_Enable) 
@@ -231,7 +233,6 @@ module cpu (
             imm                         <= 32'h00000000;
             reg_bank_write              <= 0;
             load_upper_imm              <= 0;
-            Conduit                     <= 0;
             Program_Counter_Increment   <= 2'b00;
             Reset_Out                   <= 0;
             instruction_fetch           <= 1;
@@ -592,11 +593,15 @@ module cpu (
                     AS_L        <= 1'b0;
                 end
                 ACCESS_MEMORY_2: begin
-                    State           <= DTAck ? COMPLETE : ACCESS_MEMORY_2;
-                    reg_bank_write  <= 1'b1;
-                    // increment program counter to next instruction, ie., no jumping
-                    // Program_Counter <= Program_Counter + 32'h4;
-                    Program_Counter_Increment <= 2'b00;
+                    if (DTAck) begin
+                        dtack_timeout <= 0;
+                        State <= COMPLETE;
+                        reg_bank_write <= 1'b1; // only write when data is valid
+                        Program_Counter_Increment <= 2'b00;
+                    end else begin 
+                        dtack_timeout <= dtack_timeout + 1;
+                        State <= ACCESS_MEMORY_2;
+                    end 
                 end
                 WRITE_MEMORY_1: begin
                     State       <= WRITE_MEMORY_2;
@@ -604,10 +609,15 @@ module cpu (
                     AS_L        <= 1'b0;
                 end
                 WRITE_MEMORY_2: begin
-                    State <= DTAck ? COMPLETE : WRITE_MEMORY_2;
-                    // increment program counter to next instruction, ie., no jumping
-                    //Program_Counter <= Program_Counter + 32'h4;
-                    Program_Counter_Increment <= 2'b00;
+                    if (DTAck) begin
+                        dtack_timeout <= 0;
+                        State <= COMPLETE;
+                        //reg_bank_write <= 1'b1; // only write when data is valid
+                        Program_Counter_Increment <= 2'b00;
+                    end else begin 
+                        dtack_timeout <= dtack_timeout + 1;
+                        State <= WRITE_MEMORY_2;
+                    end 
                 end
                 BRANCH_EQ: begin
                     State   <= COMPLETE;

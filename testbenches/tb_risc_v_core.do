@@ -305,11 +305,12 @@ add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_sel_n
 add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_we_n
 add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_as_n
 add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_dtack_n
+add wave -noupdate /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_rst_out
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/ctrl_state
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/rdata_hi
 add wave -noupdate -radix hexadecimal /tb_risc_v_core/dut/SDRAM_MEMORY/rdata_lo
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {7856 ps} 0}
+WaveRestoreCursors {{Cursor 1} {10244 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 383
 configure wave -valuecolwidth 219
@@ -325,4 +326,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {7849 ps} {7897 ps}
+WaveRestoreZoom {10125 ps} {10611 ps}

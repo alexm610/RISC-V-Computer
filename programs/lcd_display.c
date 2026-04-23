@@ -2,9 +2,9 @@
 #include "lcd_display.h"
 
 void Wait1ms(void) {
-    long int i;
+    volatile long int i;
     
-    for (i=0; i<1000; i++) {
+    for (i=0; i<500; i++) {
         ;
     }
 }
@@ -70,4 +70,3 @@ void LCD_line1(char *message) {
     Wait3ms();
     LCD_message(message);
 }
-
