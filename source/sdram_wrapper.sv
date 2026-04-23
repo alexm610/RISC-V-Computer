@@ -233,4 +233,4 @@ module SDRAM_wrapper (
         .SDram_DQ     (SDRAM_DQ),
         .DramState    (ctrl_state)
     );
-endmodule : SDRAM_wrapper
+endmodule: SDRAM_wrapper

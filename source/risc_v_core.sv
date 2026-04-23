@@ -36,7 +36,7 @@ module risc_v_core (
     logic [7:0] data_out_RS232;
     logic [3:0] byte_enable;
     logic [3:0] fabric_write, fabric_read;
-    logic [31:0] program_counter;//, address;
+    logic [31:0] program_counter;
     logic [31:0] address;
     logic [31:0] instruction, dummy_instr_writedata, datapath_output, data_in, data_out, fabric_data_out, ram_output, sw_output, ledr_output, SRAM_data_out, data_out_IO, data_out_SRAM;
     logic [31:0] readdata_bus [0:2];
@@ -125,13 +125,13 @@ module risc_v_core (
         .RamSelect_H (RAM_Select),
         .WE_L        (WE_L),
         .AS_L        (AS_L),
-        .Address     (address),          // NOTE: no >>2 here — wrapper takes byte addr
+        .Address     (address),         
         .ByteEnable  (byte_enable),
         .DataIn      (data_out),
         .DataOut     (data_out_SRAM),
         .DTAck_H     (sdram_dtack_h),
         .ResetOut_L  (sdram_reset_out),
-        .SDRAM_CKE   (DRAM_CKE),        // add DRAM_* to your top-level port list
+        .SDRAM_CKE   (DRAM_CKE),        
         .SDRAM_CS_N  (DRAM_CS_N),
         .SDRAM_RAS_N (DRAM_RAS_N),
         .SDRAM_CAS_N (DRAM_CAS_N),
@@ -188,9 +188,9 @@ module risc_v_core (
         .clk(clk_50),
         .rst_n(Reset_L),
         .data_in(data_out),
-        .ready(vga_ready), // output to arbiter/cpu
+        .ready(vga_ready), 
         .VGA_Select(Graphics_Select),
-        .start(1'b0), // input from arbiter (the write signal)
+        .start(1'b0), 
         .vga_x(fill_x),
         .vga_y(fill_y),
         .vga_colour(into_vga_colour),
@@ -200,17 +200,17 @@ module risc_v_core (
     vga_adapter #(.RESOLUTION("160x120")) VGA_0 (
         .clock(clk_50),
         .resetn(Reset_L),
-        .colour(into_vga_colour), // from controller
-        .x(fill_x), // from controller I need to make 
-        .y(fill_y), // from controller 
-        .plot(fill_plot),  // from controller 
+        .colour(into_vga_colour), 
+        .x(fill_x),  
+        .y(fill_y),  
+        .plot(fill_plot),   
         .VGA_R(VGA_R_10),
         .VGA_G(VGA_G_10),
         .VGA_B(VGA_B_10),
         .*
     );  
 
-    /*exponent_accelerator EXP_ACCELERATOR_0 (
+    exponent_accelerator EXP_ACCELERATOR_0 (
         .clk(CLOCK_50),
         .reset_n(Reset_L),
         .exp_select(Exponent_Accelerator_Select),
@@ -219,7 +219,7 @@ module risc_v_core (
         .addr(address[3:0]),
         .writedata(data_out),
         .readdata(data_out_EXP)
-    );*/  
+    );
 endmodule: risc_v_core
 
 module data_bus_multiplexer (
