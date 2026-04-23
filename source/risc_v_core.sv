@@ -52,7 +52,7 @@ module risc_v_core (
     logic sdram_dtack_h, sdram_reset_out;
     logic clk_25, clk_50, clk_50_180;
 
-    assign DRAM_CLK         = clk_50;
+    assign DRAM_CLK         = clk_50_180;
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
@@ -67,7 +67,7 @@ module risc_v_core (
     );
 
     cpu PROCESSOR (
-        .Clock(clk_25),
+        .Clock(clk_50),
         .Reset_L(KEY[0] & sdram_reset_out),
         .DTAck(RAM_Select ? sdram_dtack_h : 1'b1),
         .IRQ_Timer_H(IRQ_timer),
@@ -111,7 +111,7 @@ module risc_v_core (
     );
 
     OnChipROM16KWords INSTRUCTION_MEMORY (
-        .Clock(clk_25),
+        .Clock(clk_50),
         .RomSelect_H(ROM_Select),
         .Write_Enable(test_write),
         .Address(address>>2),
@@ -120,7 +120,7 @@ module risc_v_core (
     );
 
     SDRAM_wrapper SDRAM_MEMORY (
-        .Clock       (clk_50_180),
+        .Clock       (clk_50),
         .Reset_L     (KEY[0]),
         .RamSelect_H (RAM_Select),
         .WE_L        (WE_L),
@@ -144,7 +144,7 @@ module risc_v_core (
     );
 
 	IO_Handler IO (
-        .Clock(clk_25),
+        .Clock(clk_50),
         .Reset_L(Reset_L),
         .byte_enable(byte_enable),
 		.LEDR_output(LEDR[8:0]),
@@ -170,7 +170,7 @@ module risc_v_core (
 
     OnChipM68xxIO UART_0 (
 	    .IOSelect(UART_Select),
-	    .Clk(clk_25),
+	    .Clk(clk_50),
 	    .Reset_L(Reset_L),
 	    .Clock_50Mhz(clk_50),
 	    .RS232_RxData(GPIO_1[34]),
@@ -185,7 +185,7 @@ module risc_v_core (
     );
        
     vga_control VGA_CONTROL (
-        .clk(clk_25),
+        .clk(clk_50),
         .rst_n(Reset_L),
         .data_in(data_out),
         .ready(vga_ready), // output to arbiter/cpu
@@ -198,7 +198,7 @@ module risc_v_core (
     );  
 
     vga_adapter #(.RESOLUTION("160x120")) VGA_0 (
-        .clock(CLOCK_50),
+        .clock(clk_50),
         .resetn(Reset_L),
         .colour(into_vga_colour), // from controller
         .x(fill_x), // from controller I need to make 

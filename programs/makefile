@@ -2,7 +2,7 @@ CC = riscv32-unknown-elf-gcc
 OBJCOPY = riscv32-unknown-elf-objcopy
 SREC = srec_cat
 HEXDUMP = hexdump
-CFLAGS = -o
+CFLAGS = -march=rv32i_zicsr -o
 LDFLAGS = -nostdlib -T
 OFLAGS = -O binary
 SRECFLAGS1 = -Output -Memory_Initialization_File 32

@@ -9,8 +9,8 @@
 extern volatile int timer_ticks;
 
 int main(void) {
-    char *message1 = "Hello dearest,";
-    char *message2 = "you almost home!";
+    char *message1 = "Rip and tear,";
+    char *message2 = "until it is done.";
     char buf[32];
 
     Initialize_LCD();    
@@ -37,11 +37,6 @@ int main(void) {
         HEX = timer_ticks;
         LEDR = SWITCHES;
 
-        if (kbhit()) {
-            char c = _getch();
-            if (c == '\r') {
-                _puts("\nYou pressed enter!\n");
-            }
-        }
+
     }
 }
