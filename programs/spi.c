@@ -14,9 +14,7 @@ int TestForSPITransmitDataComplete(void) {
 }
 
 void WaitForSPITransmitComplete(void) {
-    while(TestForSPITransmitDataComplete() == 0) {
-        HEX = TestForSPITransmitDataComplete();
-    }
+    while(TestForSPITransmitDataComplete() == 0);
     SPI_Status      |= ((1 << SR_WCOL) | (1 << SR_SPIF));                                                          
 }
 
