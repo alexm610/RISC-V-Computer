@@ -69,15 +69,16 @@ int main(void) {
     Timer0_Data_Register    = 50000000;
     Timer0_Control_Register = 0x00000003;
     
-    /*
+    
     printf("\r\nPERFORMING FLASH MEMORY TEST\n");
     printf("\r\nErasing flash chip...");
     read_byte = WriteSPIChar(0x06, 0);      // write enable
     read_byte = WriteSPIChar(0xC7, 0);      // erase chip
     ReadStatusRegisterBUSY();               // wait for status register 'busy' bit to go low, indicating the erase operation has finished
     printf("\r\nChip erased.\n");
-*/
-    printf("Writing 0xBA to flash memory location = 0...");
+
+
+    printf("\r\nWriting 0xBA to flash memory location = 0...");
     read_byte = WriteSPIChar(0x06, 0);      // write-enable
     read_byte = WriteSPIChar(0x02, 1);      // page program
     read_byte = WriteSPIChar(0x00, 1);      // first byte of address
@@ -95,7 +96,7 @@ int main(void) {
     read_byte = WriteSPIChar(0x00, 1);      // third byte of address
     read_byte = WriteSPIChar(0x00, 0);      // dummy byte
 
-    printf("\r\nByte read from flash that was just written to flash: %08X\n", read_byte);
+    printf("\r\nByte read from flash that was just written to flash: %X\n", read_byte);
     
     printf("\r\nWelcome to DOOM (%i)!\r\n", 1993);
     menu();

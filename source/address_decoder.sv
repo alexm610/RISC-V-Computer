@@ -29,7 +29,7 @@ module address_decoder (
 			IO_Select_H			<= 1;
 		end
 
-		if ((Address >= 32'h00408020) && (Address <= 32'h0040802F)) begin
+		if ((Address >= 32'h00408020) && (Address <= 32'h00408033)) begin
 			I2CSPI_Select_H		<= 1;
 		end
 

@@ -14,7 +14,7 @@
 
 // PROGRAM		"Quartus Prime"
 // VERSION		"Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
-// CREATED		"Fri May  1 08:50:31 2026"
+// CREATED		"Fri May  1 09:38:36 2026"
 
 module IIC_SPI_Interface(
 	Clk,
@@ -78,7 +78,7 @@ simple_spi_top	b2v_inst11(
 	.penable_i(SYNTHESIZED_WIRE_10),
 	.pwrite_i(SYNTHESIZED_WIRE_5),
 	.miso_i(miso_i),
-	.paddr_i(Address[3:1]),
+	.paddr_i(Address[4:2]),
 	.pwdata_i(DataIn),
 	.pirq_o(SYNTHESIZED_WIRE_0),
 	.sck_o(sck_o),

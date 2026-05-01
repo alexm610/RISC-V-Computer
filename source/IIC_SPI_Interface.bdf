@@ -899,21 +899,9 @@ refer to the applicable agreement for further details.
 	(bus)
 )
 (connector
-	(text "Address[3..1]" (rect 274 376 341 389)(font "Intel Clear" ))
-	(pt 264 392)
-	(pt 744 392)
-	(bus)
-)
-(connector
 	(text "Address[31..0]" (rect 232 32 306 45)(font "Intel Clear" ))
 	(pt 232 48)
 	(pt 264 48)
-	(bus)
-)
-(connector
-	(text "Address[3..1]" (rect 248 330 261 397)(font "Intel Clear" )(vertical))
-	(pt 264 48)
-	(pt 264 392)
 	(bus)
 )
 (connector
@@ -1003,6 +991,18 @@ refer to the applicable agreement for further details.
 (connector
 	(pt 1096 120)
 	(pt 1096 336)
+	(bus)
+)
+(connector
+	(text "Address[4..2]" (rect 274 376 341 389)(font "Intel Clear" ))
+	(pt 264 392)
+	(pt 744 392)
+	(bus)
+)
+(connector
+	(text "Address[4..2]" (rect 248 330 261 397)(font "Intel Clear" )(vertical))
+	(pt 264 48)
+	(pt 264 392)
 	(bus)
 )
 (junction (pt 248 112))

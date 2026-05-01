@@ -7,7 +7,7 @@ module SPI_BUS_Decoder (
 	always @(*) begin
 		SPI_Enable_H	<= 0;
 		
-		if ((AS_L == 0) && (SPI_Select_H == 1) && (Address >= 32'h00408020) && (Address <= 32'h0040802F)) begin
+		if ((AS_L == 0) && (SPI_Select_H == 1) && (Address >= 32'h00408020) && (Address <= 32'h00408033)) begin
 			SPI_Enable_H <= 1;
 		end
 	end

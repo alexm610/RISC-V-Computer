@@ -4,7 +4,7 @@
 
 void SPI_Init(void) {
     Disable_SPI_CS();
-    SPI_Control = 0x50;
+    SPI_Control = 0x53;
     SPI_Ext     = 0x00;
     SPI_Status  = 0xC0;
 }
@@ -14,7 +14,9 @@ int TestForSPITransmitDataComplete(void) {
 }
 
 void WaitForSPITransmitComplete(void) {
-    while(TestForSPITransmitDataComplete() == 0);
+    while(TestForSPITransmitDataComplete() == 0) {
+        HEX = TestForSPITransmitDataComplete();
+    }
     SPI_Status      |= ((1 << SR_WCOL) | (1 << SR_SPIF));                                                          
 }
 
