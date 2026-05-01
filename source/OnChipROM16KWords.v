@@ -14,7 +14,7 @@
 
 // PROGRAM		"Quartus Prime"
 // VERSION		"Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
-// CREATED		"Sat Jul 26 16:41:32 2025"
+// CREATED		"Thu Apr 30 15:32:17 2026"
 
 module OnChipROM16KWords(
 	Clock,
@@ -29,7 +29,7 @@ module OnChipROM16KWords(
 input wire	Clock;
 input wire	RomSelect_H;
 input wire	Write_Enable;
-input wire	[11:0] Address;
+input wire	[14:0] Address;
 input wire	[31:0] DataIn;
 output wire	[31:0] DataOut;
 

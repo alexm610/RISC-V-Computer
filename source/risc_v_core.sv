@@ -51,6 +51,8 @@ module risc_v_core (
     logic [31:0] data_out_UART;
     logic sdram_dtack_h, sdram_reset_out;
     logic clk_25, clk_50, clk_50_180;
+    logic [7:0] data_out_I2CSPI;
+    logic I2CSPI_Select;
 
     assign DRAM_CLK         = clk_50_180;
     assign VGA_R            = VGA_R_10[9:2];
@@ -91,7 +93,8 @@ module risc_v_core (
         .Graphics_Select_H(Graphics_Select),
         .Keyboard_Select_H(Keyboard_Select),
         .UART_Select_H(UART_Select),
-        .ExpAccel_Select_H(Exponent_Accelerator_Select)
+        .ExpAccel_Select_H(Exponent_Accelerator_Select),
+        .I2CSPI_Select_H(I2CSPI_Select)
     );
 
     data_bus_multiplexer DATABUS_MULTIPLEXER (
@@ -101,12 +104,14 @@ module risc_v_core (
         .Select_KEYBOARD(Keyboard_Select),
         .Select_UART(UART_Select),
         .Select_EXP(Exponent_Accelerator_Select),
+        .Select_I2CSPI(I2CSPI_Select),
         .DataIn_KEYBOARD(data_out_KEYBOARD),
         .DataIn_SRAM(data_out_SRAM),
         .DataIn_IO(data_out_IO),
         .DataIn_ROM(instruction),
         .DataIn_UART(data_out_UART),
         .DataIn_EXP(data_out_EXP),
+        .DataIn_I2CSPI(data_out_I2CSPI),
         .DataOut_CPU(data_in)
     );
 
@@ -183,6 +188,25 @@ module risc_v_core (
 	    .ACIA_IRQ(),
 	    .DataOut(data_out_UART)
     );
+
+    IIC_SPI_Interface I2C_SPI_0 (
+	    .Clk(clk_50),
+	    .Reset_L(Reset_L),
+	    .WE_L(WE_L),
+	    .AS_L(AS_L),
+	    .miso_i(GPIO_0[29]),
+	    .IIC_SPI_Select(I2CSPI_Select),
+	    .Address(address),
+	    .DataIn(data_out),
+	    .IIC0_IRQ_L(),
+	    .sck_o(GPIO_0[26]),
+	    .mosi_o(GPIO_0[28]),
+	    .SPI_IRQ(),
+	    .SCL_GPIO_0(),
+	    .SDA_GPIO_0(),
+	    .DataOut(data_out_I2CSPI),
+	    .SSN_O(GPIO_0[27])
+    );
        
     vga_control VGA_CONTROL (
         .clk(clk_50),
@@ -229,12 +253,14 @@ module data_bus_multiplexer (
     input logic         Select_KEYBOARD,
     input logic         Select_UART,
     input logic         Select_EXP,
+    input logic         Select_I2CSPI,
     input logic [31:0]  DataIn_EXP,
     input logic [31:0]  DataIn_UART,
     input logic [31:0]  DataIn_KEYBOARD,
     input logic [31:0]  DataIn_SRAM,
     input logic [31:0]  DataIn_IO,
     input logic [31:0]  DataIn_ROM,
+    input logic [31:0]  DataIn_I2CSPI,
     output logic [31:0] DataOut_CPU
 );
 
@@ -263,6 +289,10 @@ module data_bus_multiplexer (
 
         if (Select_UART == 1) begin
             DataOut_CPU     = DataIn_UART;
+        end
+
+        if (Select_I2CSPI == 1) begin
+            DataOut_CPU     = DataIn_I2CSPI;
         end
     end
 endmodule: data_bus_multiplexer
