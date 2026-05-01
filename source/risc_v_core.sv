@@ -58,7 +58,7 @@ module risc_v_core (
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
-    assign LEDR[9]          = done;
+    assign LEDR[9]          = IRQ_timer;
 
     pll_alex_0002 PLL_ALEX (
         .refclk(CLOCK_50),
@@ -289,7 +289,7 @@ module data_bus_multiplexer (
 
         if (Select_UART == 1) begin
             DataOut_CPU     = DataIn_UART;
-        end
+        end else 
 
         if (Select_I2CSPI == 1) begin
             DataOut_CPU     = DataIn_I2CSPI;

@@ -59,7 +59,7 @@ _start:
  * Hardware jumps to (mtvec & ~3) + cause*4 for interrupts.
  * Must be aligned to at least 64 bytes (next power of 2 >= 16*4).
  */
-.align 6                     /* 2^6 = 64 byte alignment */
+.align 2                     /* 2^6 = 64 byte alignment */
 __vector_table:
     j default_irq_handler    /* IRQ 0  — user software */
     j default_irq_handler    /* IRQ 1  — supervisor software */
