@@ -25,7 +25,7 @@ module address_decoder (
 			ROM_Select_H		<= 1;
 		end
 
-		if ((Address >= 32'h00400000) && (Address <= 32'h004000FF)) begin
+		if ((Address >= 32'h00400000) && (Address <= 32'h0040FFFF)) begin
 			IO_Select_H			<= 1;
 		end
 
