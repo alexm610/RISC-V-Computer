@@ -2,7 +2,8 @@ module SPI_BUS_Decoder (
 	input unsigned [31:0] Address,
 	input SPI_Select_H,
 	input AS_L,
-	output reg SPI_Enable_H);
+	output reg SPI_Enable_H
+);
 	
 	always @(*) begin
 		SPI_Enable_H	<= 0;
@@ -12,6 +13,3 @@ module SPI_BUS_Decoder (
 		end
 	end
 endmodule
-
-//0000 0000 0100 0000 1000 0000 0010 0000
-//0000 0000 0100 0000 1000 0000 0010 1111

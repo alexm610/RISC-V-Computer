@@ -6,14 +6,6 @@
 #define LCD_Data_Register       *(volatile unsigned long *)(0x00400010)
 #define Timer0_Data_Register    *(volatile unsigned long *)(0x00400100)
 #define Timer0_Control_Register *(volatile unsigned long *)(0x00400104)
-
-
-
-
-/*************************************************************
-** SPI Controller 
-**************************************************************/
-
 #define SPI_Control         (*(volatile unsigned long *)(0x00408020))  // [4:2]=000
 #define SPI_Status          (*(volatile unsigned long *)(0x00408024))  // [4:2]=001
 #define SPI_Data            (*(volatile unsigned long *)(0x00408028))  // [4:2]=010
@@ -23,4 +15,3 @@
 #define Disable_SPI_CS()    SPI_CS = 0xFF
 #define SR_SPIF             7
 #define SR_WCOL             6
-
