@@ -130,4 +130,3 @@ void WriteProgramToFlash(void) {
     
     printf("\r\n256 kilobytes written to flash memory.\n");
 }
-
