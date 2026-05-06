@@ -6,6 +6,7 @@
 #include "lcd_display.h"
 #include "uart.h"
 #include "spi.h"
+#include "framebuffer.h"
 
 #define BUFFER_MAX_LENGTH 32
 
@@ -21,13 +22,32 @@ void Help(void)
 }
 
 void menu(void) {
-    char c0;
+    char c0, c1;
     while (1) {
         FlushKeyboard();
         printf("\r\n$ ");
         scanf("%c", &c0);
 
         switch (c0) {
+            case 'c': 
+                printf("\r\nCOLOUR!\n(b)lue or (r)ed or (g)reen?\r\n= ");
+                scanf("%c", &c1);
+                switch (c1) {
+                    case 'b': 
+                        fb_clear(FB_BLUE);
+                        break;
+                    case 'r': 
+                        fb_clear(FB_RED);
+                        break;
+                    case 'g': 
+                        fb_clear(FB_GREEN);
+                        break;
+                    default:
+                        printf("\r\nInvalid choice.");
+                        break;
+                }
+                break;
+                
             case 'h':
                 printf("\r\nYou asked for help!");
                 break;

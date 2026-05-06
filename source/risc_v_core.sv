@@ -207,7 +207,28 @@ module risc_v_core (
 	    .DataOut(data_out_I2CSPI),
 	    .SSN_O(GPIO_0[27])
     );
-       
+
+    vga_framebuffer VGA_FB_0  (
+        .clk_50      (clk_50),
+        .clk_25      (clk_25),
+        .rst_n       (Reset_L),
+        .VGA_Select  (Graphics_Select),
+        .AS_L        (AS_L),
+        .WE_L        (WE_L),
+        .Address     (address),
+        .ByteEnable  (byte_enable),
+        .DataIn      (data_out),
+        .DataOut     (data_out_VGA),
+        .VGA_R       (VGA_R_10),
+        .VGA_G       (VGA_G_10),
+        .VGA_B       (VGA_B_10),
+        .VGA_HS      (VGA_HS),
+        .VGA_VS      (VGA_VS),
+        .VGA_BLANK   (VGA_BLANK),
+        .VGA_SYNC    (VGA_SYNC),
+        .VGA_CLK     (VGA_CLK)
+    );
+    /*
     vga_control VGA_CONTROL (
         .clk(clk_50),
         .rst_n(Reset_L),
@@ -233,7 +254,7 @@ module risc_v_core (
         .VGA_B(VGA_B_10),
         .*
     );  
-
+    */
     exponent_accelerator EXP_ACCELERATOR_0 (
         .clk(CLOCK_50),
         .reset_n(Reset_L),

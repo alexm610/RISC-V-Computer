@@ -33,11 +33,11 @@ module address_decoder (
 			I2CSPI_Select_H		<= 1;
 		end
 
-		if ((Address >= 32'h04010000) && (Address <= 32'h0401000F)) begin
+		if ((Address >= 32'h04040000) && (Address <= 32'h0407FFFF)) begin
 			Graphics_Select_H	<= 1;
 		end
 
-		if ((Address >= 32'h04010010) && (Address <= 32'h0401001F)) begin
+		if ((Address >= 32'h04080000) && (Address <= 32'h0408000F)) begin
 			ExpAccel_Select_H	<= 1;
 		end
 
