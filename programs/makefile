@@ -18,8 +18,8 @@ BINS = instructions.bin
 SRECS = instructions.srec
 MIFS = instructions.mif
 
-SRCS = start.s instructions.c uart.c lcd_display.c vga.c irq_handler.c syscalls.c spi.c
-HDRS = instructions.h vga.h uart.h lcd_display.h irq_handler.h spi.h
+SRCS = start.s instructions.c uart.c lcd_display.c vga.c irq_handler.c syscalls.c spi.c framebuffer.c diskio.c ff.c sd_spi.c
+HDRS = instructions.h vga.h uart.h lcd_display.h irq_handler.h spi.h framebuffer.h diskio.h ff.h ffconf.h sd_spi.h
 
 all: instructions.mif
 
