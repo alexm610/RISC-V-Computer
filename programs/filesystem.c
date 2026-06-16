@@ -12,7 +12,7 @@ static FATFS  g_fs;
 static FIL    g_file;
 
 __attribute__((aligned(4)))
-static uint8_t g_bmp_buf[256 * 1024];
+static uint8_t g_bmp_buf[512 * 1024];
 
 // ---------------------------------------------------------------------------
 // SD / FatFs commands  (non-static — called from main.c)

@@ -11,7 +11,6 @@
 
 #define BUFFER_MAX_LENGTH 32
 
-
 static void cmd_clear_colour(void) {
     char c1;
     printf("\r\nCOLOUR!\n(b)lue or (r)ed or (g)reen?\r\n= ");
@@ -24,9 +23,6 @@ static void cmd_clear_colour(void) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Help
-// ---------------------------------------------------------------------------
 void Help(void) {
     char *banner = "\r\n----------------------------------------------------------------";
     printf(banner);
@@ -41,7 +37,6 @@ void Help(void) {
     printf("\r\n    h   Help menu");
     printf(banner);
 }
-
 
 void menu(void) {
     char c0;

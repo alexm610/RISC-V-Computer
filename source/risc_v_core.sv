@@ -228,33 +228,8 @@ module risc_v_core (
         .VGA_SYNC    (VGA_SYNC),
         .VGA_CLK     (VGA_CLK)
     );
-    /*
-    vga_control VGA_CONTROL (
-        .clk(clk_50),
-        .rst_n(Reset_L),
-        .data_in(data_out),
-        .ready(vga_ready), 
-        .VGA_Select(Graphics_Select),
-        .start(1'b0), 
-        .vga_x(fill_x),
-        .vga_y(fill_y),
-        .vga_colour(into_vga_colour),
-        .vga_plot(fill_plot)
-    );  
 
-    vga_adapter #(.RESOLUTION("160x120")) VGA_0 (
-        .clock(clk_50),
-        .resetn(Reset_L),
-        .colour(into_vga_colour), 
-        .x(fill_x),  
-        .y(fill_y),  
-        .plot(fill_plot),   
-        .VGA_R(VGA_R_10),
-        .VGA_G(VGA_G_10),
-        .VGA_B(VGA_B_10),
-        .*
-    );  
-    */
+    /*
     exponent_accelerator EXP_ACCELERATOR_0 (
         .clk(CLOCK_50),
         .reset_n(Reset_L),
@@ -264,7 +239,7 @@ module risc_v_core (
         .addr(address[3:0]),
         .writedata(data_out),
         .readdata(data_out_EXP)
-    );
+    );*/
 endmodule: risc_v_core
 
 module data_bus_multiplexer (
