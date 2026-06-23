@@ -8,6 +8,38 @@
 // separate upper and lower data stobes for individual byte and 16 bit word access
 //
 // Copyright PJ Davies June 2020
+//
+// ── BURST READ EXTENSION ────────────────────────────────────────────────────
+// Adds a burst-read port for the VGA framebuffer scanout (and later, blitter).
+//
+//   BurstReq_H     in   level-high request.  Hold high (with BurstAddress /
+//                       BurstLength stable) until BurstDone_H pulses.
+//   BurstAddress   in   byte address of first 16-bit word (bit 0 ignored).
+//                       The ENTIRE burst must stay inside one SDRAM row:
+//                       column(start) + BurstLength <= 1024.  Guaranteed by
+//                       using a 1024-byte (512-word) line stride and a
+//                       2KB-row-aligned framebuffer base.
+//   BurstLength    in   number of 16-bit words (1..512).
+//   BurstData      out  16-bit word, updated on negedge Clock (same proven
+//                       sampling instant as the single-read path: data for a
+//                       READ issued combinationally in cycle N is latched at
+//                       the negedge of cycle N+3).
+//   BurstValid_H   out  high for exactly one cycle per word; sample BurstData
+//                       on the posedge at the end of that cycle.
+//   BurstDone_H    out  1-cycle pulse when the burst (incl. precharge) is done.
+//
+// Burst sequence:  idling ──BankActivate──► burst_read (one ReadOnly command
+// per clock, A10=0, incrementing column) ──► burst_drain (flush the 3-deep
+// CAS pipeline) ──► burst_precharge (PrechargeSelectBank) ──► burst_finish
+// (NOP + BurstDone_H) ──► idling.
+//
+// Arbitration priority in idling:  refresh  >  burst  >  CPU bus cycle.
+// A refresh falling due mid-burst is deferred until the burst completes; to
+// keep the 64ms/8192-row budget safe with a worst-case 320-word (~6.5us)
+// deferral, RefreshTimerValue is shortened from 375 to 300 (6us nominal).
+//
+// The CPU single-access path (read_SDRAM / write_SDRAM / terminate_bus_cycle)
+// is completely untouched.
 //////////////////////////////////////////////////////////////////////////////////////-
 
 
@@ -21,6 +53,14 @@ module M68kDramController_Verilog (
 			input DramSelect_L,     				// active low signal indicating dram is being addressed by 68000
 			input WE_L,  								// active low write signal, otherwise assumed to be read
 			input AS_L,									// Address Strobe
+
+			// ── Burst read port (framebuffer scanout) ──────────────────────
+			input BurstReq_H,							// level-high burst request; hold until BurstDone_H
+			input unsigned [31:0] BurstAddress,	// byte address of first 16-bit word of the burst
+			input unsigned [9:0] BurstLength,	// number of 16-bit words to read (1..512, one row max)
+			output reg unsigned [15:0] BurstData,	// burst read data (latched on negedge Clock)
+			output BurstValid_H,						// 1 cycle high per word; sample BurstData on the ending posedge
+			output reg BurstDone_H,					// 1 cycle pulse when burst fully complete
 			
 			output reg unsigned[15:0] DataOut, 				// data bus out to 68000
 			output reg SDram_CKE_H,								// active high clock enable for dram chip
@@ -84,6 +124,20 @@ module M68kDramController_Verilog (
 		reg counter_done;
 		wire counter_done_wire;
 
+		// ── Burst datapath registers ────────────────────────────────────────
+		reg unsigned [9:0]  BurstCol;			// current column being issued
+		reg unsigned [1:0]  BurstBankReg;	// bank for this burst (latched at grant)
+		reg unsigned [9:0]  BurstRemain;		// words left to issue
+		reg [2:0]           BurstPipe;		// CAS-latency tracking: bit set per in-flight READ
+		reg                 BurstLoad_H;		// comb: latch BurstAddress/BurstLength at grant
+		reg                 BurstStep_H;		// comb: one READ issued this cycle
+
+		// A word whose READ command was generated combinationally in cycle N is
+		// latched from SDram_DQ at the negedge of cycle N+3 (BurstPipe[2]) - the
+		// identical sampling instant the proven single-read path uses
+		// (TimerValue=2 in read_SDRAM, last DramDataLatch_H negedge before Dtack).
+		assign BurstValid_H = BurstPipe[2];
+
 		// 5 bit Commands to the SDRam
 
 		parameter PoweringUp = 5'b00000 ;					// take CKE & CS low during power up phase, address and bank address = dont'care
@@ -128,6 +182,12 @@ module M68kDramController_Verilog (
 		parameter terminate_bus_cycle		= 5'h11;
 		parameter read_SDRAM				= 5'h12;
 		parameter read_SDRAM_wait			= 5'h13;
+
+		// ── Burst read states ───────────────────────────────────────────────
+		parameter burst_read				= 5'h14;		// issue one ReadOnly command per clock
+		parameter burst_drain				= 5'h15;		// NOPs while CAS pipeline flushes
+		parameter burst_precharge			= 5'h16;		// PrechargeSelectBank (A10=0)
+		parameter burst_finish				= 5'h17;		// tRP spacing + BurstDone_H pulse
 		
 		
 		// TODO - Add your own states as per your own design
@@ -174,8 +234,10 @@ module M68kDramController_Verilog (
 
    always@(posedge Clock, negedge Reset_L)
 	begin
-		if(Reset_L == 0) 							// asynchronous reset
+		if(Reset_L == 0) begin					// asynchronous reset
 			CurrentState <= InitialisingState ;
+			BurstPipe	 <= 3'b000;				// no reads in flight
+		end
 			
 		else 	begin									// state can change only on low-to-high transition of clock
 			CurrentState <= NextState;		
@@ -205,6 +267,21 @@ module M68kDramController_Verilog (
 
 			counter_done		<= counter_done_wire;
 
+			// ── Burst datapath ──────────────────────────────────────────────
+			// BurstPipe is a 3-deep shift register tracking in-flight READ
+			// commands.  A '1' enters when a READ is issued (BurstStep_H) and
+			// reaches bit [2] exactly when that word must be latched/consumed.
+			BurstPipe <= {BurstPipe[1:0], BurstStep_H};
+
+			if (BurstLoad_H) begin				// latch burst parameters at grant
+				BurstCol     <= BurstAddress[10:1];
+				BurstBankReg <= BurstAddress[25:24];
+				BurstRemain  <= BurstLength;
+			end else if (BurstStep_H) begin	// one READ issued this cycle
+				BurstCol     <= BurstCol + 10'd1;
+				BurstRemain  <= BurstRemain - 10'd1;
+			end
+
 			// The signal FPGAWritingtoSDram_H can be driven by you when you need to turn on or tri-state the data bus out signals to the dram chip data lines DQ0-15
 			// when you are reading from the dram you have to ensure they are tristated (so the dram chip can drive them)
 			// when you are writing, you have to drive them to the value of SDramWriteData so that you 'present' your data to the dram chips
@@ -231,6 +308,18 @@ module M68kDramController_Verilog (
 	begin
 		if(DramDataLatch_H == 1)      			// asserted during the read operation
 			DataOut <= SDram_DQ ;					// store 16 bits of data regardless of width - don't worry about tri state since that will be handled by buffers outside dram controller
+	end
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-
+// Burst read data latch: same negedge sampling as the single-read path above,
+// but gated by the CAS pipeline tracker so each in-flight word is captured on
+// exactly the right falling edge during back-to-back streaming.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-
+
+	always@(negedge Clock)
+	begin
+		if(BurstPipe[2] == 1)
+			BurstData <= SDram_DQ ;
 	end
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-
@@ -270,6 +359,10 @@ module M68kDramController_Verilog (
 		counter_write		<= 1'b0;
 		counter_increment	<= 1'b0;
 		counter_value		<= 16'd0;
+
+		BurstLoad_H			<= 1'b0;									// don't latch burst parameters
+		BurstStep_H			<= 1'b0;									// no READ issued this cycle
+		BurstDone_H			<= 1'b0;									// burst not complete
 
 
 
@@ -383,8 +476,10 @@ module M68kDramController_Verilog (
 
 			//DramAddress	<= 13	'hEEE;
 			CPUReset_L	<= 1;
-			RefreshTimerValue	<= 16'd375;
-			RefreshTimerLoad_H	<= 1;
+			RefreshTimerValue	<= 16'd300;					// was 375 (7.5us). Shortened to 6us so a refresh
+			RefreshTimerLoad_H	<= 1;						// deferred behind a full 320-word burst (~6.5us)
+															// still keeps the average interval inside the
+															// 64ms/8192-row budget (7.8125us) with margin.
 			//counter_value	<= 16'd20;
 			//counter_write	<= 1'b1;
 
@@ -396,6 +491,12 @@ module M68kDramController_Verilog (
 			CPUReset_L			<= 1;
 			if (RefreshTimerDone_H  == 1) begin
 				NextState		<= start_RRH;
+			end else if (BurstReq_H == 1) begin								// Framebuffer burst request: higher priority than CPU
+				DramAddress		<= BurstAddress[23:11];						// Issue row address to SDRAM
+				BankAddress		<= BurstAddress[25:24];						// Issue bank address to SDRAM
+				Command			<= BankActivate;							// Open the row (ACT -> first READ spacing = 1 clock, same as CPU path)
+				BurstLoad_H		<= 1;										// Latch column / bank / length into burst datapath
+				NextState		<= burst_read;
 			end else if ((DramSelect_L == 0) && (AS_L == 0)) begin				// CPU is accessing DRAM
 				DramAddress		<= Address[23:11];								// Issue row address to SDRAM
 				BankAddress		<= Address[25:24];								// Issue bank address to SDRAM
@@ -485,6 +586,45 @@ module M68kDramController_Verilog (
 			RRH_enable		<= 1;
 			CPUReset_L	<= 1;
 			NextState		<= wait_refresh_request;
+		end
+
+		// ── Burst read states ────────────────────────────────────────────────
+
+		else if (CurrentState == burst_read) begin
+			CPUReset_L					<= 1;									// Keep CPU reset inactive
+			Command						<= ReadOnly;							// READ with NO auto-precharge (row stays open)
+			DramAddress[10]				<= 0;									// A10 = 0: no auto-precharge
+			DramAddress[9:0]			<= BurstCol;							// current column (increments every clock)
+			BankAddress					<= BurstBankReg;						// bank latched at grant
+			BurstStep_H					<= 1;									// advance column / decrement remaining / feed pipe
+			if (BurstRemain <= 10'd1)											// last READ being issued this cycle
+				NextState				<= burst_drain;
+			else
+				NextState				<= burst_read;
+		end
+
+		else if (CurrentState == burst_drain) begin
+			CPUReset_L					<= 1;									// Keep CPU reset inactive
+			Command						<= NOP;									// let the in-flight reads complete
+			if (BurstPipe == 3'b000)											// all issued words latched and consumed
+				NextState				<= burst_precharge;
+			else
+				NextState				<= burst_drain;
+		end
+
+		else if (CurrentState == burst_precharge) begin
+			CPUReset_L					<= 1;									// Keep CPU reset inactive
+			Command						<= PrechargeSelectBank;					// close the row (A10 = 0, selected bank only)
+			DramAddress[10]				<= 0;
+			BankAddress					<= BurstBankReg;
+			NextState					<= burst_finish;
+		end
+
+		else if (CurrentState == burst_finish) begin
+			CPUReset_L					<= 1;									// Keep CPU reset inactive
+			Command						<= NOP;									// one NOP gives tRP spacing before next ACT
+			BurstDone_H					<= 1;									// tell requester the burst is complete
+			NextState					<= idling;
 		end
 
 		else begin

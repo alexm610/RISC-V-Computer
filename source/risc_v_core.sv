@@ -54,11 +54,22 @@ module risc_v_core (
     logic [7:0] data_out_I2CSPI;
     logic I2CSPI_Select;
 
+    // ── Framebuffer burst port + VGA MMIO readback ──────────────────────────
+    logic        fb_req, fb_valid, fb_done;
+    logic [31:0] fb_addr;
+    logic [9:0]  fb_len;
+    logic [15:0] fb_data;
+    logic [31:0] data_out_VGA;
+
     assign DRAM_CLK         = clk_50_180;
     assign VGA_R            = VGA_R_10[9:2];
     assign VGA_G            = VGA_G_10[9:2];
     assign VGA_B            = VGA_B_10[9:2];
     assign LEDR[9]          = IRQ_timer;
+
+    // exponent accelerator is disabled; keep its read-data driven so the mux
+    // never sees an undriven bus when ExpAccel_Select happens to assert.
+    assign data_out_EXP     = 32'h0;
 
     pll_alex_0002 PLL_ALEX (
         .refclk(CLOCK_50),
@@ -105,6 +116,7 @@ module risc_v_core (
         .Select_UART(UART_Select),
         .Select_EXP(Exponent_Accelerator_Select),
         .Select_I2CSPI(I2CSPI_Select),
+        .Select_VGA(Graphics_Select),
         .DataIn_KEYBOARD(data_out_KEYBOARD),
         .DataIn_SRAM(data_out_SRAM),
         .DataIn_IO(data_out_IO),
@@ -112,6 +124,7 @@ module risc_v_core (
         .DataIn_UART(data_out_UART),
         .DataIn_EXP(data_out_EXP),
         .DataIn_I2CSPI(data_out_I2CSPI),
+        .DataIn_VGA(data_out_VGA),
         .DataOut_CPU(data_in)
     );
 
@@ -124,19 +137,28 @@ module risc_v_core (
         .DataOut(instruction)
     );
 
-    SDRAM_wrapper SDRAM_MEMORY (
+    // ── SDRAM: single owner, arbitrating CPU single-access + FB burst port ──
+    sdram_mmu SDRAM_MEMORY (
         .Clock       (clk_50),
         .Reset_L     (KEY[0]),
         .RamSelect_H (RAM_Select),
         .WE_L        (WE_L),
         .AS_L        (AS_L),
-        .Address     (address),         
+        .Address     (address),
         .ByteEnable  (byte_enable),
         .DataIn      (data_out),
         .DataOut     (data_out_SRAM),
         .DTAck_H     (sdram_dtack_h),
         .ResetOut_L  (sdram_reset_out),
-        .SDRAM_CKE   (DRAM_CKE),        
+
+        .fb_req      (fb_req),
+        .fb_addr     (fb_addr),
+        .fb_len      (fb_len),
+        .fb_data     (fb_data),
+        .fb_valid    (fb_valid),
+        .fb_done     (fb_done),
+
+        .SDRAM_CKE   (DRAM_CKE),
         .SDRAM_CS_N  (DRAM_CS_N),
         .SDRAM_RAS_N (DRAM_RAS_N),
         .SDRAM_CAS_N (DRAM_CAS_N),
@@ -146,6 +168,35 @@ module risc_v_core (
         .SDRAM_DQ    (DRAM_DQ),
         .SDRAM_UDQM  (DRAM_UDQM),
         .SDRAM_LDQM  (DRAM_LDQM)
+    );
+
+    vga_framebuffer_sdram VGA_FB_0 (
+        .clk_50      (clk_50),
+        .clk_25      (clk_25),
+        .rst_n       (Reset_L),
+        .VGA_Select  (Graphics_Select),
+        .AS_L        (AS_L),
+        .WE_L        (WE_L),
+        .Address     (address),
+        .ByteEnable  (byte_enable),
+        .DataIn      (data_out),
+        .DataOut     (data_out_VGA),
+
+        .fb_req      (fb_req),
+        .fb_addr     (fb_addr),
+        .fb_len      (fb_len),
+        .fb_data     (fb_data),
+        .fb_valid    (fb_valid),
+        .fb_done     (fb_done),
+
+        .VGA_R       (VGA_R_10),
+        .VGA_G       (VGA_G_10),
+        .VGA_B       (VGA_B_10),
+        .VGA_HS      (VGA_HS),
+        .VGA_VS      (VGA_VS),
+        .VGA_BLANK   (VGA_BLANK),
+        .VGA_SYNC    (VGA_SYNC),
+        .VGA_CLK     (VGA_CLK)
     );
 
 	IO_Handler IO (
@@ -208,27 +259,6 @@ module risc_v_core (
 	    .SSN_O(GPIO_0[27])
     );
 
-    vga_framebuffer VGA_FB_0  (
-        .clk_50      (clk_50),
-        .clk_25      (clk_25),
-        .rst_n       (Reset_L),
-        .VGA_Select  (Graphics_Select),
-        .AS_L        (AS_L),
-        .WE_L        (WE_L),
-        .Address     (address),
-        .ByteEnable  (byte_enable),
-        .DataIn      (data_out),
-        .DataOut     (data_out_VGA),
-        .VGA_R       (VGA_R_10),
-        .VGA_G       (VGA_G_10),
-        .VGA_B       (VGA_B_10),
-        .VGA_HS      (VGA_HS),
-        .VGA_VS      (VGA_VS),
-        .VGA_BLANK   (VGA_BLANK),
-        .VGA_SYNC    (VGA_SYNC),
-        .VGA_CLK     (VGA_CLK)
-    );
-
     /*
     exponent_accelerator EXP_ACCELERATOR_0 (
         .clk(CLOCK_50),
@@ -250,6 +280,7 @@ module data_bus_multiplexer (
     input logic         Select_UART,
     input logic         Select_EXP,
     input logic         Select_I2CSPI,
+    input logic         Select_VGA,
     input logic [31:0]  DataIn_EXP,
     input logic [31:0]  DataIn_UART,
     input logic [31:0]  DataIn_KEYBOARD,
@@ -257,6 +288,7 @@ module data_bus_multiplexer (
     input logic [31:0]  DataIn_IO,
     input logic [31:0]  DataIn_ROM,
     input logic [31:0]  DataIn_I2CSPI,
+    input logic [31:0]  DataIn_VGA,
     output logic [31:0] DataOut_CPU
 );
 
@@ -289,6 +321,10 @@ module data_bus_multiplexer (
 
         if (Select_I2CSPI == 1) begin
             DataOut_CPU     = DataIn_I2CSPI;
+        end else
+
+        if (Select_VGA == 1) begin
+            DataOut_CPU     = DataIn_VGA;
         end
     end
 endmodule: data_bus_multiplexer
