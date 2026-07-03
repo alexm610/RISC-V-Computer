@@ -73,7 +73,6 @@ int main(void) {
     Timer0_Data_Register    = 50000000;
     Timer0_Control_Register = 0x00000003;
 
-    printf("\r\nWelcome to DOOM (1993)!\r\n");
     printf("\r\nInitializing SD card...");
     int sd_rc = sd_init();
     if (sd_rc != SD_OK) {
@@ -84,6 +83,7 @@ int main(void) {
         init_filesystem();
     }
 
+    printf("\r\nWelcome to DOOM (1993)!\r\n");
     menu();
     return 0;
 }

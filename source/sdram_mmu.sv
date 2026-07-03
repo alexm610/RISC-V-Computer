@@ -129,20 +129,16 @@ module sdram_mmu (
                 end
 
                 DECODE_BE: begin
-                    if (WE_L == 1'b1) begin
-                        state <= LOW_HALF;
-                    end else begin
-                        case (ByteEnable)
-                            4'b0001: state <= LOW_ONLY;
-                            4'b0010: state <= LOW_ONLY;
-                            4'b0011: state <= LOW_ONLY;
-                            4'b0100: state <= HIGH_ONLY;
-                            4'b1000: state <= HIGH_ONLY;
-                            4'b1100: state <= HIGH_ONLY;
-                            4'b1111: state <= LOW_HALF;
-                            default: state <= IDLE;
-                        endcase
-                    end
+                    case (ByteEnable)
+                        4'b0001: state <= LOW_ONLY;
+                        4'b0010: state <= LOW_ONLY;
+                        4'b0011: state <= LOW_ONLY;
+                        4'b0100: state <= HIGH_ONLY;
+                        4'b1000: state <= HIGH_ONLY;
+                        4'b1100: state <= HIGH_ONLY;
+                        4'b1111: state <= LOW_HALF;
+                        default: state <= (WE_L == 1'b1) ? LOW_HALF : IDLE;
+                    endcase
                 end
 
                 LOW_ONLY: begin
