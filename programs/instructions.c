@@ -83,7 +83,7 @@ int main(void) {
         init_filesystem();
     }
 
-    printf("\r\nWelcome to DOOM (1993)!\r\n");
+    printf("\r\nWelcome to DOOM!\r\n");
     menu();
     return 0;
 }

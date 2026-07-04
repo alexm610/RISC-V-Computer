@@ -1,0 +1,20 @@
+{
+  "flags": "-f source/risc_v_core.f",
+  "index": [
+    {
+      "dirs": [
+        "source"
+      ],
+      "excludeDirs": [
+        "source/schematic_version",
+        "source/ps2_controller",
+        "source/clock25",
+        "source/pll_alex",
+        "output_files",
+        "testbenches",
+        "lab7bonus"
+      ]
+    }
+  ],
+  "build": "source/risc_v_core.f"
+}

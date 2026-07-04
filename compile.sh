@@ -10,6 +10,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROGRAMS_DIR="${ROOT_DIR}/programs"
 SOURCE_DIR="${ROOT_DIR}/source"
 SOF_FILE="${SOURCE_DIR}/output_files/${PROJECT}.sof"
+FLASH_DEVICE_INDEX="${FLASH_DEVICE_INDEX:-2}"
 
 format_duration() {
     local total_seconds="$1"
@@ -50,12 +51,13 @@ usage() {
 Usage:
   ./compile.sh           Build programs/instructions.mif and run full Quartus compile
   ./compile.sh --update  Build programs/instructions.mif and update only the .sof MIF contents
-  ./compile.sh --flash   Program the existing .sof to the attached JTAG device
+  ./compile.sh --flash   Program the existing .sof to JTAG device ${FLASH_DEVICE_INDEX}
   ./compile.sh --help    Show this help
 
 Notes:
   --update expects a previous successful full Quartus compile/fitter run.
   --flash expects ${SOF_FILE} to exist.
+  Set FLASH_DEVICE_INDEX to override the JTAG chain device index.
 USAGE
 }
 
@@ -104,6 +106,6 @@ else
         exit 1
     fi
 
-    echo "==> Flashing ${SOF_FILE} over JTAG"
-    quartus_pgm --mode=JTAG -o "p;${SOF_FILE}"
+    echo "==> Flashing ${SOF_FILE} over JTAG device ${FLASH_DEVICE_INDEX}"
+    quartus_pgm --mode=JTAG -o "p;${SOF_FILE}@${FLASH_DEVICE_INDEX}"
 fi

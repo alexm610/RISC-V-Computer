@@ -1,0 +1,7 @@
+{
+    "verilog.linting.slang.includePath": [
+        "source",
+        "source/schematic_version",
+        "source/vga-core"
+    ]
+}

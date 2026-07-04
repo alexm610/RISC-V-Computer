@@ -1,3 +1,7 @@
+// synopsys translate_off
+`timescale 1 ps / 1 ps
+// synopsys translate_on
+
 module risc_v_core (
     input logic CLOCK_50, 
     input logic [3:0] KEY, 
@@ -45,9 +49,8 @@ module risc_v_core (
     logic fill_plot, done;
     logic [9:0] VGA_R_10, VGA_G_10, VGA_B_10;
     logic VGA_BLANK, VGA_SYNC;
-    logic [2:0] into_vga_colour;
     logic RAM_Select, IO_Select, Graphics_Select, ROM_Select, Keyboard_Select, IRQ_timer;
-    logic [31:0] data_out_KEYBOARD, data_out_EXP;
+    logic [31:0] data_out_EXP;
     logic [31:0] data_out_UART;
     logic sdram_dtack_h, sdram_reset_out;
     logic clk_25, clk_50, clk_50_180;
@@ -76,7 +79,8 @@ module risc_v_core (
         .rst(~KEY[0]),
         .outclk_0(clk_25),
         .outclk_1(clk_50),
-        .outclk_2(clk_50_180)
+        .outclk_2(clk_50_180),
+        .locked()
   );  
 
     cpu PROCESSOR (
