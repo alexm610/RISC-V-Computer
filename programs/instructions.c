@@ -8,8 +8,28 @@
 #include "framebuffer.h"
 #include "sd_spi.h"
 #include "filesystem.h"
+#include "ff.h"
 
 #define BUFFER_MAX_LENGTH 32
+#define SLIDESHOW_DELAY_CYCLES 250000000u
+
+static int has_bmp_ext(const char *name) {
+    const char *dot = strrchr(name, '.');
+    if (dot == NULL) return 0;
+    return (dot[1] == 'b' || dot[1] == 'B') &&
+           (dot[2] == 'm' || dot[2] == 'M') &&
+           (dot[3] == 'p' || dot[3] == 'P') &&
+           dot[4] == '\0';
+}
+
+static void wait_5_seconds(void) {
+    Timer0_Control_Register = 0x0;
+    Timer0_Data_Register = SLIDESHOW_DELAY_CYCLES;
+    Timer0_Control_Register = 0x1;
+    while (Timer0_Data_Register != 0) {
+    }
+    Timer0_Control_Register = 0x0;
+}
 
 static void cmd_clear_colour(void) {
     char c1;
@@ -23,6 +43,41 @@ static void cmd_clear_colour(void) {
     }
 }
 
+static void cmd_slideshow(void) {
+    printf("\r\nStarting BMP slideshow from SD root.");
+    printf("\r\nReset the board to leave slideshow mode.");
+
+    for (;;) {
+        DIR dir;
+        FILINFO fno;
+        int shown = 0;
+        FRESULT res = f_opendir(&dir, "/");
+        if (res != FR_OK) {
+            printf("\r\nf_opendir failed: %d (run 'm' first?)", res);
+            wait_5_seconds();
+            continue;
+        }
+
+        for (;;) {
+            res = f_readdir(&dir, &fno);
+            if (res != FR_OK || fno.fname[0] == '\0') break;
+            if ((fno.fattrib & AM_DIR) || !has_bmp_ext(fno.fname)) continue;
+
+            printf("\r\nSlide: %s", fno.fname);
+            if (load_bmp_from_path(fno.fname) == 0) {
+                shown = 1;
+                wait_5_seconds();
+            }
+        }
+
+        f_closedir(&dir);
+        if (!shown) {
+            printf("\r\nNo .bmp files found in /.");
+            wait_5_seconds();
+        }
+    }
+}
+
 void Help(void) {
     char *banner = "\r\n----------------------------------------------------------------";
     printf(banner);
@@ -32,6 +87,7 @@ void Help(void) {
     printf("\r\n    m   Mount SD card");
     printf("\r\n    l   List files in root directory");
     printf("\r\n    b   Load and display a .bmp file");
+    printf("\r\n    s   Start looping .bmp slideshow");
     printf("\r\n    i   Show SD card info");
     printf("\r\n    d   Dump sector 0");
     printf("\r\n    h   Help menu");
@@ -50,6 +106,7 @@ void menu(void) {
             case 'i': cmd_card_info();    break;
             case 'l': cmd_list_dir();     break;
             case 'b': cmd_load_bmp();     break;
+            case 's': cmd_slideshow();    break;
             case 'h': Help();             break;
             case 'd': cmd_dump_sector0(); break;
             default:
@@ -83,6 +140,7 @@ int main(void) {
         init_filesystem();
     }
 
+    fb_clear(FB_BLACK);
     printf("\r\nWelcome to DOOM!\r\n");
     menu();
     return 0;

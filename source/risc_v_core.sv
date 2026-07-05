@@ -56,6 +56,7 @@ module risc_v_core (
     logic clk_25, clk_50, clk_50_180;
     logic [7:0] data_out_I2CSPI;
     logic I2CSPI_Select;
+    logic clk_12;
 
     // ── Framebuffer burst port + VGA MMIO readback ──────────────────────────
     logic        fb_req, fb_valid, fb_done;
@@ -80,6 +81,7 @@ module risc_v_core (
         .outclk_0(clk_25),
         .outclk_1(clk_50),
         .outclk_2(clk_50_180),
+        .outclk_3(clk_12),
         .locked()
   );  
 

@@ -7,5 +7,6 @@ void cmd_card_info(void);
 void cmd_list_dir(void);
 void cmd_load_bmp(void);
 void cmd_dump_sector0(void);
+int load_bmp_from_path(const char *path);
 
 #endif /* FILESYSTEM_H */

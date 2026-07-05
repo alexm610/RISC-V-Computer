@@ -18,15 +18,18 @@ void fb_pixel(int x, int y, uint16_t c) {
 }
 
 // ---------------------------------------------------------------------------
-// Full-screen clear. The backing store is FB_STRIDE x FB_H contiguous pixels,
-// so clear the whole thing (visible + off-screen padding) with pair stores.
+// Full-screen clear. Only the visible 320 pixels of each row are scanned out,
+// so skip the off-screen stride padding and use aligned pair stores.
 // ---------------------------------------------------------------------------
 void fb_clear(uint16_t c) {
-    volatile uint32_t *p = fb_pairs();
+    volatile uint16_t *fb = fb_pixels();
     uint32_t pair = ((uint32_t)c << 16) | c;
-    int n = FB_WORDS / 2;
-    for (int i = 0; i < n; i++) {
-        p[i] = pair;
+    int pairs = FB_W / 2;
+    for (int y = 0; y < FB_H; y++) {
+        volatile uint32_t *row = (volatile uint32_t *)&fb[y * FB_STRIDE];
+        for (int i = 0; i < pairs; i++) {
+            row[i] = pair;
+        }
     }
 }
 
@@ -117,25 +120,42 @@ int fb_blit_bmp24(const uint8_t *bmp_data, size_t bmp_size, int x0, int y0) {
     if (h.bi_compression != 0)      return -3;
     if (h.bf_off_bits >= bmp_size)  return -1;
     int w = h.bi_width;
+    if (w <= 0) return -1;
     int top_down = h.bi_height < 0;
     int h_abs = top_down ? -h.bi_height : h.bi_height;
+    if (h_abs <= 0) return 0;
     int row_bytes = (w * 3 + 3) & ~3;
     const uint8_t *px_base = bmp_data + h.bf_off_bits;
     volatile uint16_t *fb = fb_pixels();
+    int dst_x0 = clip_lo(x0, 0);
+    int dst_x1 = clip_hi(x0 + w, FB_W);
+    if (dst_x0 >= dst_x1) return 0;
+    int src_col0 = dst_x0 - x0;
     for (int row = 0; row < h_abs; row++) {
         int src_row = top_down ? row : (h_abs - 1 - row);
         const uint8_t *src = px_base + src_row * row_bytes;
         int dy = y0 + row;
         if ((unsigned)dy >= FB_H) continue;
         if ((size_t)((src - bmp_data) + (size_t)w * 3) > bmp_size) break;
-        int dy_off = dy * FB_STRIDE;
-        for (int col = 0; col < w; col++) {
-            int dx = x0 + col;
-            if ((unsigned)dx >= FB_W) continue;
-            uint8_t b = src[col * 3 + 0];
-            uint8_t g = src[col * 3 + 1];
-            uint8_t r = src[col * 3 + 2];
-            fb[dy_off + dx] = fb_rgb(r, g, b);
+        volatile uint16_t *dst = &fb[dy * FB_STRIDE + dst_x0];
+        const uint8_t *s = src + src_col0 * 3;
+        int pixels = dst_x1 - dst_x0;
+        if (dst_x0 & 1) {
+            dst[0] = fb_rgb(s[2], s[1], s[0]);
+            dst++;
+            s += 3;
+            pixels--;
+        }
+        volatile uint32_t *dst_pair = (volatile uint32_t *)dst;
+        int pairs = pixels >> 1;
+        for (int i = 0; i < pairs; i++) {
+            uint16_t p0 = fb_rgb(s[2], s[1], s[0]);
+            uint16_t p1 = fb_rgb(s[5], s[4], s[3]);
+            dst_pair[i] = ((uint32_t)p1 << 16) | p0;
+            s += 6;
+        }
+        if (pixels & 1) {
+            dst[pairs * 2] = fb_rgb(s[2], s[1], s[0]);
         }
     }
     return 0;

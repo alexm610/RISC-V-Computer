@@ -99,18 +99,12 @@ static void prompt_filename(char *buf, int max_len) {
     scanf("%s", buf);
 }
 
-void cmd_load_bmp(void) {
-    char path[64];
-    prompt_filename(path, sizeof(path));
-    if (path[0] == '\0') {
-        printf("\r\nNo filename.");
-        return;
-    }
+int load_bmp_from_path(const char *path) {
     printf("\r\nOpening '%s'...", path);
     FRESULT res = f_open(&g_file, path, FA_READ);
     if (res != FR_OK) {
         printf("\r\nf_open failed: %d", res);
-        return;
+        return -1;
     }
     FSIZE_t fsize = f_size(&g_file);
     printf("\r\nSize: %lu bytes", (unsigned long)fsize);
@@ -118,7 +112,7 @@ void cmd_load_bmp(void) {
         printf("\r\nToo big for buffer (%u). Aborting.",
                (unsigned)sizeof(g_bmp_buf));
         f_close(&g_file);
-        return;
+        return -1;
     }
     UINT br, total = 0;
     while (total < fsize) {
@@ -127,7 +121,7 @@ void cmd_load_bmp(void) {
         if (res != FR_OK) {
             printf("\r\nf_read failed: %d at %lu", res, (unsigned long)total);
             f_close(&g_file);
-            return;
+            return -1;
         }
         if (br == 0) break;
         total += br;
@@ -138,7 +132,19 @@ void cmd_load_bmp(void) {
     if (rc != 0) {
         printf("\r\nfb_blit_bmp24 failed: %d", rc);
         printf("\r\n  -1=bad magic, -2=not 24bpp, -3=compressed");
-    } else {
-        printf("\r\nDone.");
+        return -1;
     }
+
+    printf("\r\nDone.");
+    return 0;
+}
+
+void cmd_load_bmp(void) {
+    char path[64];
+    prompt_filename(path, sizeof(path));
+    if (path[0] == '\0') {
+        printf("\r\nNo filename.");
+        return;
+    }
+    (void)load_bmp_from_path(path);
 }
