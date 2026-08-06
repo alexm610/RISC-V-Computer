@@ -8,7 +8,9 @@ module address_decoder (
 		output logic Keyboard_Select_H,
 		output logic UART_Select_H,
 		output logic ExpAccel_Select_H,
-		output logic I2CSPI_Select_H
+		output logic I2CSPI_Select_H,
+		output logic AudioI2S_Select_H,
+		output logic AudioI2C_Select_H
 );
 
 	always @(*) begin
@@ -20,6 +22,8 @@ module address_decoder (
 		UART_Select_H		<= 0;
 		ExpAccel_Select_H	<= 0;
 		I2CSPI_Select_H		<= 0;
+		AudioI2S_Select_H	<= 0;
+		AudioI2C_Select_H	<= 0;
 
 		if ((Address >= 32'h00000000) && (Address <= 32'h0001FFFF)) begin
 			ROM_Select_H		<= 1;
@@ -31,6 +35,14 @@ module address_decoder (
 
 		if ((Address >= 32'h00408020) && (Address <= 32'h00408033)) begin
 			I2CSPI_Select_H		<= 1;
+		end
+
+		if ((Address >= 32'h00409000) && (Address <= 32'h0040901F)) begin
+			AudioI2S_Select_H	<= 1;
+		end
+
+		if ((Address >= 32'h00409100) && (Address <= 32'h0040911F)) begin
+			AudioI2C_Select_H	<= 1;
 		end
 
 		if ((Address >= 32'h04040000) && (Address <= 32'h0407FFFF)) begin

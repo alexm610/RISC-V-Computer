@@ -33,7 +33,15 @@ module risc_v_core (
     output logic [1:0]  DRAM_BA,
     inout  wire  [15:0] DRAM_DQ,
     output logic        DRAM_UDQM,
-    output logic        DRAM_LDQM
+    output logic        DRAM_LDQM,
+    output logic        AUD_XCK,
+    output logic        AUD_BCLK,
+    output logic        AUD_DACLRCK,
+    output logic        AUD_DACDAT,
+    output logic        FPGA_I2C_SCLK,
+    inout  wire         FPGA_I2C_SDAT,
+    output logic        AUD_ADCLRCK,
+    input  logic        AUD_ADCDAT
 );
 
     logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select, vga_ready;
@@ -57,6 +65,8 @@ module risc_v_core (
     logic [7:0] data_out_I2CSPI;
     logic I2CSPI_Select;
     logic clk_12;
+    logic AudioI2S_Select, AudioI2C_Select;
+    logic [31:0] data_out_AudioI2S, data_out_AudioI2C;
 
     // ── Framebuffer burst port + VGA MMIO readback ──────────────────────────
     logic        fb_req, fb_valid, fb_done;
@@ -111,7 +121,9 @@ module risc_v_core (
         .Keyboard_Select_H(Keyboard_Select),
         .UART_Select_H(UART_Select),
         .ExpAccel_Select_H(Exponent_Accelerator_Select),
-        .I2CSPI_Select_H(I2CSPI_Select)
+        .I2CSPI_Select_H(I2CSPI_Select),
+        .AudioI2S_Select_H(AudioI2S_Select),
+        .AudioI2C_Select_H(AudioI2C_Select)
     );
 
     data_bus_multiplexer DATABUS_MULTIPLEXER (
@@ -122,6 +134,8 @@ module risc_v_core (
         .Select_UART(UART_Select),
         .Select_EXP(Exponent_Accelerator_Select),
         .Select_I2CSPI(I2CSPI_Select),
+        .Select_AudioI2S(AudioI2S_Select),
+        .Select_AudioI2C(AudioI2C_Select),
         .Select_VGA(Graphics_Select),
         .DataIn_KEYBOARD(data_out_KEYBOARD),
         .DataIn_SRAM(data_out_SRAM),
@@ -130,6 +144,8 @@ module risc_v_core (
         .DataIn_UART(data_out_UART),
         .DataIn_EXP(data_out_EXP),
         .DataIn_I2CSPI(data_out_I2CSPI),
+        .DataIn_AudioI2S(data_out_AudioI2S),
+        .DataIn_AudioI2C(data_out_AudioI2C),
         .DataIn_VGA(data_out_VGA),
         .DataOut_CPU(data_in)
     );
@@ -265,6 +281,37 @@ module risc_v_core (
 	    .SSN_O(GPIO_0[27])
     );
 
+    audio_i2s_controller AUDIO_I2S_0 (
+        .bus_clk     (clk_50),
+        .audio_clk   (clk_12),
+        .reset_n     (Reset_L),
+        .select      (AudioI2S_Select),
+        .AS_L        (AS_L),
+        .WE_L        (WE_L),
+        .Address     (address),
+        .DataIn      (data_out),
+        .DataOut     (data_out_AudioI2S),
+        .AUD_XCK     (AUD_XCK),
+        .AUD_BCLK    (AUD_BCLK),
+        .AUD_DACLRCK (AUD_DACLRCK),
+        .AUD_DACDAT  (AUD_DACDAT),
+        .AUD_ADCLRCK (AUD_ADCLRCK),
+        .AUD_ADCDAT  (AUD_ADCDAT)
+    );
+
+    i2c_master_mmio AUDIO_I2C_0 (
+        .clk     (clk_50),
+        .reset_n (Reset_L),
+        .select  (AudioI2C_Select),
+        .AS_L    (AS_L),
+        .WE_L    (WE_L),
+        .Address (address),
+        .DataIn  (data_out),
+        .DataOut (data_out_AudioI2C),
+        .scl     (FPGA_I2C_SCLK),
+        .sda     (FPGA_I2C_SDAT)
+    );
+
     /*
     exponent_accelerator EXP_ACCELERATOR_0 (
         .clk(CLOCK_50),
@@ -286,6 +333,8 @@ module data_bus_multiplexer (
     input logic         Select_UART,
     input logic         Select_EXP,
     input logic         Select_I2CSPI,
+    input logic         Select_AudioI2S,
+    input logic         Select_AudioI2C,
     input logic         Select_VGA,
     input logic [31:0]  DataIn_EXP,
     input logic [31:0]  DataIn_UART,
@@ -294,6 +343,8 @@ module data_bus_multiplexer (
     input logic [31:0]  DataIn_IO,
     input logic [31:0]  DataIn_ROM,
     input logic [31:0]  DataIn_I2CSPI,
+    input logic [31:0]  DataIn_AudioI2S,
+    input logic [31:0]  DataIn_AudioI2C,
     input logic [31:0]  DataIn_VGA,
     output logic [31:0] DataOut_CPU
 );
@@ -327,6 +378,14 @@ module data_bus_multiplexer (
 
         if (Select_I2CSPI == 1) begin
             DataOut_CPU     = DataIn_I2CSPI;
+        end else
+
+        if (Select_AudioI2S == 1) begin
+            DataOut_CPU     = DataIn_AudioI2S;
+        end else
+
+        if (Select_AudioI2C == 1) begin
+            DataOut_CPU     = DataIn_AudioI2C;
         end else
 
         if (Select_VGA == 1) begin
