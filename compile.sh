@@ -49,8 +49,8 @@ trap finish EXIT
 usage() {
     cat <<USAGE
 Usage:
-  ./compile.sh           Build programs/instructions.mif and run full Quartus compile
-  ./compile.sh --update  Build programs/instructions.mif and update only the .sof MIF contents
+  ./compile.sh           Build programs/bootloader.mif and run full Quartus compile
+  ./compile.sh --update  Build programs/bootloader.mif and update only the .sof MIF contents
   ./compile.sh --flash   Program the existing .sof to JTAG device ${FLASH_DEVICE_INDEX}
   ./compile.sh --help    Show this help
 
@@ -83,15 +83,15 @@ case "${1:-}" in
 esac
 
 if [[ "${MODE}" == "full" ]]; then
-    echo "==> Building program image"
-    make -C "${PROGRAMS_DIR}"
+    echo "==> Building ROM bootloader image"
+    make -C "${PROGRAMS_DIR}" -f Makefile.bootloader
 
     echo "==> Running full Quartus compile"
     cd "${SOURCE_DIR}"
     quartus_sh --flow compile "${PROJECT}"
 elif [[ "${MODE}" == "update" ]]; then
-    echo "==> Building program image"
-    make -C "${PROGRAMS_DIR}"
+    echo "==> Building ROM bootloader image"
+    make -C "${PROGRAMS_DIR}" -f Makefile.bootloader
 
     echo "==> Updating MIF contents in existing Quartus database"
     cd "${SOURCE_DIR}"

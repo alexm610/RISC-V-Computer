@@ -8,3 +8,4 @@
 *.srec
 *.hex
 *.o
+*.map

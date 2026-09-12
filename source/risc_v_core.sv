@@ -50,7 +50,7 @@ module risc_v_core (
     logic [3:0] fabric_write, fabric_read;
     logic [31:0] program_counter;
     logic [31:0] address;
-    logic [31:0] instruction, dummy_instr_writedata, datapath_output, data_in, data_out, fabric_data_out, ram_output, sw_output, ledr_output, SRAM_data_out, data_out_IO, data_out_SRAM;
+    logic [31:0] instruction_rom, instruction_fetch_data, dummy_instr_writedata, datapath_output, data_in, data_out, fabric_data_out, ram_output, sw_output, ledr_output, SRAM_data_out, data_out_IO, data_out_SRAM;
     logic [31:0] readdata_bus [0:2];
     logic [7:0] fill_x;
     logic [6:0] fill_y;
@@ -81,6 +81,12 @@ module risc_v_core (
     assign VGA_B            = VGA_B_10[9:2];
     assign LEDR[9]          = IRQ_timer;
 
+    // The PC already drives `address` while the CPU is fetching.  Select the
+    // instruction source from the decoded address: boot code executes from
+    // on-chip ROM, while programs linked into 0x08000000-0x0BFFFFFF execute
+    // directly from SDRAM through the normal CPU read port.
+    assign instruction_fetch_data = RAM_Select ? data_out_SRAM : instruction_rom;
+
     // exponent accelerator is disabled; keep its read-data driven so the mux
     // never sees an undriven bus when ExpAccel_Select happens to assert.
     assign data_out_EXP     = 32'h0;
@@ -101,7 +107,7 @@ module risc_v_core (
         .DTAck(RAM_Select ? sdram_dtack_h : 1'b1),
         .IRQ_Timer_H(IRQ_timer),
         .IRQ_UART_H(1'b0),
-        .Instruction(instruction),
+        .Instruction(instruction_fetch_data),
         .DataBus_In(data_in),
         .AS_L(AS_L),
         .Byte_Enable(byte_enable),
@@ -140,7 +146,7 @@ module risc_v_core (
         .DataIn_KEYBOARD(data_out_KEYBOARD),
         .DataIn_SRAM(data_out_SRAM),
         .DataIn_IO(data_out_IO),
-        .DataIn_ROM(instruction),
+        .DataIn_ROM(instruction_rom),
         .DataIn_UART(data_out_UART),
         .DataIn_EXP(data_out_EXP),
         .DataIn_I2CSPI(data_out_I2CSPI),
@@ -156,7 +162,7 @@ module risc_v_core (
         .Write_Enable(test_write),
         .Address(address>>2),
         .DataIn(dummy_instr_writedata),
-        .DataOut(instruction)
+        .DataOut(instruction_rom)
     );
 
     // ── SDRAM: single owner, arbitrating CPU single-access + FB burst port ──

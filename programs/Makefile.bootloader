@@ -1,0 +1,37 @@
+CC      = riscv32-unknown-elf-gcc
+OBJCOPY = riscv32-unknown-elf-objcopy
+SREC    = srec_cat
+
+CFLAGS  = -march=rv32i_zicsr -mabi=ilp32 -Wall -Wextra -Os \
+          -ffunction-sections -fdata-sections
+LDFLAGS = -T bootloader.ld --specs=nano.specs -nostartfiles \
+          -Wl,--gc-sections -Wl,-Map,bootloader.map
+LIBS    = -lc -lgcc
+
+SRCS = bootloader_start.s bootloader.c uart.c syscalls.c spi.c \
+       sd_spi.c diskio.c ff.c
+
+.PHONY: all clean
+
+all: bootloader.mif
+
+bootloader.elf: $(SRCS) bootloader.ld ff.h ffconf.h diskio.h sd_spi.h spi.h \
+                uart.h instructions.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCS) $(LIBS)
+
+bootloader.bin: bootloader.elf
+	$(OBJCOPY) -O binary $< $@
+
+bootloader.srec: bootloader.bin
+	$(SREC) $< -binary -o bootloader.raw.srec
+	$(SREC) bootloader.raw.srec -byte-swap 4 > bootloader.swapped.srec
+	$(SREC) bootloader.swapped.srec -fill 0x00 \
+		-within bootloader.swapped.srec -range-padding 4 > $@
+
+bootloader.mif: bootloader.srec
+	$(SREC) -Output -Memory_Initialization_File 32 $< \
+		-Output_Block_Size 4 -DISable Execution_Start_Address > $@
+
+clean:
+	$(RM) bootloader.elf bootloader.bin bootloader.srec bootloader.mif \
+		bootloader.raw.srec bootloader.swapped.srec bootloader.map

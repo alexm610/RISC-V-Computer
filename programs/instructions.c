@@ -124,9 +124,9 @@ int main(void) {
 
     Initialize_LCD();
     Init_RS232();
-    audio_init();
-    int codec_rc = audio_codec_init();
-    printf("\r\nAudio codec result: %d", codec_rc);
+    //audio_init();
+    //int codec_rc = audio_codec_init();
+    //printf("\r\nAudio codec result: %d", codec_rc);
     LCD_line0(message1);
     LCD_line1(message2);
 
@@ -147,8 +147,8 @@ int main(void) {
     fb_clear(FB_BLACK);
     printf("\r\nWelcome to DOOM!\r\n");
     //audio_play_test_tone(5000, 5000);
-    int audio_rc = audio_play_wav("SANDMAN.WAV");
-    printf("\r\nAudio result: %d", audio_rc);
+    //int audio_rc = audio_play_wav("SANDMAN.WAV");
+    //printf("\r\nAudio result: %d", audio_rc);
     menu();
     return 0;
 }

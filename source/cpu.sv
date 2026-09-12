@@ -18,7 +18,7 @@ module cpu (
 );
 
     // CPU signals
-    enum {LATCH_INSTRUCTION, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1, IRQ_0, IRQ_2_STALL, IRQ_4_STALL} State;
+    enum {LATCH_INSTRUCTION, FETCH_WAIT, INITIALIZE, START, WRITE_BACK, INCREMENT_PC, COMPLETE, ACCESS_MEMORY_1, ACCESS_MEMORY_2, WRITE_MEMORY_1, WRITE_MEMORY_2, BRANCH_EQ, BRANCH_NE, BRANCH_LT, BRANCH_GE, BRANCH_LTU, BRANCH_GEU, JUMP_LINK_1, JUMP_LINK_2, JUMP_LINK_3, LOAD_UPPER_IMM_1, CSR_WRITE_BACK, CSRRW_WRITE_1, CSRRW_WRITE_2, CSRRS_WRITE_1, CSRRS_WRITE_2, CSRRC_WRITE_1, CSRRC_WRITE_2, MRET_1, MRET_2, IRQ_1, IRQ_2, IRQ_3, IRQ_4, IRQ_5, CSRRWI_1, CSRRSI_1, CSRRCI_1, IRQ_0, IRQ_2_STALL, IRQ_4_STALL} State;
     logic           mem_or_reg, jump_link, load_upper_imm, instruction_fetch, save_pc;
     logic           CSR_process;
     logic           CSR_WE_L;
@@ -577,14 +577,29 @@ module cpu (
                     end
                 end
                 INCREMENT_PC: begin
-                    State   <= LATCH_INSTRUCTION;
-                    // delay one clock cycle for new instruction to appear on output bus of SRAM
-                    CSR_WE_L <= 1'b1;
+                    // Instruction fetches use the same address/strobe/DTACK
+                    // transaction as data reads.  ROM acknowledges immediately;
+                    // SDRAM holds DTACK low until both 16-bit halves are ready.
+                    // Always spend one full cycle in FETCH_WAIT before looking
+                    // at DTACK.  This prevents a DONE/DTACK from the preceding
+                    // load or store being consumed as the next instruction.
+                    State         <= FETCH_WAIT;
+                    AS_L          <= 1'b0;
+                    WE_L          <= 1'b1;
+                    CSR_WE_L      <= 1'b1;
+                end
+                FETCH_WAIT: begin
+                    State <= LATCH_INSTRUCTION;
                 end
                 LATCH_INSTRUCTION: begin
-                    State <= START;
-                    Current_Instruction <= Instruction;
-                    save_pc <= 1;
+                    if (DTAck) begin
+                        State               <= START;
+                        Current_Instruction <= Instruction;
+                        AS_L                <= 1'b1;
+                        save_pc             <= 1;
+                    end else begin
+                        State <= LATCH_INSTRUCTION;
+                    end
                 end
                 ACCESS_MEMORY_1: begin
                     State       <= ACCESS_MEMORY_2;
