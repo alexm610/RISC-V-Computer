@@ -44,13 +44,13 @@ module risc_v_core (
     input  logic        AUD_ADCDAT
 );
 
-    logic write_d_mem, test_write, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select, vga_ready;
+    logic write_d_mem, read_d_mem, valid, AS_L, WE_L, Reset_L, UART_Select, Exponent_Accelerator_Select, vga_ready;
     logic [7:0] data_out_RS232;
     logic [3:0] byte_enable;
     logic [3:0] fabric_write, fabric_read;
     logic [31:0] program_counter;
     logic [31:0] address;
-    logic [31:0] instruction, dummy_instr_writedata, datapath_output, data_in, data_out, fabric_data_out, ram_output, sw_output, ledr_output, SRAM_data_out, data_out_IO, data_out_SRAM;
+    logic [31:0] instruction, datapath_output, data_in, data_out, fabric_data_out, ram_output, sw_output, ledr_output, SRAM_data_out, data_out_IO, data_out_SRAM;
     logic [31:0] readdata_bus [0:2];
     logic [7:0] fill_x;
     logic [6:0] fill_y;
@@ -101,7 +101,8 @@ module risc_v_core (
         .DTAck(RAM_Select ? sdram_dtack_h : 1'b1),
         .IRQ_Timer_H(IRQ_timer),
         .IRQ_UART_H(1'b0),
-        .Instruction(instruction),
+        // Fetches and data loads share the address-decoded ROM/SDRAM bus.
+        .Instruction(data_in),
         .DataBus_In(data_in),
         .AS_L(AS_L),
         .Byte_Enable(byte_enable),
@@ -153,9 +154,9 @@ module risc_v_core (
     OnChipROM16KWords INSTRUCTION_MEMORY (
         .Clock(clk_50),
         .RomSelect_H(ROM_Select),
-        .Write_Enable(test_write),
+        .Write_Enable(1'b0),
         .Address(address>>2),
-        .DataIn(dummy_instr_writedata),
+        .DataIn(32'h0),
         .DataOut(instruction)
     );
 

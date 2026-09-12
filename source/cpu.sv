@@ -29,7 +29,7 @@ module cpu (
     logic [11:0]    CSR_address;
     logic [19:0]    imm_U_TYPE;
     logic [20:0]    imm_J_TYPE;
-    logic [31:0]    datapath_in, Program_Counter, Current_Instruction;
+    logic [31:0]    datapath_in, Program_Counter, Current_Instruction, jump_target;
     logic [31:0]    CSR_read_data, CSR_write_data, CSR_read_data_temp;
     logic [31:0]    imm_CSR_TYPE;
     // Data path signals
@@ -140,28 +140,33 @@ module cpu (
     always @(*) begin
         Byte_Enable <= 4'b0000; // disable Byte_Enable by default
 
-        if (funct3 == 3'h0) begin
-            case (Address[1:0]) 
-                2'b00: Byte_Enable <= 4'b0001; // we are writing a byte at no offset
-                2'b01: Byte_Enable <= 4'b0010; // we are writing a byte at offset = 1
-                2'b10: Byte_Enable <= 4'b0100; // writing a byte at offset = 2
-                2'b11: Byte_Enable <= 4'b1000; // writing a byte at offset = 3
-            endcase
-        end 
+        if (instruction_fetch) begin
+            // Fetch both 16-bit SDRAM halves, independent of the previous opcode.
+            Byte_Enable <= 4'b1111;
+        end else begin
+            if (funct3 == 3'h0) begin
+                case (Address[1:0])
+                    2'b00: Byte_Enable <= 4'b0001; // we are writing a byte at no offset
+                    2'b01: Byte_Enable <= 4'b0010; // we are writing a byte at offset = 1
+                    2'b10: Byte_Enable <= 4'b0100; // writing a byte at offset = 2
+                    2'b11: Byte_Enable <= 4'b1000; // writing a byte at offset = 3
+                endcase
+            end
 
-        if (funct3 == 3'h1) begin
-            case (Address[1:0]) 
-                2'b00: Byte_Enable <= 4'b0011; // writing a half-word at offset = 0
-                2'b10: Byte_Enable <= 4'b1100; // writing a half-word at offset = 2
-                default: Byte_Enable <= 4'b0000; // we cannot write a half word at offset = 3 or offset = 1, as this is misaligned. Half words must be aligned at byte multiples of 2
-            endcase 
-        end
+            if (funct3 == 3'h1) begin
+                case (Address[1:0])
+                    2'b00: Byte_Enable <= 4'b0011; // writing a half-word at offset = 0
+                    2'b10: Byte_Enable <= 4'b1100; // writing a half-word at offset = 2
+                    default: Byte_Enable <= 4'b0000; // we cannot write a half word at offset = 3 or offset = 1, as this is misaligned. Half words must be aligned at byte multiples of 2
+                endcase
+            end
 
-        if (funct3 == 3'h2) begin
-            Byte_Enable <= 4'b0000; // disable Byte_Enable, unless condition below is met
+            if (funct3 == 3'h2) begin
+                Byte_Enable <= 4'b0000; // disable Byte_Enable, unless condition below is met
 
-            if (Address[1:0] == 2'b00) begin
-                Byte_Enable <= 4'b1111;
+                if (Address[1:0] == 2'b00) begin
+                    Byte_Enable <= 4'b1111;
+                end
             end
         end
     end
@@ -223,6 +228,7 @@ module cpu (
         if (Reset_L == 0) begin
             State                       <= INITIALIZE;
             Program_Counter             <= 32'h00000000;
+            jump_target                 <= 32'h00000000;
             AS_L                        <= 1;
             WE_L                        <= 1;
             mem_or_reg                  <= 0;
@@ -485,8 +491,8 @@ module cpu (
                         // increment program counter by immediate
                         Program_Counter <= Program_Counter + imm;
                     end else if (Program_Counter_Increment == 2'b10) begin
-                        // set program counter to output of data path
-                        Program_Counter <= datapath_out;
+                        // use the JALR target captured before link-register writeback
+                        Program_Counter <= jump_target;
                     end
 
                     if (IRQ_pending == 0) begin
@@ -578,13 +584,22 @@ module cpu (
                 end
                 INCREMENT_PC: begin
                     State   <= LATCH_INSTRUCTION;
-                    // delay one clock cycle for new instruction to appear on output bus of SRAM
+                    // The preceding cycle released AS_L and selected the PC.
+                    // Start a read only after the old transaction can retire.
+                    instruction_fetch <= 1'b1;
+                    WE_L <= 1'b1;
+                    AS_L <= 1'b0;
                     CSR_WE_L <= 1'b1;
                 end
                 LATCH_INSTRUCTION: begin
-                    State <= START;
-                    Current_Instruction <= Instruction;
-                    save_pc <= 1;
+                    // Hold the PC and request stable through SDRAM wait states.
+                    // ROM also has a full clock cycle to produce its word.
+                    if (DTAck) begin
+                        Current_Instruction <= Instruction;
+                        AS_L <= 1'b1;
+                        State <= START;
+                        save_pc <= 1;
+                    end
                 end
                 ACCESS_MEMORY_1: begin
                     State       <= ACCESS_MEMORY_2;
@@ -704,8 +719,8 @@ module cpu (
                     State           <= JUMP_LINK_3;
                     // write to register bank PC + 4
                     reg_bank_write  <= 1'b1;
-                    // disable jump_link so the destination register is not updated after this state
-                    jump_link       <= 1'b0;
+                    // Keep PC+4 selected until the link register is written
+                    // on the next edge (JUMP_LINK_3).
                     // begin ALU operation to sum RS1 + imm
                     alu_OP[2:0]     <= `ADDSUB;
                     alu_SRC         <= 1'b0;
@@ -714,11 +729,14 @@ module cpu (
                 JUMP_LINK_3: begin
                     State           <= COMPLETE;
 
-                    // we are no longer writing to the register bank
+                    // Capture the target before the link write can change rs1
+                    // (jalr permits rd == rs1), and clear target bit zero.
+                    jump_target     <= {datapath_out[31:1], 1'b0};
+                    // The link register captured PC+4 on this edge.
                     reg_bank_write  <= 0;
+                    jump_link       <= 1'b0;
 
-                    // program counter gets RS1 + imm
-                    //Program_Counter <= datapath_out;
+                    // COMPLETE transfers the captured JALR target to the PC.
                     Program_Counter_Increment <= 2'b10;
                 end
                 LOAD_UPPER_IMM_1: begin
