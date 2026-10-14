@@ -171,7 +171,7 @@ module cpu (
         end
     end
 
-     always @(*) begin
+    always @(*) begin
         if (mem_or_reg == 1) begin
             case (funct3)
                 3'h0: begin
