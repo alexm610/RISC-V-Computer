@@ -495,37 +495,24 @@ module cpu (
                         Program_Counter <= jump_target;
                     end
 
+                    // The register bank commits the retiring result on this
+                    // edge. Clear its controls for both the next fetch and IRQ
+                    // entry so that writeback cannot repeat during either path.
+                    reg_bank_write    <= 1'b0;
+                    mem_or_reg        <= 1'b0;
+                    WE_L              <= 1'b1;
+                    AS_L              <= 1'b1;
+                    load_upper_imm    <= 1'b0;
+                    instruction_fetch <= 1'b1;
+                    jump_link         <= 1'b0;
+                    CSR_process       <= 1'b0;
+
                     if (IRQ_pending == 0) begin
                         State <= INCREMENT_PC;
-                        // disable control signals in preparation for next instruction cycle
-                        reg_bank_write  <= 1'b0;
-                        mem_or_reg      <= 1'b0;
-                        WE_L            <= 1'b1;
-                        AS_L            <= 1'b1;
-                        load_upper_imm  <= 0;
-                        instruction_fetch <= 1;
-                        jump_link       <= 0;
-                        CSR_process     <= 0;
-                        // if (Program_Counter_Increment == 2'b00) begin
-                        //     // increment program counter by 4
-                        //     Program_Counter <= Program_Counter + 32'h4;
-                        // end else if (Program_Counter_Increment == 2'b01) begin
-                        //     // increment program counter by immediate
-                        //     Program_Counter <= Program_Counter + imm;
-                        // end else if (Program_Counter_Increment == 2'b10) begin
-                        //     // set program counter to output of data path
-                        //     Program_Counter <= datapath_out;
-                        // end
                     end else begin
-                        State               <= IRQ_0;
-                        instruction_fetch   <= 1;
-                        MSTATUS_temp        <= 32'h0;
-                        //CSR_write_data      <= Program_Counter;
-                        CSR_address         <= 12'h341; 
-                        //CSR_WE_L            <= 1'b0;
-                        WE_L            <= 1'b1;
-                        AS_L            <= 1'b1;
-                        mem_or_reg <= 1'b0;
+                        State        <= IRQ_0;
+                        MSTATUS_temp <= 32'h0;
+                        CSR_address  <= 12'h341;
                     end
                 end
                 IRQ_0: begin

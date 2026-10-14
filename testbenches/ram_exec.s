@@ -77,6 +77,68 @@ wait_rom_irq:
     sw t1, 0(t0)
 wait_ram_irq:
     bne s2, t1, wait_ram_irq
+
+    /* Arm an IRQ on the following register-writing instruction's retirement.
+       The RAM ISR deliberately starts with an ADDI so stale writeback selectors
+       cannot silently survive interrupt entry. Keep s3 for the retired result. */
+    li t0, 0x00400008
+    li s3, 7
+    li t1, 1
+    sw t1, 0(t0)
+    addi s3, s3, 3
+    li t1, 10
+    bne s3, t1, ram_fail
+    li t1, 3
+    bne s2, t1, ram_fail
+
+    li t1, 2
+    sw t1, 0(t0)
+    lui s3, 0x12345
+    li t1, 0x12345000
+    bne s3, t1, ram_fail
+    li t1, 4
+    bne s2, t1, ram_fail
+
+    la t2, irq_jal_link
+    li t1, 3
+    sw t1, 0(t0)
+    jal s3, irq_jal_target
+irq_jal_link:
+    j ram_fail
+irq_jal_target:
+    bne s3, t2, ram_fail
+    li t1, 5
+    bne s2, t1, ram_fail
+
+    la s3, irq_jalr_target
+    la t2, irq_jalr_link
+    li t1, 4
+    sw t1, 0(t0)
+    jalr s3, 0(s3)
+irq_jalr_link:
+    j ram_fail
+irq_jalr_target:
+    bne s3, t2, ram_fail
+    li t1, 6
+    bne s2, t1, ram_fail
+
+    li t1, 5
+    sw t1, 0(t0)
+    csrrs s3, mie, zero
+    li t1, 128
+    bne s3, t1, ram_fail
+    li t1, 7
+    bne s2, t1, ram_fail
+
+    li t1, 0x51a7c0de
+    sw t1, 0(s1)
+    li t1, 6
+    sw t1, 0(t0)
+    lw s3, 0(s1)
+    li t1, 0x51a7c0de
+    bne s3, t1, ram_fail
+    li t1, 8
+    bne s2, t1, ram_fail
     ret
 ram_fail:
     la t0, fail

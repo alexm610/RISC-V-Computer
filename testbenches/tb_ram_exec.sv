@@ -19,6 +19,24 @@ module tb_ram_exec;
     logic fetch_pending = 0;
     logic [31:0] fetched_word;
     wire [15:0] dram_dq;
+    integer irq_arm_case = 0, irq_probe_case = 0;
+    integer irq_handler_waits = 0;
+    logic [5:0] irq_writeback_coverage = 0;
+    logic irq_probe = 0, irq_before_handler = 0, irq_return_pending = 0;
+    logic [31:0] irq_armed_target, irq_retired_value, irq_resume_pc, irq_expected_count;
+
+    function automatic logic irq_target_instruction(input integer test_case,
+                                                     input logic [31:0] instruction);
+        case (test_case)
+            1: irq_target_instruction = instruction[6:0] == 7'h13;
+            2: irq_target_instruction = instruction[6:0] == 7'h37;
+            3: irq_target_instruction = instruction[6:0] == 7'h6f;
+            4: irq_target_instruction = instruction[6:0] == 7'h67;
+            5: irq_target_instruction = instruction[6:0] == 7'h73;
+            6: irq_target_instruction = instruction[6:0] == 7'h03;
+            default: irq_target_instruction = 0;
+        endcase
+    endfunction
 
     always #10 Clock = ~Clock;
     assign DTAck = ram_select ? ram_ack : 1'b1;
@@ -74,6 +92,75 @@ module tb_ram_exec;
             rom_data <= 32'hxxxxxxxx;
     end
 
+    // Inject before the retirement edge, then check architectural state while
+    // interrupt entry and the delayed RAM-vector fetch are in progress.
+    always @(negedge Clock) begin
+        if (Reset_L) begin
+            if (irq_probe) begin
+                if (dut.HW.REGISTER_BANK.x19 !== irq_retired_value)
+                    $fatal(1, "IRQ case %0d changed retired s3: expected=%h actual=%h",
+                           irq_probe_case, irq_retired_value, dut.HW.REGISTER_BANK.x19);
+
+                if (irq_before_handler && dut.State == dut.LATCH_INSTRUCTION) begin
+                    if (dut.Program_Counter !== {dut.MTVEC_BASE, 2'b00} ||
+                        dut.MEPC !== irq_resume_pc)
+                        $fatal(1, "IRQ case %0d saved wrong return PC or fetched wrong vector",
+                               irq_probe_case);
+                    if (dut.reg_bank_write !== 0 || dut.load_upper_imm !== 0 ||
+                        dut.jump_link !== 0 || dut.CSR_process !== 0 || dut.mem_or_reg !== 0)
+                        $fatal(1, "IRQ case %0d retained instruction controls during vector fetch",
+                               irq_probe_case);
+                    if (!DTAck) irq_handler_waits = irq_handler_waits + 1;
+                end
+                if (irq_before_handler && dut.State == dut.START &&
+                    dut.Program_Counter == {dut.MTVEC_BASE, 2'b00})
+                    irq_before_handler = 0;
+
+                if (irq_return_pending) begin
+                    if (dut.State != dut.INCREMENT_PC || dut.Program_Counter !== irq_resume_pc ||
+                        dut.HW.REGISTER_BANK.x18 !== irq_expected_count)
+                        $fatal(1, "IRQ case %0d failed to resume once after running the ISR",
+                               irq_probe_case);
+                    irq_writeback_coverage[irq_probe_case - 1] = 1;
+                    irq_probe = 0;
+                    irq_return_pending = 0;
+                end else if (!irq_before_handler && dut.State == dut.MRET_2) begin
+                    irq_return_pending = 1;
+                end
+            end
+
+            if (irq_arm_case != 0 && dut.State == dut.COMPLETE &&
+                irq_target_instruction(irq_arm_case, dut.Current_Instruction)) begin
+                if (!dut.MIE || IRQ_Timer_H || dut.rd0 != 19)
+                    $fatal(1, "Invalid IRQ retirement injection for case %0d", irq_arm_case);
+                irq_probe_case = irq_arm_case;
+                irq_resume_pc = dut.Program_Counter + 4;
+                case (irq_arm_case)
+                    1: irq_retired_value = 32'd10;
+                    2: irq_retired_value = 32'h12345000;
+                    3: begin
+                        irq_retired_value = dut.Program_Counter + 4;
+                        irq_resume_pc = dut.Program_Counter +
+                            {{11{dut.Current_Instruction[31]}}, dut.Current_Instruction[31],
+                             dut.Current_Instruction[19:12], dut.Current_Instruction[20],
+                             dut.Current_Instruction[30:21], 1'b0};
+                    end
+                    4: begin
+                        irq_retired_value = dut.Program_Counter + 4;
+                        irq_resume_pc = {irq_armed_target[31:1], 1'b0};
+                    end
+                    5: irq_retired_value = 32'd128;
+                    6: irq_retired_value = 32'h51a7c0de;
+                endcase
+                irq_expected_count = dut.HW.REGISTER_BANK.x18 + 1;
+                irq_probe = 1;
+                irq_before_handler = 1;
+                irq_arm_case = 0;
+                IRQ_Timer_H <= 1;
+            end
+        end
+    end
+
     initial begin
         if (!$value$plusargs("image=%s", image_path))
             $fatal(1, "Missing +image=ROM_HEX");
@@ -124,14 +211,22 @@ module tb_ram_exec;
                         if (Address == 32'h00400004) begin
                             IRQ_Timer_H <= 1;
                         end
+                        if (Address == 32'h00400008) begin
+                            if (irq_probe || irq_arm_case != 0 ||
+                                DataBus_Out < 1 || DataBus_Out > 6)
+                                $fatal(1, "Invalid IRQ test marker: %h", DataBus_Out);
+                            irq_arm_case = DataBus_Out;
+                            irq_armed_target = dut.HW.REGISTER_BANK.x19;
+                        end
                         if (Address == 32'h00400000) begin
                             if (DataBus_Out !== 32'h600d)
                                 $fatal(1, "Program reported failure: %h", DataBus_Out);
                             if (ram_fetches < 30 || rom_fetches < 30 ||
-                                ram_data_reads < 6 || ram_writes < 10 || irq_entries != 2)
+                                ram_data_reads < 7 || ram_writes < 11 || irq_entries != 8 ||
+                                irq_writeback_coverage != 6'b111111 || irq_handler_waits == 0)
                                 $fatal(1, "Missing execution/interrupt coverage");
-                            $display("PASS: ROM copy -> RAM execution -> ROM return; byte/half/word data, ROM/RAM IRQ + mret; fetches ROM=%0d RAM=%0d",
-                                     rom_fetches, ram_fetches);
+                            $display("PASS: ROM copy -> RAM execution -> ROM return; byte/half/word data, ROM/RAM IRQ + mret; six retirement IRQ cases, vector wait clocks=%0d; fetches ROM=%0d RAM=%0d",
+                                     irq_handler_waits, rom_fetches, ram_fetches);
                             $finish;
                         end
                     end

@@ -16,6 +16,12 @@ as data, and takes interrupts into both ROM and RAM before returning with
 `mret`. The call also checks `jalr` with the same base/link register and an
 odd target whose low bit must be cleared.
 
+Additional interrupts are injected when ADDI, LUI, JAL, JALR, CSRRS, and a RAM
+load retire. These cases check that the completed register value survives
+interrupt entry, the ISR runs once, and `mepc`/`mret` preserve the correct next
+PC, including jump targets. Writeback controls must stay cleared while the RAM
+interrupt-vector fetch waits for acknowledgement.
+
 Bus assertions check full-word instruction fetches, stable requests through
 wait states, instruction capture only on acknowledgement, and request release
 before the next transaction. Three latency settings are tested.
